@@ -1,90 +1,75 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Enums\TeamPermission;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\Team;
-use App\Models\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class TeamPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return true;
+        return $authUser->can('ViewAny:Team');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Team $team): bool
+    public function view(AuthUser $authUser, Team $team): bool
     {
-        return $user->belongsToTeam($team);
+        return $authUser->can('View:Team');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return true;
+        return $authUser->can('Create:Team');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Team $team): bool
+    public function update(AuthUser $authUser, Team $team): bool
     {
-        return $user->hasTeamPermission($team, TeamPermission::UpdateTeam);
+        return $authUser->can('Update:Team');
     }
 
-    /**
-     * Determine whether the user can add a member to the team.
-     */
-    public function addMember(User $user, Team $team): bool
+    public function delete(AuthUser $authUser, Team $team): bool
     {
-        return $user->hasTeamPermission($team, TeamPermission::AddMember);
+        return $authUser->can('Delete:Team');
     }
 
-    /**
-     * Determine whether the user can update a member's role in the team.
-     */
-    public function updateMember(User $user, Team $team): bool
+    public function deleteAny(AuthUser $authUser): bool
     {
-        return $user->hasTeamPermission($team, TeamPermission::UpdateMember);
+        return $authUser->can('DeleteAny:Team');
     }
 
-    /**
-     * Determine whether the user can remove a member from the team.
-     */
-    public function removeMember(User $user, Team $team): bool
+    public function restore(AuthUser $authUser, Team $team): bool
     {
-        return $user->hasTeamPermission($team, TeamPermission::RemoveMember);
+        return $authUser->can('Restore:Team');
     }
 
-    /**
-     * Determine whether the user can invite members to the team.
-     */
-    public function inviteMember(User $user, Team $team): bool
+    public function forceDelete(AuthUser $authUser, Team $team): bool
     {
-        return $user->hasTeamPermission($team, TeamPermission::CreateInvitation);
+        return $authUser->can('ForceDelete:Team');
     }
 
-    /**
-     * Determine whether the user can cancel invitations.
-     */
-    public function cancelInvitation(User $user, Team $team): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->hasTeamPermission($team, TeamPermission::CancelInvitation);
+        return $authUser->can('ForceDeleteAny:Team');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Team $team): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return ! $team->is_personal && $user->hasTeamPermission($team, TeamPermission::DeleteTeam);
+        return $authUser->can('RestoreAny:Team');
     }
+
+    public function replicate(AuthUser $authUser, Team $team): bool
+    {
+        return $authUser->can('Replicate:Team');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:Team');
+    }
+
 }
