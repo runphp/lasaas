@@ -11,7 +11,7 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class TeamPolicy
 {
     use HandlesAuthorization;
-    
+
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:Team');
@@ -29,7 +29,10 @@ class TeamPolicy
 
     public function update(AuthUser $authUser, Team $team): bool
     {
-        return $authUser->can('Update:Team');
+        return $authUser->can('Update:Team') || $team->members()
+                ->where('user_id', $authUser->id)
+                ->whereIn('role', ['owner', 'admin'])
+                ->exists();
     }
 
     public function delete(AuthUser $authUser, Team $team): bool
