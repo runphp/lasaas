@@ -24,6 +24,15 @@ class TenantResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'Tenant';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('filament-resources.tenant.label');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament-resources.system.group');
+    }
     public static function form(Schema $schema): Schema
     {
         return TenantForm::configure($schema);

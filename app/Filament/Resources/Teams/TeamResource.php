@@ -26,6 +26,15 @@ class TeamResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'Team';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('filament-resources.team.label');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament-resources.system.group');
+    }
     public static function form(Schema $schema): Schema
     {
         return TeamForm::configure($schema);
