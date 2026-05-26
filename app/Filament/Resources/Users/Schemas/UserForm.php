@@ -4,8 +4,8 @@ namespace App\Filament\Resources\Users\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
 class UserForm
@@ -26,6 +26,9 @@ class UserForm
                     ->required(),
                 Select::make('current_team_id')
                     ->relationship('currentTeam', 'name')
+                    ->options(function ($record) {
+                        return $record->teams()->pluck('teams.name', 'teams.id');
+                    })
                     ->default(null),
                 Textarea::make('two_factor_secret')
                     ->default(null)
