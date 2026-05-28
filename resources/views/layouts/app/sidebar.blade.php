@@ -17,15 +17,6 @@
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
-                    @if(auth()->user()->canAccessPanel(filament()->getDefaultPanel()))
-                        <flux:sidebar.item
-                            icon="lock-closed"
-                            href="{{ route('filament.admin.pages.dashboard') }}"
-                            target="_blank"
-                        >
-                            {{ __('Admin Panel') }}
-                        </flux:sidebar.item>
-                    @endif
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

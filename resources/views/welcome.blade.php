@@ -21,6 +21,28 @@
         <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
             @if (Route::has('login'))
                 <nav class="flex items-center justify-end gap-4">
+                    {{-- Language Switcher --}}
+                    <div class="flex items-center gap-2">
+                        @php
+                                $currentLocale = App::currentLocale();
+                                $locales = \LaravelLang\Locales\Facades\Locales::installed();
+                        @endphp
+
+                        @foreach($locales as $locale)
+                            @if($locale->code !== $currentLocale)
+                                <a
+                                    href="{{ localizedRoute('home', ['locale' => $locale->code]) }}"
+                                    class="inline-block px-3 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal transition-colors"
+                                >
+                                    {{ $locale->native }}
+                                </a>
+                            @else
+                                <span class="inline-block px-3 py-1.5 font-medium text-[#f53003] dark:text-[#FF4433]">
+                                    {{ $locale->native }}
+                                </span>
+                            @endif
+                        @endforeach
+                    </div>
                     @auth
                         <a
                             href="{{ route('dashboard') }}"

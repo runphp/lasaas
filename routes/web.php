@@ -3,7 +3,6 @@
 use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
 use LaravelLang\Locales\Facades\Locales;
-use LaravelLang\Routes\Middlewares\LocalizationByParameter;
 
 $installedLocales = Locales::installed()->pluck('code')->all();
 foreach (config('tenancy.central_domains') as $domain) {
@@ -11,10 +10,10 @@ foreach (config('tenancy.central_domains') as $domain) {
         Route::view('/{locale?}', 'welcome')
             ->name('home')
             ->whereIn('locale', $installedLocales)
-            ->middleware(LocalizationByParameter::class);
+            ->middleware(['localization.parameter']);
 
         Route::prefix('{current_team}')
-            ->middleware(['auth', 'verified', EnsureTeamMembership::class])
+            ->middleware(['auth', 'verified', EnsureTeamMembership::class, 'localization.session'])
             ->group(function () {
                 Route::view('dashboard', 'dashboard')->name('dashboard');
             });
@@ -22,8 +21,9 @@ foreach (config('tenancy.central_domains') as $domain) {
         Route::middleware(['auth'])->group(function () {
             Route::livewire('invitations/{invitation}/accept', 'pages::teams.accept-invitation')->name('invitations.accept');
         });
-
-        require __DIR__ . '/settings.php';
+        Route::middleware(['localization.session','localization.model'])->group(function () {
+            require __DIR__ . '/settings.php';
+        });
     });
 }
 
