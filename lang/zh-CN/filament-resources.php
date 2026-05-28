@@ -6,6 +6,9 @@ return [
     'team' => [
         'label' => '团队管理',
     ],
+    'plan' => [
+        'label' => '套餐管理',
+    ],
     'tenant' => [
         'label' => '租户管理',
     ],

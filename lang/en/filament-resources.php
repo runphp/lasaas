@@ -6,6 +6,9 @@ return [
     'team' => [
         'label' => 'Team Management',
     ],
+    'plan' => [
+        'label' => 'Plan Management',
+    ],
     'tenant' => [
         'label' => 'Tenant Management',
     ],
