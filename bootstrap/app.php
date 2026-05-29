@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\LocalizationByHeader;
+use App\Http\Middleware\SetHomeLocale;
 use App\Http\Middleware\SetTeamUrlDefaults;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -27,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'localization.cookie' => LocalizationByCookie::class,
             'localization.session' => LocalizationBySession::class,
             'localization.model' => LocalizationByModel::class,
+            'localization.home' => SetHomeLocale::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
