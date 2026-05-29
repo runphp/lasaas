@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/livewire-starter-kit",
+    "name": "runphp/lasaas",
     "type": "project",
-    "description": "The official Laravel starter kit for Livewire.",
-    "keywords": ["laravel", "framework"],
+    "description": "Laravel SaaS.",
+    "keywords": ["laravel", "saas"],
     "license": "MIT",
     "require": {
         "php": "^8.3",
