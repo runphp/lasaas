@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 use LaravelLang\Config\Constants\RouteName;
 use LaravelLang\LocaleList\Locale;
+use LaravelLang\Routes\Middlewares\LocalizationByCookie;
+use LaravelLang\Routes\Middlewares\LocalizationByHeader;
+use LaravelLang\Routes\Middlewares\LocalizationByModel;
+use LaravelLang\Routes\Middlewares\LocalizationByParameterPrefix;
+use LaravelLang\Routes\Middlewares\LocalizationBySession;
 
 return [
     /*
@@ -38,7 +43,7 @@ return [
     'aliases' => [
         // \LaravelLang\LocaleList\Locale::German->value => 'de-DE',
         // \LaravelLang\LocaleList\Locale::GermanSwitzerland->value => 'de-CH',
-        \LaravelLang\LocaleList\Locale::Chinese->value => 'zh-CN',
+        Locale::Chinese->value => 'zh-CN',
     ],
 
     /*
@@ -112,10 +117,10 @@ return [
 
         'names' => [
             'parameter' => RouteName::Parameter,
-            'header'    => RouteName::Header,
-            'cookie'    => RouteName::Cookie,
-            'session'   => RouteName::Session,
-            'column'    => RouteName::Column,
+            'header' => RouteName::Header,
+            'cookie' => RouteName::Cookie,
+            'session' => RouteName::Session,
+            'column' => RouteName::Column,
         ],
 
         /*
@@ -149,20 +154,20 @@ return [
                 // This option contains settings for routes without the prefix of the localization code.
 
                 'default' => [
-                    LaravelLang\Routes\Middlewares\LocalizationByCookie::class,
-                    LaravelLang\Routes\Middlewares\LocalizationByHeader::class,
-                    LaravelLang\Routes\Middlewares\LocalizationBySession::class,
-                    LaravelLang\Routes\Middlewares\LocalizationByModel::class,
+                    LocalizationByCookie::class,
+                    LocalizationByHeader::class,
+                    LocalizationBySession::class,
+                    LocalizationByModel::class,
                 ],
 
                 // This option contains settings for routes with the prefix of the localization code.
 
                 'prefix' => [
-                    LaravelLang\Routes\Middlewares\LocalizationByParameterPrefix::class,
-                    LaravelLang\Routes\Middlewares\LocalizationByCookie::class,
-                    LaravelLang\Routes\Middlewares\LocalizationByHeader::class,
-                    LaravelLang\Routes\Middlewares\LocalizationBySession::class,
-                    LaravelLang\Routes\Middlewares\LocalizationByModel::class,
+                    LocalizationByParameterPrefix::class,
+                    LocalizationByCookie::class,
+                    LocalizationByHeader::class,
+                    LocalizationBySession::class,
+                    LocalizationByModel::class,
                 ],
             ],
         ],
@@ -230,14 +235,14 @@ return [
             'google' => [
                 'translator' => '\LaravelLang\Translator\Integrations\Google',
 
-                'enabled'  => (bool) env('TRANSLATION_GOOGLE_ENABLED', true),
+                'enabled' => (bool) env('TRANSLATION_GOOGLE_ENABLED', true),
                 'priority' => (int) env('TRANSLATION_GOOGLE_PRIORITY', 1),
             ],
 
             'deepl' => [
                 'translator' => '\LaravelLang\Translator\Integrations\Deepl',
 
-                'enabled'  => (bool) env('TRANSLATION_DEEPL_ENABLED', false),
+                'enabled' => (bool) env('TRANSLATION_DEEPL_ENABLED', false),
                 'priority' => (int) env('TRANSLATION_DEEPL_PRIORITY', 2),
 
                 'credentials' => [
@@ -248,11 +253,11 @@ return [
             'yandex' => [
                 'translator' => '\LaravelLang\Translator\Integrations\Yandex',
 
-                'enabled'  => (bool) env('TRANSLATION_YANDEX_ENABLED', false),
+                'enabled' => (bool) env('TRANSLATION_YANDEX_ENABLED', false),
                 'priority' => (int) env('TRANSLATION_YANDEX_PRIORITY', 3),
 
                 'credentials' => [
-                    'key'    => (string) env('TRANSLATION_YANDEX_KEY'),
+                    'key' => (string) env('TRANSLATION_YANDEX_KEY'),
                     'folder' => (string) env('TRANSLATION_YANDEX_FOLDER_ID'),
                 ],
             ],

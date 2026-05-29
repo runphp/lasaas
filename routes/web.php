@@ -21,10 +21,8 @@ foreach (config('tenancy.central_domains') as $domain) {
         Route::middleware(['auth'])->group(function () {
             Route::livewire('invitations/{invitation}/accept', 'pages::teams.accept-invitation')->name('invitations.accept');
         });
-        Route::middleware(['localization.session','localization.model'])->group(function () {
-            require __DIR__ . '/settings.php';
+        Route::middleware(['localization.session', 'localization.model'])->group(function () {
+            require __DIR__.'/settings.php';
         });
     });
 }
-
-

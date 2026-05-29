@@ -35,6 +35,7 @@ class TeamResource extends Resource
     {
         return __('filament-resources.system.group');
     }
+
     public static function form(Schema $schema): Schema
     {
         return TeamForm::configure($schema);

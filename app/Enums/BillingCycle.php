@@ -5,13 +5,13 @@ namespace App\Enums;
 enum BillingCycle: string
 {
     case Monthly = 'monthly';
-    case Yearly  = 'yearly';
+    case Yearly = 'yearly';
 
     public function label(): string
     {
         return match ($this) {
             self::Monthly => __('Monthly'),
-            self::Yearly  => __('Yearly'),
+            self::Yearly => __('Yearly'),
         };
     }
 
@@ -19,7 +19,7 @@ enum BillingCycle: string
     {
         return match ($this) {
             self::Monthly => 30,
-            self::Yearly  => 365,
+            self::Yearly => 365,
         };
     }
 }

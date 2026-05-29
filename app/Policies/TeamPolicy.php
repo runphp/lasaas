@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\Team;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Foundation\Auth\User as AuthUser;
 
 class TeamPolicy
 {
@@ -30,9 +30,9 @@ class TeamPolicy
     public function update(AuthUser $authUser, Team $team): bool
     {
         return $authUser->can('Update:Team') || $team->members()
-                ->where('user_id', $authUser->id)
-                ->whereIn('role', ['owner', 'admin'])
-                ->exists();
+            ->where('user_id', $authUser->id)
+            ->whereIn('role', ['owner', 'admin'])
+            ->exists();
     }
 
     public function delete(AuthUser $authUser, Team $team): bool
@@ -74,5 +74,4 @@ class TeamPolicy
     {
         return $authUser->can('Reorder:Team');
     }
-
 }

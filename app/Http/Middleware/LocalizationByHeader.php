@@ -2,11 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
-use Illuminate\Http\Request;
 use LaravelLang\Routes\Middlewares\LocalizationByHeader as BaseHeader;
-use LaravelLang\Config\Facades\Config;
-use LaravelLang\Locales\Facades\Locales;
 
 class LocalizationByHeader extends BaseHeader
 {

@@ -5,8 +5,8 @@ namespace App\Filament\Resources\Tenants\Schemas;
 use App\Enums\TenantStatus;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
 class TenantForm

@@ -22,11 +22,11 @@ return Application::configure(basePath: dirname(__DIR__))
             SetTeamUrlDefaults::class,
         ])->alias([
             'localization.parameter' => LocalizationByParameter::class,
-            'localization.redirect'  => LocalizationByParameterWithRedirect::class,
-            'localization.header'    => LocalizationByHeader::class,
-            'localization.cookie'    => LocalizationByCookie::class,
-            'localization.session'   => LocalizationBySession::class,
-            'localization.model'     => LocalizationByModel::class,
+            'localization.redirect' => LocalizationByParameterWithRedirect::class,
+            'localization.header' => LocalizationByHeader::class,
+            'localization.cookie' => LocalizationByCookie::class,
+            'localization.session' => LocalizationBySession::class,
+            'localization.model' => LocalizationByModel::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
