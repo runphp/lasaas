@@ -1,174 +1,198 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
-    <head>
-        @include('partials.head')
-    </head>
-    <body class="min-h-screen bg-white dark:bg-zinc-900 antialiased">
-        {{-- Header --}}
-        <header class="sticky top-0 z-50 border-b border-zinc-200 bg-white/80 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/80">
-            <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-                {{-- Logo --}}
-                <div class="flex items-center gap-8">
-                    <x-app-logo href="{{ localizedRoute('home', ['locale' => App::currentLocale()]) }}" wire:navigate />
+<head>
+    @include('partials.head')
+</head>
+<body class="min-h-screen bg-white dark:bg-zinc-900 antialiased" x-data="{ mobileNavOpen: false }">
 
-                    {{-- Navigation --}}
-                    <nav class="hidden items-center gap-6 md:flex">
-                        <a href="{{ localizedRoute('home') }}" @class([
-                            'text-sm font-medium transition-colors hover:text-zinc-900 dark:hover:text-white',
-                            'text-zinc-900 dark:text-white' => request()->routeIs('home'),
-                            'text-zinc-500 dark:text-zinc-400' => ! request()->routeIs('home'),
-                        ]) wire:navigate>
-                            {{ __('Home') }}
-                        </a>
-                        <a href="#" class="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-                            {{ __('Features') }}
-                        </a>
-                        <a href="#" class="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-                            {{ __('Pricing') }}
-                        </a>
-                        <a href="#" class="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-                            {{ __('About') }}
-                        </a>
-                    </nav>
-                </div>
+{{-- Header --}}
+<flux:header container class="max-lg:hidden sticky top-0 z-50 border-b border-zinc-200 bg-white/80 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/80">
+    <x-app-logo href="{{ localizedRoute('home', ['locale' => app()->getLocale()]) }}" wire:navigate />
 
-                {{-- Right side: Language switcher + Auth buttons --}}
-                <div class="flex items-center gap-3">
-                    @php
-                        $currentLocale = App::currentLocale();
-                        $locales = \LaravelLang\Locales\Facades\Locales::installed();
-                        $currentLocaleData = $locales->firstWhere('code', $currentLocale);
-                    @endphp
+    <flux:navbar class="-mb-px max-lg:hidden">
+        <flux:navbar.item :href="localizedRoute('home', ['locale' => app()->getLocale()])" :current="request()->routeIs('home')" wire:navigate>
+            {{ __('Home') }}
+        </flux:navbar.item>
+        <flux:navbar.item href="#">
+            {{ __('Features') }}
+        </flux:navbar.item>
+        <flux:navbar.item href="#">
+            {{ __('Pricing') }}
+        </flux:navbar.item>
+        <flux:navbar.item href="#">
+            {{ __('About') }}
+        </flux:navbar.item>
+    </flux:navbar>
 
-                    <flux:dropdown position="bottom" align="end">
-                        <flux:button variant="ghost" size="sm" icon:trailing="chevron-down">
-                            {{ $currentLocaleData?->native ?? strtoupper($currentLocale) }}
-                        </flux:button>
-                        <flux:menu>
-                            @foreach($locales as $locale)
-                                <flux:menu.item
-                                    href="{{ localizedRoute('home', ['locale' => $locale->code]) }}"
-                                    :active="$locale->code === $currentLocale"
-                                >
-                                    {{ $locale->native }}
-                                </flux:menu.item>
-                            @endforeach
-                        </flux:menu>
-                    </flux:dropdown>
+    <flux:spacer />
 
-                    @auth
-                        <flux:button href="{{ route('dashboard') }}" wire:navigate>
-                            {{ __('Dashboard') }}
-                        </flux:button>
-                    @else
-                        <flux:button variant="ghost" href="{{ route('login') }}" wire:navigate>
-                            {{ __('Log in') }}
-                        </flux:button>
+    <div class="flex items-center gap-2">
+        <livewire:locale-switcher />
+        <livewire:theme-switcher />
 
-                        @if (Route::has('register'))
-                            <flux:button href="{{ route('register') }}" wire:navigate>
-                                {{ __('Register') }}
-                            </flux:button>
-                        @endif
-                    @endauth
-                </div>
-            </div>
-        </header>
+        @auth
+            <flux:button href="{{ route('dashboard') }}" wire:navigate>
+                {{ __('Dashboard') }}
+            </flux:button>
+        @else
+            <flux:button variant="ghost" href="{{ route('login') }}" wire:navigate>
+                {{ __('Log in') }}
+            </flux:button>
 
-        {{-- Main Content --}}
-        <main>
-            {{ $slot }}
-        </main>
+            @if (Route::has('register'))
+                <flux:button href="{{ route('register') }}" wire:navigate>
+                    {{ __('Register') }}
+                </flux:button>
+            @endif
+        @endauth
+    </div>
+</flux:header>
 
-        {{-- Footer --}}
-        <footer class="border-t border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950">
-            <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                    {{-- Brand Column --}}
-                    <div class="space-y-4">
-                        <x-app-logo href="{{ localizedRoute('home') }}" wire:navigate />
-                        <p class="text-sm text-zinc-500 dark:text-zinc-400">
-                            {{ __('Building better experiences, one app at a time.') }}
-                        </p>
+<!-- Mobile Header -->
+<flux:header class="lg:hidden sticky top-0 z-40 border-b border-zinc-200 bg-white/80 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/80">
+    <flux:button variant="ghost" icon="bars-2" @click="mobileNavOpen = true" />
+
+    <x-app-logo href="{{ localizedRoute('home') }}" wire:navigate />
+
+    <flux:spacer />
+
+    <livewire:locale-switcher />
+    <livewire:theme-switcher />
+
+    @auth
+        <flux:dropdown position="top" align="end">
+            <flux:profile
+                :initials="auth()->user()->initials()"
+                icon-trailing="chevron-down"
+            />
+
+            <flux:menu>
+                <flux:menu.radio.group>
+                    <div class="p-0 text-sm font-normal">
+                        <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
+                            <flux:avatar
+                                :name="auth()->user()->name"
+                                :initials="auth()->user()->initials()"
+                            />
+
+                            <div class="grid flex-1 text-start text-sm leading-tight">
+                                <flux:heading class="truncate">{{ auth()->user()->name }}</flux:heading>
+                                <flux:text class="truncate">{{ auth()->user()->email }}</flux:text>
+                            </div>
+                        </div>
                     </div>
+                </flux:menu.radio.group>
 
-                    {{-- Product --}}
-                    <div>
-                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-white">{{ __('Product') }}</h3>
-                        <ul class="mt-4 space-y-3">
-                            <li>
-                                <a href="#" class="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-                                    {{ __('Features') }}
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-                                    {{ __('Pricing') }}
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-                                    {{ __('Changelog') }}
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                <flux:menu.separator />
 
-                    {{-- Company --}}
-                    <div>
-                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-white">{{ __('Company') }}</h3>
-                        <ul class="mt-4 space-y-3">
-                            <li>
-                                <a href="#" class="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-                                    {{ __('About') }}
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-                                    {{ __('Blog') }}
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-                                    {{ __('Careers') }}
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                <flux:menu.radio.group>
+                    <flux:menu.item :href="route('dashboard')" icon="home" wire:navigate>
+                        {{ __('Dashboard') }}
+                    </flux:menu.item>
+                    <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
+                        {{ __('Settings') }}
+                    </flux:menu.item>
+                </flux:menu.radio.group>
 
-                    {{-- Legal --}}
-                    <div>
-                        <h3 class="text-sm font-semibold text-zinc-900 dark:text-white">{{ __('Legal') }}</h3>
-                        <ul class="mt-4 space-y-3">
-                            <li>
-                                <a href="#" class="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-                                    {{ __('Privacy Policy') }}
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-                                    {{ __('Terms of Service') }}
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                <flux:menu.separator />
 
-                {{-- Bottom bar --}}
-                <div class="mt-12 border-t border-zinc-200 pt-8 dark:border-zinc-800">
-                    <p class="text-center text-sm text-zinc-400 dark:text-zinc-500">
-                        &copy; {{ date('Y') }} {{ config('app.name', 'Laravel') }}. {{ __('All rights reserved.') }}
-                    </p>
-                </div>
-            </div>
-        </footer>
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    @csrf
+                    <flux:menu.item
+                        as="button"
+                        type="submit"
+                        icon="arrow-right-start-on-rectangle"
+                        class="w-full cursor-pointer"
+                    >
+                        {{ __('Log out') }}
+                    </flux:menu.item>
+                </form>
+            </flux:menu>
+        </flux:dropdown>
+    @else
+        <flux:button variant="ghost" href="{{ route('login') }}" wire:navigate>
+            {{ __('Log in') }}
+        </flux:button>
 
-        @persist('toast')
-            <flux:toast.group>
-                <flux:toast />
-            </flux:toast.group>
-        @endpersist
+        @if (Route::has('register'))
+            <flux:button href="{{ route('register') }}" wire:navigate>
+                {{ __('Register') }}
+            </flux:button>
+        @endif
+    @endauth
+</flux:header>
 
-        @fluxScripts
-    </body>
+<!-- Mobile Nav Drawer -->
+<div x-show="mobileNavOpen" class="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" x-cloak>
+    <div
+        x-show="mobileNavOpen"
+        x-transition.opacity
+        class="fixed inset-0 bg-zinc-900/50 backdrop-blur-sm"
+        @click="mobileNavOpen = false"
+    ></div>
+
+    <div
+        x-show="mobileNavOpen"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="-translate-x-full"
+        x-transition:enter-end="translate-x-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="translate-x-0"
+        x-transition:leave-end="-translate-x-full"
+        class="fixed inset-y-0 left-0 w-72 bg-white shadow-xl dark:bg-zinc-900 dark:shadow-zinc-950"
+    >
+        <div class="flex items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
+            <x-app-logo href="{{ localizedRoute('home') }}" wire:navigate />
+            <flux:button variant="ghost" icon="x-mark" @click="mobileNavOpen = false" />
+        </div>
+
+        <nav class="mt-2 flex flex-col gap-1 px-2">
+            <a
+                href="{{ localizedRoute('home') }}"
+                wire:navigate
+                @click="mobileNavOpen = false"
+                class="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 {{ request()->routeIs('home') ? 'bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white' : '' }}"
+            >
+                {{ __('Home') }}
+            </a>
+            <a
+                href="#"
+                @click="mobileNavOpen = false"
+                class="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+                {{ __('Features') }}
+            </a>
+            <a
+                href="#"
+                @click="mobileNavOpen = false"
+                class="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+                {{ __('Pricing') }}
+            </a>
+            <a
+                href="#"
+                @click="mobileNavOpen = false"
+                class="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+                {{ __('About') }}
+            </a>
+        </nav>
+    </div>
+</div>
+
+{{-- Main content --}}
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    {{ $slot }}
+</div>
+
+<livewire:landing-footer />
+
+@persist('toast')
+<flux:toast.group>
+    <flux:toast />
+</flux:toast.group>
+@endpersist
+
+@fluxScripts
+</body>
 </html>

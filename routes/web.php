@@ -7,7 +7,7 @@ use LaravelLang\Locales\Facades\Locales;
 $installedLocales = Locales::installed()->pluck('code')->all();
 foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(function () use ($installedLocales) {
-        Route::view('/{locale?}', 'home')
+        Route::livewire('/{locale?}', 'pages::home')
             ->name('home')
             ->whereIn('locale', $installedLocales)
             ->middleware('localization.home');
