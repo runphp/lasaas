@@ -9,10 +9,12 @@ class PageSeeder extends Seeder
 {
     public function run(): void
     {
-        Page::query()->create([
-            'slug' => 'home',
-            'title' => 'Welcome to Lasaas',
-            'is_published' => true,
-        ]);
+        Page::query()->updateOrCreate(
+            ['slug' => 'home'],
+            [
+                'title' => 'Welcome to Lasaas',
+                'is_published' => true,
+            ]
+        );
     }
 }
