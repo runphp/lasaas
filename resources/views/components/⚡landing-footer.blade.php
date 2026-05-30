@@ -28,7 +28,7 @@ new class extends Component {
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
+                        <a href="{{ localizedRoute('pricing', ['locale' => app()->getLocale()]) }}" wire:navigate class="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
                             {{ __('Pricing') }}
                         </a>
                     </li>

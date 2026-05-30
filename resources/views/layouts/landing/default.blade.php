@@ -16,7 +16,7 @@
         <flux:navbar.item href="#">
             {{ __('Features') }}
         </flux:navbar.item>
-        <flux:navbar.item href="#">
+        <flux:navbar.item :href="localizedRoute('pricing', ['locale' => app()->getLocale()])" :current="request()->routeIs('pricing')" wire:navigate>
             {{ __('Pricing') }}
         </flux:navbar.item>
         <flux:navbar.item href="#">
@@ -163,9 +163,10 @@
                 {{ __('Features') }}
             </a>
             <a
-                href="#"
+                href="{{ localizedRoute('pricing', ['locale' => app()->getLocale()]) }}"
+                wire:navigate
                 @click="mobileNavOpen = false"
-                class="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                class="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 {{ request()->routeIs('pricing') ? 'bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white' : '' }}"
             >
                 {{ __('Pricing') }}
             </a>

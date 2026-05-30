@@ -12,6 +12,11 @@ foreach (config('tenancy.central_domains') as $domain) {
             ->whereIn('locale', $installedLocales)
             ->middleware('localization.home');
 
+        Route::livewire('/pricing/{locale?}', 'pages::pricing')
+            ->name('pricing')
+            ->whereIn('locale', $installedLocales)
+            ->middleware('localization.home');
+
         Route::prefix('{current_team}')
             ->middleware(['auth', 'verified', EnsureTeamMembership::class, 'localization.session'])
             ->group(function () {

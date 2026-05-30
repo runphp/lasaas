@@ -16,5 +16,13 @@ class PageSeeder extends Seeder
                 'is_published' => true,
             ]
         );
+
+        Page::query()->updateOrCreate(
+            ['slug' => 'pricing'],
+            [
+                'title' => 'Pricing',
+                'is_published' => true,
+            ]
+        );
     }
 }
