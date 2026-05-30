@@ -24,11 +24,10 @@ return [
      *
      * Only relevant if you're using the domain or subdomain identification middleware.
      */
-    'central_domains' => [
-        'lasaas.ddev.site',
-        '127.0.0.1',
-        'localhost',
-    ],
+    'central_domains' => array_map(
+        'trim',
+        explode(',', env('CENTRAL_DOMAINS', 'lasaas.ddev.site,127.0.0.1,localhost'))
+    ),
 
     /**
      * Tenancy bootstrappers are executed when tenancy is initialized.
