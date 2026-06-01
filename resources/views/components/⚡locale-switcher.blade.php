@@ -25,7 +25,8 @@ new class extends Component {
 <div>
     <flux:dropdown position="bottom" align="end">
         <flux:button variant="ghost" size="sm" icon:trailing="chevron-down">
-            {{ $this->currentNative() }}
+            <flux:icon.language class="size-4 lg:hidden" />
+            <span class="max-lg:hidden">{{ $this->currentNative() }}</span>
         </flux:button>
         <flux:menu>
             @foreach ($this->locales() as $locale)

@@ -11,15 +11,15 @@ new class extends Component {
         <flux:button variant="ghost" size="sm" icon:trailing="chevron-down">
             <div x-cloak x-show="$flux.appearance === 'light'" class="flex items-center gap-2">
                 <flux:icon.sun class="size-4" />
-                {{ __('Light') }}
+                <span class="max-lg:hidden">{{ __('Light') }}</span>
             </div>
             <div x-cloak x-show="$flux.appearance === 'dark'" class="flex items-center gap-2">
                 <flux:icon.moon class="size-4" />
-                {{ __('Dark') }}
+                <span class="max-lg:hidden">{{ __('Dark') }}</span>
             </div>
             <div x-cloak x-show="$flux.appearance === 'system'" class="flex items-center gap-2">
                 <flux:icon.computer-desktop class="size-4" />
-                {{ __('System') }}
+                <span class="max-lg:hidden">{{ __('System') }}</span>
             </div>
         </flux:button>
         <flux:menu>
