@@ -312,14 +312,14 @@ new #[Layout('layouts::landing')] class extends Component
                     </div>
                     <flux:heading class="mt-6 !text-xl">在线演示</flux:heading>
                     <flux:text class="mt-2">登录即可体验完整功能</flux:text>
-                    <div class="mt-6 space-y-3 rounded-xl bg-white/80 p-5 backdrop-blur-sm dark:bg-zinc-800/80">
+                    <div class="mt-6 space-y-3 rounded-xl bg-zinc-900/[0.03] p-5 backdrop-blur-sm dark:bg-white/[0.03]">
                         <div class="flex flex-col items-start gap-1 text-sm sm:flex-row sm:items-center sm:justify-between">
-                            <span class="shrink-0 text-zinc-400 dark:text-zinc-500">演示地址</span>
-                            <code class="rounded-lg bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">lasaas.doulingvip.com</code>
+                            <span class="shrink-0 text-zinc-500">演示地址</span>
+                            <code class="rounded-lg bg-blue-500/[0.08] px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-400">lasaas.doulingvip.com</code>
                         </div>
                         <div class="flex flex-col items-start gap-1 text-sm sm:flex-row sm:items-center sm:justify-between">
-                            <span class="shrink-0 text-zinc-400 dark:text-zinc-500">管理员账号</span>
-                            <code class="rounded-lg bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-950 dark:text-blue-300">runphp@qq.com / 123456789</code>
+                            <span class="shrink-0 text-zinc-500">管理员账号</span>
+                            <code class="rounded-lg bg-blue-500/[0.08] px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-400">runphp@qq.com / 123456789</code>
                         </div>
                     </div>
                     <flux:button class="mt-6 w-full !h-11 !rounded-xl !font-semibold" variant="primary" href="https://lasaas.doulingvip.com/login" target="_blank">
