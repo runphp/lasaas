@@ -21,77 +21,106 @@ new #[Layout('layouts::landing')] class extends Component
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-gradient-to-b from-violet-100/60 via-fuchsia-50/30 to-transparent blur-3xl dark:from-violet-900/20 dark:via-fuchsia-900/10"></div>
         </div>
         <div class="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-            <flux:badge color="violet" class="!rounded-full !px-3 !py-1 !text-xs">定制开发</flux:badge>
-            <flux:heading size="xl" class="mt-6">你的需求，就是功能列表</flux:heading>
+            <flux:badge color="violet" class="!rounded-full !px-3 !py-1 !text-xs">应用市场</flux:badge>
+            <flux:heading size="xl" class="mt-6">像搭积木一样构建你的系统</flux:heading>
             <flux:text class="mx-auto mt-6 max-w-2xl !text-lg !leading-relaxed">
-                这里不是一个功能固定的 SaaS 产品，而是根据你的业务场景<strong>按需开发</strong>。<br class="hidden sm:block" />
-                没有多余模块，不需要的功能不会出现，你需要的功能一个不少。
+                一个开放的应用模块市场：按需挑选模块自由组合，付费模块收益归模块开发者。<br class="hidden sm:block" />
+                可定制新模块或二次开发现有模块，开源通用模块还能享受更优价格。
             </flux:text>
         </div>
     </section>
 
-    {{-- What can be built --}}
+    {{-- How It Works --}}
     <section class="border-t border-zinc-100 bg-zinc-50/50 py-24 dark:border-zinc-800/50 dark:bg-zinc-900/50">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-3xl text-center">
-                <flux:badge color="indigo" class="!rounded-full !px-3 !py-1 !text-xs">可快速实现</flux:badge>
-                <flux:heading size="lg" class="mt-6">常见业务系统，都能做</flux:heading>
-                <flux:text class="mt-4">以下只是冰山一角，告诉我你的场景，我来实现。</flux:text>
+                <flux:badge color="indigo" class="!rounded-full !px-3 !py-1 !text-xs">运作模式</flux:badge>
+                <flux:heading size="lg" class="mt-6">模块市场怎么玩</flux:heading>
             </div>
-            <div class="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
                 @php
-                    $systems = [
-                        ['emoji' => '🛒', 'title' => '电商 / 商城系统', 'desc' => '商品管理、订单流转、支付接入、库存管理', 'color' => 'orange'],
-                        ['emoji' => '📊', 'title' => '数据管理后台', 'desc' => 'CRUD 面板、权限控制、数据导入导出、图表看板', 'color' => 'blue'],
-                        ['emoji' => '🔗', 'title' => 'API 服务 / 数据中台', 'desc' => 'RESTful / GraphQL 接口、多端数据服务、接口文档自动生成', 'color' => 'sky'],
-                        ['emoji' => '👥', 'title' => '多租户 SaaS 平台', 'desc' => '租户隔离、自定义域名、按量计费、白标定制', 'color' => 'purple'],
-                        ['emoji' => '📱', 'title' => '小程序 / App 后端', 'desc' => '用户认证、推送通知、内容管理、支付回调', 'color' => 'green'],
-                        ['emoji' => '🤖', 'title' => '自动化 / 工作流系统', 'desc' => '审批流配置、定时任务、规则引擎、消息通知', 'color' => 'amber'],
-                        ['emoji' => '📝', 'title' => 'CMS / 内容管理系统', 'desc' => '多语言、媒体管理、SEO 友好、Markdown 支持', 'color' => 'red'],
-                        ['emoji' => '📈', 'title' => '数据采集 / 报表系统', 'desc' => '爬虫抓取、ETL 清洗、BI 报表、数据可视化', 'color' => 'teal'],
-                        ['emoji' => '💳', 'title' => '支付 / 账务系统', 'desc' => '分账结算、对账流水、发票管理、多通道聚合', 'color' => 'pink'],
-                    ];
+                $steps = [
+                    ['emoji' => '🧩', 'title' => '浏览模块', 'desc' => '在市场中挑选你需要的功能模块', 'color' => 'blue'],
+                    ['emoji' => '🛠️', 'title' => '自由组合', 'desc' => '按需搭配，只装你真正要用的功能', 'color' => 'violet'],
+                    ['emoji' => '✨', 'title' => '定制开发', 'desc' => '没有满意的？定制新模块或改造现有模块', 'color' => 'amber'],
+                    ['emoji' => '🌍', 'title' => '开源回流', 'desc' => '定制的通用模块开源，享更优价格', 'color' => 'emerald'],
+                    ['emoji' => '📈', 'title' => '持续繁荣', 'desc' => '模块越丰富，后续开发成本越低', 'color' => 'rose'],
+                ];
                 @endphp
-                @foreach ($systems as $s)
-                    <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-{{ $s['color'] }}-200 hover:shadow-lg dark:hover:border-{{ $s['color'] }}-800">
-                        <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-{{ $s['color'] }}-100 to-{{ $s['color'] }}-200 dark:from-{{ $s['color'] }}-900/50 dark:to-{{ $s['color'] }}-800/50 text-2xl">{{ $s['emoji'] }}</div>
-                        <flux:heading class="mt-5 !text-base">{{ $s['title'] }}</flux:heading>
-                        <flux:text class="mt-2">{{ $s['desc'] }}</flux:text>
+                @foreach ($steps as $step)
+                    <flux:card class="group text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                        <div class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-{{ $step['color'] }}-100 to-{{ $step['color'] }}-200 dark:from-{{ $step['color'] }}-900/50 dark:to-{{ $step['color'] }}-800/50 text-2xl">{{ $step['emoji'] }}</div>
+                        <flux:heading class="mt-5 !text-base">{{ $step['title'] }}</flux:heading>
+                        <flux:text class="mt-2 !text-sm">{{ $step['desc'] }}</flux:text>
                     </flux:card>
                 @endforeach
             </div>
         </div>
     </section>
 
-    {{-- Advantage --}}
+    {{-- Three Roles --}}
     <section class="py-24">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-3xl text-center">
-                <flux:badge color="emerald" class="!rounded-full !px-3 !py-1 !text-xs">开发优势</flux:badge>
-                <flux:heading size="lg" class="mt-6">不是买功能，是按需开发</flux:heading>
-                <flux:text class="mt-4">与传统 SaaS 产品不同：不用为不需要的功能买单，也不受限于预设的功能边界。</flux:text>
+                <flux:badge color="emerald" class="!rounded-full !px-3 !py-1 !text-xs">生态共赢</flux:badge>
+                <flux:heading size="lg" class="mt-6">三方受益，正向循环</flux:heading>
             </div>
-            <div class="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <flux:card class="text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                    <div class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900/50 dark:to-emerald-800/50 text-2xl">🎯</div>
-                    <flux:heading class="mt-5 !text-base">精准匹配需求</flux:heading>
-                    <flux:text class="mt-2 !text-sm">没有多余功能堆砌，每一个模块都为你量身定制</flux:text>
+            <div class="mt-16 grid gap-6 lg:grid-cols-3">
+                {{-- Client --}}
+                <flux:card class="transition-all duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg dark:hover:border-blue-700">
+                    <div class="flex items-center gap-3">
+                        <div class="flex size-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50 text-xl">🛒</div>
+                        <flux:heading class="!text-base">客户方</flux:heading>
+                    </div>
+                    <flux:text class="mt-4 !text-sm">
+                        按需选取模块，用多少装多少。需要个性化功能？可定制开发，通用模块还能通过开源回流获得费用优惠。前期投入，后期受益。
+                    </flux:text>
                 </flux:card>
-                <flux:card class="text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                    <div class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/50 dark:to-blue-800/50 text-2xl">⚡</div>
-                    <flux:heading class="mt-5 !text-base">快速交付</flux:heading>
-                    <flux:text class="mt-2 !text-sm">成熟的技术底座，从零到可用比你想的更快</flux:text>
+
+                {{-- Developer --}}
+                <flux:card class="transition-all duration-300 hover:-translate-y-1 hover:border-purple-300 hover:shadow-lg dark:hover:border-purple-700">
+                    <div class="flex items-center gap-3">
+                        <div class="flex size-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/50 text-xl">💎</div>
+                        <flux:heading class="!text-base">模块开发者</flux:heading>
+                    </div>
+                    <flux:text class="mt-4 !text-sm">
+                        开发通用模块上架市场，每次被客户选用即获得收益。一次开发，持续收入。
+                    </flux:text>
                 </flux:card>
-                <flux:card class="text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                    <div class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-violet-200 dark:from-violet-900/50 dark:to-violet-800/50 text-2xl">🧩</div>
-                    <flux:heading class="mt-5 !text-base">灵活扩展</flux:heading>
-                    <flux:text class="mt-2 !text-sm">随着业务发展，随时增加新模块，持续迭代</flux:text>
+
+                {{-- Ecosystem --}}
+                <flux:card class="transition-all duration-300 hover:-translate-y-1 hover:border-amber-300 hover:shadow-lg dark:hover:border-amber-700">
+                    <div class="flex items-center gap-3">
+                        <div class="flex size-10 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/50 text-xl">🌱</div>
+                        <flux:heading class="!text-base">市场生态</flux:heading>
+                    </div>
+                    <flux:text class="mt-4 !text-sm">
+                        每个开源回流的模块都在壮大公共资产池。模块越丰富，下一个项目的搭建成本就越低，形成正向循环。
+                    </flux:text>
                 </flux:card>
-                <flux:card class="text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                    <div class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-100 to-rose-200 dark:from-rose-900/50 dark:to-rose-800/50 text-2xl">🔐</div>
-                    <flux:heading class="mt-5 !text-base">100% 掌控</flux:heading>
-                    <flux:text class="mt-2 !text-sm">代码交付给你，数据完全自主，不受平台限制</flux:text>
-                </flux:card>
+            </div>
+        </div>
+    </section>
+
+    {{-- Open Source Incentive --}}
+    <section class="border-t border-zinc-100 bg-zinc-50/50 py-24 dark:border-zinc-800/50 dark:bg-zinc-900/50">
+        <div class="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+            <flux:badge color="green" class="!rounded-full !px-3 !py-1 !text-xs">开源激励机制</flux:badge>
+            <flux:heading size="lg" class="mt-6">你开源，我降价</flux:heading>
+            <flux:text class="mt-6 !text-lg !leading-relaxed">
+                如果你定制的模块<strong>通用性强</strong>，愿意将其开源贡献到市场中，<br class="hidden sm:block" />
+                我会在开发费用上给予<strong>更优的价格</strong>。
+            </flux:text>
+            <div class="mt-10 flex justify-center">
+                <div class="max-w-xl rounded-2xl border-2 border-dashed border-green-300 bg-green-50/50 px-6 py-5 text-left dark:border-green-800 dark:bg-green-950/30">
+                    <p class="text-sm font-semibold text-green-800 dark:text-green-200">为什么值得开源?</p>
+                    <ul class="mt-3 space-y-2 text-sm text-green-700 dark:text-green-300">
+                        <li>•  定制费更优惠，边际成本更低</li>
+                        <li>•  模块经社区打磨后更稳定、更安全</li>
+                        <li>•  后续其他人二次开发时，基础功能不用重复造轮子</li>
+                        <li>•  整个生态的开发成本持续走低</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </section>
@@ -102,8 +131,8 @@ new #[Layout('layouts::landing')] class extends Component
         <div class="relative mx-auto max-w-3xl px-4 py-24 text-center sm:px-6 lg:px-8">
             <flux:heading size="lg">有想法？聊聊看</flux:heading>
             <flux:text class="mt-4 !text-lg">
-                大胆说出你的业务场景，免费评估可行性和工时。<br class="hidden sm:block" />
-                再奇葩的需求，也值得认真讨论。
+                想搭建系统还是贡献模块？大胆说出你的想法。<br class="hidden sm:block" />
+                免费评估，认真对待每一个需求。
             </flux:text>
             <div class="mt-10">
                 <flux:heading size="base" class="!font-semibold">联系我</flux:heading>
