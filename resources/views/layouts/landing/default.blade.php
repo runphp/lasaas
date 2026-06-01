@@ -18,14 +18,16 @@
                           :current="request()->routeIs('home')" wire:navigate>
             {{ __('Home') }}
         </flux:navbar.item>
-        <flux:navbar.item href="#">
+        <flux:navbar.item :href="localizedRoute('features', ['locale' => app()->getLocale()])"
+                          :current="request()->routeIs('features')" wire:navigate>
             {{ __('Features') }}
         </flux:navbar.item>
         <flux:navbar.item :href="localizedRoute('pricing', ['locale' => app()->getLocale()])"
                           :current="request()->routeIs('pricing')" wire:navigate>
             {{ __('Pricing') }}
         </flux:navbar.item>
-        <flux:navbar.item href="#">
+        <flux:navbar.item :href="localizedRoute('about', ['locale' => app()->getLocale()])"
+                          :current="request()->routeIs('about')" wire:navigate>
             {{ __('About') }}
         </flux:navbar.item>
     </flux:navbar>
@@ -68,14 +70,16 @@
                            :current="request()->routeIs('home')" wire:navigate>
             {{ __('Home') }}
         </flux:sidebar.item>
-        <flux:sidebar.item icon="sparkles" href="#">
+        <flux:sidebar.item icon="sparkles" :href="localizedRoute('features', ['locale' => app()->getLocale()])"
+                           :current="request()->routeIs('features')" wire:navigate>
             {{ __('Features') }}
         </flux:sidebar.item>
         <flux:sidebar.item icon="currency-dollar" :href="localizedRoute('pricing', ['locale' => app()->getLocale()])"
                            :current="request()->routeIs('pricing')" wire:navigate>
             {{ __('Pricing') }}
         </flux:sidebar.item>
-        <flux:sidebar.item icon="information-circle" href="#">
+        <flux:sidebar.item icon="information-circle" :href="localizedRoute('about', ['locale' => app()->getLocale()])"
+                           :current="request()->routeIs('about')" wire:navigate>
             {{ __('About') }}
         </flux:sidebar.item>
     </flux:sidebar.nav>

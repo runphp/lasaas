@@ -1,0 +1,177 @@
+<?php
+
+use App\Models\Page;
+use Livewire\Attributes\Layout;
+use Livewire\Component;
+
+new #[Layout('layouts::landing')] class extends Component
+{
+    public function mount(): void
+    {
+        $page = Page::findBySlug('about');
+        view()->share('title', $page?->title ?? __('About'));
+    }
+}; ?>
+
+<flux:main>
+
+    {{-- Hero --}}
+    <section class="relative overflow-hidden pt-28 pb-20">
+        <div class="absolute inset-0 -z-10">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-gradient-to-b from-blue-100/60 via-indigo-50/30 to-transparent blur-3xl dark:from-blue-900/20 dark:via-indigo-900/10"></div>
+        </div>
+        <div class="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+            <flux:badge color="blue" class="!rounded-full !px-3 !py-1 !text-xs">SOHO 全栈开发</flux:badge>
+            <flux:heading size="xl" class="mt-6">PHP / Go / Java 现代化开发</flux:heading>
+            <flux:text class="mx-auto mt-6 max-w-2xl !text-lg !leading-relaxed">
+                多年后端开发经验，掌握多语言技术栈，代码规范、结构清晰、易维护。只接靠谱项目，诚信交付。
+            </flux:text>
+        </div>
+    </section>
+
+    {{-- Services --}}
+    <section class="border-t border-zinc-100 bg-zinc-50/50 py-24 dark:border-zinc-800/50 dark:bg-zinc-900/50">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-3xl text-center">
+                <flux:badge color="green" class="!rounded-full !px-3 !py-1 !text-xs">可接范围</flux:badge>
+                <flux:heading size="lg" class="mt-6">我能帮你做什么</flux:heading>
+            </div>
+            <div class="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg dark:hover:border-blue-800">
+                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/50 dark:to-blue-800/50 text-2xl">🆕</div>
+                    <flux:heading class="mt-5 !text-base">新项目开发</flux:heading>
+                    <flux:text class="mt-2">网站、后台管理系统、API 接口、业务系统，从零到交付</flux:text>
+                </flux:card>
+                <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-amber-200 hover:shadow-lg dark:hover:border-amber-800">
+                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/50 dark:to-amber-800/50 text-2xl">🔧</div>
+                    <flux:heading class="mt-5 !text-base">二次开发 / 维护</flux:heading>
+                    <flux:text class="mt-2">老项目功能新增、Bug 修复、逻辑梳理，接手遗留代码</flux:text>
+                </flux:card>
+                <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-purple-200 hover:shadow-lg dark:hover:border-purple-800">
+                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/50 dark:to-purple-800/50 text-2xl">⬆️</div>
+                    <flux:heading class="mt-5 !text-base">版本 / 框架升级</flux:heading>
+                    <flux:text class="mt-2">PHP 版本升级、框架升级迁移、代码重构，平稳过渡</flux:text>
+                </flux:card>
+                <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-green-200 hover:shadow-lg dark:hover:border-green-800">
+                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/50 dark:to-green-800/50 text-2xl">⚡</div>
+                    <flux:heading class="mt-5 !text-base">性能优化 / 安全加固</flux:heading>
+                    <flux:text class="mt-2">SQL 慢查询优化、缓存策略、安全漏洞修复、代码规范提升</flux:text>
+                </flux:card>
+                <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-rose-200 hover:shadow-lg dark:hover:border-rose-800">
+                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-rose-100 to-rose-200 dark:from-rose-900/50 dark:to-rose-800/50 text-2xl">🔗</div>
+                    <flux:heading class="mt-5 !text-base">接口 / 集成开发</flux:heading>
+                    <flux:text class="mt-2">第三方 API 对接、支付集成、短信/邮件服务、数据同步</flux:text>
+                </flux:card>
+                <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-lg dark:hover:border-teal-800">
+                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal-100 to-teal-200 dark:from-teal-900/50 dark:to-teal-800/50 text-2xl">🎯</div>
+                    <flux:heading class="mt-5 !text-base">技术咨询</flux:heading>
+                    <flux:text class="mt-2">架构评审、技术选型建议、代码 Review，少走弯路</flux:text>
+                </flux:card>
+            </div>
+        </div>
+    </section>
+
+    {{-- Tech Stack --}}
+    <section class="py-24">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-3xl text-center">
+                <flux:badge color="purple" class="!rounded-full !px-3 !py-1 !text-xs">技术栈</flux:badge>
+                <flux:heading size="lg" class="mt-6">按你指定，灵活适配</flux:heading>
+                <flux:text class="mt-4">以下是我的常用技术栈，也可以按你的需求适配其他技术。</flux:text>
+            </div>
+            <div class="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-red-200 hover:shadow-lg dark:hover:border-red-800">
+                    <flux:heading class="!text-base !font-semibold">框架</flux:heading>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <flux:badge color="red" class="!rounded-lg">Laravel</flux:badge>
+                        <flux:badge color="blue" class="!rounded-lg">ThinkPHP</flux:badge>
+                        <flux:badge color="green" class="!rounded-lg">Yii</flux:badge>
+                        <flux:badge color="amber" class="!rounded-lg">CodeIgniter</flux:badge>
+                        <flux:badge color="zinc" class="!rounded-lg">Hyperf</flux:badge>
+                        <flux:badge color="sky" class="!rounded-lg">Gin</flux:badge>
+                        <flux:badge color="cyan" class="!rounded-lg">Fiber</flux:badge>
+                        <flux:badge color="orange" class="!rounded-lg">Spring Boot</flux:badge>
+                    </div>
+                </flux:card>
+                <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-sky-200 hover:shadow-lg dark:hover:border-sky-800">
+                    <flux:heading class="!text-base !font-semibold">语言 / 环境</flux:heading>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <flux:badge color="sky" class="!rounded-lg">PHP 7.x</flux:badge>
+                        <flux:badge color="sky" class="!rounded-lg">PHP 8.x</flux:badge>
+                        <flux:badge color="blue" class="!rounded-lg">Go</flux:badge>
+                        <flux:badge color="red" class="!rounded-lg">Java</flux:badge>
+                        <flux:badge color="indigo" class="!rounded-lg">MySQL</flux:badge>
+                        <flux:badge color="rose" class="!rounded-lg">Redis</flux:badge>
+                        <flux:badge color="green" class="!rounded-lg">Nginx</flux:badge>
+                    </div>
+                </flux:card>
+                <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-lg dark:hover:border-indigo-800">
+                    <flux:heading class="!text-base !font-semibold">方向</flux:heading>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <flux:badge color="indigo" class="!rounded-lg">纯后端</flux:badge>
+                        <flux:badge color="purple" class="!rounded-lg">前后端分离</flux:badge>
+                        <flux:badge color="pink" class="!rounded-lg">API 服务</flux:badge>
+                        <flux:badge color="orange" class="!rounded-lg">全栈</flux:badge>
+                    </div>
+                </flux:card>
+                <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-lg dark:hover:border-emerald-800">
+                    <flux:heading class="!text-base !font-semibold">其他</flux:heading>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <flux:badge color="emerald" class="!rounded-lg">Docker</flux:badge>
+                        <flux:badge color="teal" class="!rounded-lg">Git</flux:badge>
+                        <flux:badge color="cyan" class="!rounded-lg">CI/CD</flux:badge>
+                        <flux:badge color="zinc" class="!rounded-lg">Linux</flux:badge>
+                    </div>
+                </flux:card>
+            </div>
+        </div>
+    </section>
+
+    {{-- Workflow --}}
+    <section class="border-t border-zinc-100 bg-zinc-50/50 py-24 dark:border-zinc-800/50 dark:bg-zinc-900/50">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-3xl text-center">
+                <flux:badge color="amber" class="!rounded-full !px-3 !py-1 !text-xs">服务流程</flux:badge>
+                <flux:heading size="lg" class="mt-6">从需求到交付，清晰透明</flux:heading>
+            </div>
+            <div class="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                @php
+                    $steps = [
+                        ['emoji' => '📋', 'title' => '需求沟通', 'desc' => '发我需求文档或截图，详细沟通确认细节'],
+                        ['emoji' => '✍️', 'title' => '方案确认', 'desc' => '出技术方案、工时评估、报价，达成一致后启动'],
+                        ['emoji' => '💻', 'title' => '开发实现', 'desc' => '按节点推进，定期同步进度，保障代码质量'],
+                        ['emoji' => '🧪', 'title' => '测试交付', 'desc' => '自测通过后交付验收，配合修改直到满意'],
+                        ['emoji' => '💬', 'title' => '售后答疑', 'desc' => '交付后提供技术支持，长期合作无忧'],
+                    ];
+                @endphp
+                @foreach ($steps as $step)
+                    <flux:card class="group text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                        <div class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-zinc-100 to-zinc-200 text-2xl dark:from-zinc-800 dark:to-zinc-700">{{ $step['emoji'] }}</div>
+                        <flux:heading class="mt-4 !text-base">{{ $step['title'] }}</flux:heading>
+                        <flux:text class="mt-2 !text-sm">{{ $step['desc'] }}</flux:text>
+                    </flux:card>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    {{-- Bottom CTA --}}
+    <section class="relative overflow-hidden border-t border-zinc-100 dark:border-zinc-800/50">
+        <div class="absolute inset-0 bg-gradient-to-b from-blue-50/30 to-indigo-50/30 dark:from-blue-950/10 dark:to-indigo-950/10"></div>
+        <div class="relative mx-auto max-w-3xl px-4 py-24 text-center sm:px-6 lg:px-8">
+            <flux:heading size="lg">有 PHP / Go / Java 项目要开发？</flux:heading>
+            <flux:text class="mt-4 !text-lg">
+                直接发需求文档或截图，免费初步评估。<br class="hidden sm:block" />
+                诚信接单，不接违法违规项目。
+            </flux:text>
+            <div class="mt-10">
+                <flux:heading size="base" class="!font-semibold">联系我</flux:heading>
+                <div class="mt-4 inline-flex items-center gap-3 rounded-2xl border border-green-200 bg-green-50 px-8 py-4 text-lg font-semibold text-green-700 shadow-sm dark:border-green-800 dark:bg-green-950 dark:text-green-300">
+                    <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 0 1 .598.082l1.584.926a.272.272 0 0 0 .14.047c.134 0 .24-.111.24-.247 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 0 1-.023-.156.49.49 0 0 1 .201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.952-7.062-6.122zm-2.18 2.769c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.97-.982z"/></svg>
+                    <span class="whitespace-nowrap">微信：runphp</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</flux:main>

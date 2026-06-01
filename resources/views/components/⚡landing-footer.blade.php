@@ -23,7 +23,7 @@ new class extends Component {
                 <h3 class="text-sm font-semibold text-zinc-900 dark:text-white">{{ __('Products') }}</h3>
                 <ul class="mt-4 space-y-3">
                     <li>
-                        <a href="#" class="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
+                        <a href="{{ localizedRoute('features', ['locale' => app()->getLocale()]) }}" wire:navigate class="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
                             {{ __('Features') }}
                         </a>
                     </li>

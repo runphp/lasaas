@@ -18,9 +18,17 @@ class PageSeeder extends Seeder
         );
 
         Page::query()->updateOrCreate(
-            ['slug' => 'pricing'],
+            ['slug' => 'features'],
             [
-                'title' => 'Pricing',
+                'title' => 'Features',
+                'is_published' => true,
+            ]
+        );
+
+        Page::query()->updateOrCreate(
+            ['slug' => 'about'],
+            [
+                'title' => 'About',
                 'is_published' => true,
             ]
         );
