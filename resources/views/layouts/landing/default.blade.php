@@ -10,7 +10,7 @@
              class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
     {{-- 移动端：显示 toggle 按钮 --}}
     <flux:sidebar.toggle icon="bars-2" inset="left" class="lg:hidden"/>
-    <div class="flex-1 flex items-center justify-center lg:justify-start">
+    <div class="max-lg:flex-1 max-lg:flex max-lg:items-center max-lg:justify-center">
         <x-app-logo href="{{ localizedRoute('home', ['locale' => app()->getLocale()]) }}" wire:navigate />
     </div>
     <flux:navbar class="hidden lg:flex">
