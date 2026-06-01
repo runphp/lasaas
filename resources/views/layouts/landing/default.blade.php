@@ -16,7 +16,7 @@
     <flux:navbar class="hidden lg:flex">
         <flux:navbar.item :href="localizedRoute('home', ['locale' => app()->getLocale()])"
                           :current="request()->routeIs('home')" wire:navigate>
-            {{ __('Home') }}
+            {{ __('Home|nav') }}
         </flux:navbar.item>
         <flux:navbar.item :href="localizedRoute('features', ['locale' => app()->getLocale()])"
                           :current="request()->routeIs('features')" wire:navigate>
@@ -68,7 +68,7 @@
     <flux:sidebar.nav>
         <flux:sidebar.item icon="home" :href="localizedRoute('home', ['locale' => app()->getLocale()])"
                            :current="request()->routeIs('home')" wire:navigate>
-            {{ __('Home') }}
+            {{ __('Home|nav') }}
         </flux:sidebar.item>
         <flux:sidebar.item icon="sparkles" :href="localizedRoute('features', ['locale' => app()->getLocale()])"
                            :current="request()->routeIs('features')" wire:navigate>
