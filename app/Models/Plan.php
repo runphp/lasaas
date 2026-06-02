@@ -3,26 +3,14 @@
 namespace App\Models;
 
 use App\Enums\BillingCycle;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+#[Fillable(['name', 'slug', 'description', 'badge', 'price', 'original_price', 'billing_cycle', 'features', 'sort_order', 'is_featured', 'is_active'])]
 class Plan extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'name',
-        'slug',
-        'description',
-        'badge',
-        'price',
-        'original_price',
-        'billing_cycle',
-        'features',
-        'sort_order',
-        'is_featured',
-        'is_active',
-    ];
 
     protected function casts(): array
     {

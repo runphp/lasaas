@@ -2,18 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
+#[Fillable(['slug', 'title', 'meta', 'content', 'is_published'])]
 class Page extends Model
 {
-    protected $fillable = [
-        'slug',
-        'title',
-        'meta',
-        'content',
-        'is_published',
-    ];
-
     protected $casts = [
         'meta' => 'array',
         'is_published' => 'boolean',

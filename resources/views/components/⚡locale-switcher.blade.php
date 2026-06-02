@@ -5,6 +5,11 @@ use LaravelLang\Locales\Facades\Locales;
 use Livewire\Component;
 
 new class extends Component {
+    public string $currentRoute;
+    public function mount(): void
+    {
+        $this->currentRoute = request()->route()->getName();
+    }
     public function locales(): Collection
     {
         return Locales::installed();
@@ -31,7 +36,7 @@ new class extends Component {
         <flux:menu>
             @foreach ($this->locales() as $locale)
                 <flux:menu.item
-                    href="{{ localizedRoute('home', ['locale' => $locale->code]) }}"
+                    href="{{ localizedRoute($this->currentRoute, ['locale' => $locale->code]) }}"
                     :active="$locale->code === $this->currentCode()"
                 >
                     {{ $locale->native }}

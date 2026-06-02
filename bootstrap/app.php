@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Middleware\LocalizationByHeader;
 use App\Http\Middleware\SetHomeLocale;
 use App\Http\Middleware\SetTeamUrlDefaults;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use LaravelLang\Routes\Middlewares\LocalizationByCookie;
+use LaravelLang\Routes\Middlewares\LocalizationByHeader;
 use LaravelLang\Routes\Middlewares\LocalizationByModel;
 use LaravelLang\Routes\Middlewares\LocalizationByParameter;
 use LaravelLang\Routes\Middlewares\LocalizationByParameterWithRedirect;
