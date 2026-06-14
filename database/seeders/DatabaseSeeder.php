@@ -2,9 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Enums\TeamRole;
+use App\Models\Team;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
@@ -19,7 +22,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'runphp@qq.com'],
             [
                 'name' => 'Super Admin',
-                'password' => bcrypt('123456789'),
+                'password' => Hash::make('123456789'),
                 'email_verified_at' => now(),
             ]
         );
@@ -27,6 +30,20 @@ class DatabaseSeeder extends Seeder
         // 确保 super_admin 角色存在并分配
         Role::firstOrCreate(['name' => 'super_admin']);
         $user->assignRole('super_admin');
+
+        // 确保超级管理员有个人团队（与 UserFactory 行为一致）
+        if (! $user->personalTeam()) {
+            $team = Team::factory()->personal()->create([
+                'name' => $user->name."'s Team",
+                'slug' => null,  // 让 boot() 钩子从 name 重新生成 slug
+            ]);
+
+            $team->members()->attach($user, [
+                'role' => TeamRole::Owner->value,
+            ]);
+
+            $user->switchTeam($team);
+        }
 
         User::factory(10)->create();
 

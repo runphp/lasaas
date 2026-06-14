@@ -29,10 +29,7 @@ class TeamPolicy
 
     public function update(AuthUser $authUser, Team $team): bool
     {
-        return $authUser->can('Update:Team') || $team->members()
-            ->where('user_id', $authUser->id)
-            ->whereIn('role', ['owner', 'admin'])
-            ->exists();
+        return $authUser->can('Update:Team');
     }
 
     public function delete(AuthUser $authUser, Team $team): bool
