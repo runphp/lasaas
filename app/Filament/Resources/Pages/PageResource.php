@@ -22,7 +22,7 @@ class PageResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'Page';
+    protected static ?string $recordTitleAttribute = 'title';
 
     public static function getNavigationLabel(): string
     {
@@ -32,6 +32,11 @@ class PageResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return __('filament-resources.system.group');
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title', 'slug'];
     }
 
     public static function form(Schema $schema): Schema
