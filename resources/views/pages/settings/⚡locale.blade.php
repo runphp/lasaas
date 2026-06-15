@@ -27,7 +27,7 @@ class extends Component {
 
         Flux::toast(variant: 'success', text: __('Locale updated.'));
 
-        $this->dispatch('locale-updated');
+        $this->redirectRoute('locale.edit',navigate: true);
     }
 
     #[Computed]
