@@ -12,8 +12,9 @@ return new class extends Migration
             $table->id();
             $table->string('slug')->unique();
             $table->string('title');
+            $table->string('layout')->default('landing.default');
             $table->json('meta')->nullable();
-            $table->longText('content')->nullable();
+            $table->json('content')->nullable();
             $table->boolean('is_published')->default(true);
             $table->timestamps();
         });

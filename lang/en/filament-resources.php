@@ -9,6 +9,9 @@ return [
     'plan' => [
         'label' => 'Plan Management',
     ],
+    'page' => [
+        'label' => 'Page Management',
+    ],
     'tenant' => [
         'label' => 'Tenant Management',
     ],

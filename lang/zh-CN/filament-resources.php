@@ -9,6 +9,9 @@ return [
     'plan' => [
         'label' => '套餐管理',
     ],
+    'page' => [
+        'label' => '页面管理',
+    ],
     'tenant' => [
         'label' => '租户管理',
     ],
