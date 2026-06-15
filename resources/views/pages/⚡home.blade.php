@@ -79,9 +79,7 @@ new #[Layout('layouts::landing')] class extends Component
                 <flux:card class="group relative overflow-hidden !p-8 transition-all duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/5 dark:hover:border-blue-700">
                     <div class="absolute top-0 right-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-blue-100/50 opacity-0 blur-2xl transition-opacity group-hover:opacity-100 dark:bg-blue-900/30"></div>
                     <div class="relative flex size-14 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/20">
-                        <svg class="h-7 w-7 text-zinc-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z" />
-                        </svg>
+                        <flux:icon.database class="size-7 text-zinc-900 dark:text-white" />
                     </div>
                     <flux:heading class="mt-6">独立数据库</flux:heading>
                     <flux:text class="mt-3">每个租户独立数据库，数据物理隔离，满足等保合规要求</flux:text>
@@ -89,9 +87,7 @@ new #[Layout('layouts::landing')] class extends Component
                 <flux:card class="group relative overflow-hidden !p-8 transition-all duration-300 hover:-translate-y-1 hover:border-green-300 hover:shadow-xl hover:shadow-green-500/5 dark:hover:border-green-700">
                     <div class="absolute top-0 right-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-green-100/50 opacity-0 blur-2xl transition-opacity group-hover:opacity-100 dark:bg-green-900/30"></div>
                     <div class="relative flex size-14 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg shadow-green-500/20">
-                        <svg class="h-7 w-7 text-zinc-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
-                        </svg>
+                        <flux:icon.globe class="size-7 text-zinc-900 dark:text-white" />
                     </div>
                     <flux:heading class="mt-6">独立域名</flux:heading>
                     <flux:text class="mt-3">每个租户可绑定专属域名，完全白标，客户无感知</flux:text>
@@ -99,9 +95,7 @@ new #[Layout('layouts::landing')] class extends Component
                 <flux:card class="group relative overflow-hidden !p-8 transition-all duration-300 hover:-translate-y-1 hover:border-purple-300 hover:shadow-xl hover:shadow-purple-500/5 dark:hover:border-purple-700">
                     <div class="absolute top-0 right-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-purple-100/50 opacity-0 blur-2xl transition-opacity group-hover:opacity-100 dark:bg-purple-900/30"></div>
                     <div class="relative flex size-14 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 shadow-lg shadow-purple-500/20">
-                        <svg class="h-7 w-7 text-zinc-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
-                        </svg>
+                        <flux:icon.users class="size-7 text-zinc-900 dark:text-white" />
                     </div>
                     <flux:heading class="mt-6">团队管辖</flux:heading>
                     <flux:text class="mt-3">用户可以在多个团队间切换，每个团队独立管理自己的租户</flux:text>
@@ -109,9 +103,7 @@ new #[Layout('layouts::landing')] class extends Component
                 <flux:card class="group relative overflow-hidden !p-8 transition-all duration-300 hover:-translate-y-1 hover:border-amber-300 hover:shadow-xl hover:shadow-amber-500/5 dark:hover:border-amber-700">
                     <div class="absolute top-0 right-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-amber-100/50 opacity-0 blur-2xl transition-opacity group-hover:opacity-100 dark:bg-amber-900/30"></div>
                     <div class="relative flex size-14 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/20">
-                        <svg class="h-7 w-7 text-zinc-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 0 1-.657.643 48.39 48.39 0 0 1-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 0 1-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 0 0-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 0 1-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 0 0 .657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 0 1-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.401.604-.401.959v0c0 .333.277.599.61.58a48.1 48.1 0 0 0 5.427-.63 48.05 48.05 0 0 0 .582-4.717.532.532 0 0 0-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.959.401v0a.656.656 0 0 0 .658-.663 48.422 48.422 0 0 0-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 0 1-.61-.58v0Z" />
-                        </svg>
+                        <flux:icon.blocks class="size-7 text-zinc-900 dark:text-white" />
                     </div>
                     <flux:heading class="mt-6">模块开关</flux:heading>
                     <flux:text class="mt-3">中央管理平台可精细控制每个租户 App 可用的功能模块</flux:text>
@@ -262,32 +254,44 @@ new #[Layout('layouts::landing')] class extends Component
             </div>
             <div class="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg dark:hover:border-blue-700">
-                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 to-indigo-200 text-2xl dark:from-blue-900/50 dark:to-indigo-800/50">🧠</div>
+                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 to-indigo-200 dark:from-blue-900/50 dark:to-indigo-800/50">
+                        <flux:icon.brain class="size-6 text-blue-600 dark:text-blue-400" />
+                    </div>
                     <flux:heading class="mt-5 !text-base">RAG 知识库平台</flux:heading>
                     <flux:text class="mt-2">企业私有文档问答，知识库绝对隔离</flux:text>
                 </flux:card>
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-green-300 hover:shadow-lg dark:hover:border-green-700">
-                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-green-100 to-emerald-200 text-2xl dark:from-green-900/50 dark:to-emerald-800/50">💬</div>
+                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-green-100 to-emerald-200 dark:from-green-900/50 dark:to-emerald-800/50">
+                        <flux:icon.message-circle class="size-6 text-green-600 dark:text-green-400" />
+                    </div>
                     <flux:heading class="mt-5 !text-base">AI 客服机器人</flux:heading>
                     <flux:text class="mt-2">每个租户基于自身知识独立训练</flux:text>
                 </flux:card>
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-purple-300 hover:shadow-lg dark:hover:border-purple-700">
-                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-100 to-violet-200 text-2xl dark:from-purple-900/50 dark:to-violet-800/50">✍️</div>
+                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-100 to-violet-200 dark:from-purple-900/50 dark:to-violet-800/50">
+                        <flux:icon.pen-line class="size-6 text-purple-600 dark:text-purple-400" />
+                    </div>
                     <flux:heading class="mt-5 !text-base">AI 内容工厂</flux:heading>
                     <flux:text class="mt-2">按品牌生成文案，tone&voice 独立配置</flux:text>
                 </flux:card>
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-amber-300 hover:shadow-lg dark:hover:border-amber-700">
-                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-100 to-orange-200 text-2xl dark:from-amber-900/50 dark:to-orange-800/50">📊</div>
+                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-100 to-orange-200 dark:from-amber-900/50 dark:to-orange-800/50">
+                        <flux:icon.chart-bar class="size-6 text-amber-600 dark:text-amber-400" />
+                    </div>
                     <flux:heading class="mt-5 !text-base">AI 数据分析</flux:heading>
                     <flux:text class="mt-2">租户上传数据，AI 生成洞察和预测</flux:text>
                 </flux:card>
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-rose-300 hover:shadow-lg dark:hover:border-rose-700">
-                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-rose-100 to-pink-200 text-2xl dark:from-rose-900/50 dark:to-pink-800/50">🤖</div>
+                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-rose-100 to-pink-200 dark:from-rose-900/50 dark:to-pink-800/50">
+                        <flux:icon.bot class="size-6 text-rose-600 dark:text-rose-400" />
+                    </div>
                     <flux:heading class="mt-5 !text-base">AI Agent 工作流</flux:heading>
                     <flux:text class="mt-2">每个租户编排自己的 Agent 和工具链</flux:text>
                 </flux:card>
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-teal-300 hover:shadow-lg dark:hover:border-teal-700">
-                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal-100 to-cyan-200 text-2xl dark:from-teal-900/50 dark:to-cyan-800/50">💰</div>
+                    <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal-100 to-cyan-200 dark:from-teal-900/50 dark:to-cyan-800/50">
+                        <flux:icon.coins class="size-6 text-teal-600 dark:text-teal-400" />
+                    </div>
                     <flux:heading class="mt-5 !text-base">AI 智能记账</flux:heading>
                     <flux:text class="mt-2">财务数据自动分类对账，物理隔离</flux:text>
                 </flux:card>
@@ -306,9 +310,7 @@ new #[Layout('layouts::landing')] class extends Component
             <div class="mt-12 grid gap-8 sm:grid-cols-2">
                 <div class="group rounded-2xl border border-blue-200/60 bg-gradient-to-br from-blue-50/50 to-white p-8 transition-all duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl dark:border-blue-800/60 dark:from-blue-950/30 dark:to-zinc-900 dark:hover:border-blue-700">
                     <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25">
-                        <svg class="h-6 w-6 text-zinc-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                        </svg>
+                        <flux:icon.circle-user-round class="size-6 text-zinc-900 dark:text-white" />
                     </div>
                     <flux:heading class="mt-6 !text-xl">在线演示</flux:heading>
                     <flux:text class="mt-2">登录即可体验完整功能</flux:text>
@@ -329,9 +331,7 @@ new #[Layout('layouts::landing')] class extends Component
                 </div>
                 <div class="group rounded-2xl border border-zinc-200 bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:border-zinc-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700">
                     <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-900 shadow-lg shadow-zinc-500/20 dark:from-zinc-600 dark:to-zinc-800">
-                        <svg class="h-6 w-6 text-zinc-900 dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
-                        </svg>
+                        <flux:icon.code class="size-6 text-zinc-900 dark:text-white" />
                     </div>
                     <flux:heading class="mt-6 !text-xl">开源地址</flux:heading>
                     <flux:text class="mt-2">查看源码，Star 支持我们</flux:text>
