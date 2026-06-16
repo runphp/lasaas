@@ -22,6 +22,9 @@ class TenantInfolist
                     ->placeholder('-'),
                 TextEntry::make('user.name')
                     ->label('User'),
+                TextEntry::make('team.name')
+                    ->label('Team')
+                    ->placeholder('-'),
                 TextEntry::make('status')
                     ->badge(),
                 TextEntry::make('expired_at')

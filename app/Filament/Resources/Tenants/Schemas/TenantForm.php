@@ -27,6 +27,9 @@ class TenantForm
                 Select::make('user_id')
                     ->relationship('user', 'name')
                     ->required(),
+                Select::make('team_id')
+                    ->relationship('team', 'name')
+                    ->default(null),
                 Select::make('status')
                     ->options(TenantStatus::class)
                     ->default('pending')

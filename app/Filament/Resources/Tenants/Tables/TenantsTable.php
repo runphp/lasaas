@@ -27,6 +27,8 @@ class TenantsTable
                     ->searchable(),
                 TextColumn::make('user.name')
                     ->searchable(),
+                TextColumn::make('team.name')
+                    ->searchable(),
                 TextColumn::make('status')
                     ->badge(),
                 TextColumn::make('expired_at')

@@ -16,7 +16,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     public static function getCustomColumns(): array
     {
         return [
-            'id', 'name', 'email', 'phone', 'user_id', 'status', 'expired_at', 'data',
+            'id', 'name', 'email', 'phone', 'user_id', 'team_id', 'status', 'expired_at', 'data',
         ];
     }
 
@@ -31,5 +31,10 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function team(): BelongsTo
+    {
+        return $this->belongsTo(Team::class);
     }
 }
