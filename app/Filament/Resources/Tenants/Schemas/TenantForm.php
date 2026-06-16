@@ -26,9 +26,13 @@ class TenantForm
                     ->default(null),
                 Select::make('user_id')
                     ->relationship('user', 'name')
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 Select::make('team_id')
                     ->relationship('team', 'name')
+                    ->searchable()
+                    ->preload()
                     ->default(null),
                 Select::make('status')
                     ->options(TenantStatus::class)

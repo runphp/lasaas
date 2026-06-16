@@ -2,11 +2,18 @@
 
 namespace App\Enums;
 
-enum TenantStatus: string
+use Filament\Support\Contracts\HasLabel;
+
+enum TenantStatus: string implements HasLabel
 {
-    case PENDING = 'pending';       // 待审核
-    case ACTIVE = 'active';         // 正常使用
-    case SUSPENDED = 'suspended';   // 已暂停
-    case EXPIRED = 'expired';       // 已过期
-    case DISABLED = 'disabled';     // 已禁用
+    case PENDING = 'pending';
+    case ACTIVE = 'active';
+    case SUSPENDED = 'suspended';
+    case EXPIRED = 'expired';
+    case DISABLED = 'disabled';
+
+    public function getLabel(): ?string
+    {
+        return __('filament-resources.tenant.statuses.' . $this->value);
+    }
 }

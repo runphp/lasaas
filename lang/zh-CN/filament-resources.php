@@ -14,6 +14,13 @@ return [
     ],
     'tenant' => [
         'label' => '租户管理',
+        'statuses' => [
+            'pending' => '待审核',
+            'active' => '正常使用',
+            'suspended' => '已暂停',
+            'expired' => '已过期',
+            'disabled' => '已禁用',
+        ],
     ],
     'user' => [
         'label' => '用户管理',

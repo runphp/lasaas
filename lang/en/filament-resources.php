@@ -14,6 +14,13 @@ return [
     ],
     'tenant' => [
         'label' => 'Tenant Management',
+        'statuses' => [
+            'pending' => 'Pending',
+            'active' => 'Active',
+            'suspended' => 'Suspended',
+            'expired' => 'Expired',
+            'disabled' => 'Disabled',
+        ],
     ],
     'user' => [
         'label' => 'User Management',
