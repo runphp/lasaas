@@ -4,8 +4,8 @@ namespace App\Filament\Resources\Tenants\Schemas;
 
 use App\Enums\TenantStatus;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -39,8 +39,17 @@ class TenantForm
                     ->default('pending')
                     ->required(),
                 DateTimePicker::make('expired_at'),
-                Textarea::make('data')
-                    ->default(null)
+                Repeater::make('domains')
+                    ->relationship('domains')
+                    ->schema([
+                        TextInput::make('domain')
+                            ->required()
+                            ->unique('domains', 'domain', ignoreRecord: true)
+                            ->helperText('如：myshop.tenant.ddev.site'),
+                    ])
+                    ->addActionLabel('添加域名')
+                    ->collapsible()
+                    ->defaultItems(1)
                     ->columnSpanFull(),
             ]);
     }

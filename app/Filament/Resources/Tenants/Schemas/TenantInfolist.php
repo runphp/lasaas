@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Tenants\Schemas;
 
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -30,15 +31,17 @@ class TenantInfolist
                 TextEntry::make('expired_at')
                     ->dateTime()
                     ->placeholder('-'),
+                RepeatableEntry::make('domains')
+                    ->schema([
+                        TextEntry::make('domain'),
+                    ])
+                    ->columnSpanFull(),
                 TextEntry::make('created_at')
                     ->dateTime()
                     ->placeholder('-'),
                 TextEntry::make('updated_at')
                     ->dateTime()
                     ->placeholder('-'),
-                TextEntry::make('data')
-                    ->placeholder('-')
-                    ->columnSpanFull(),
             ]);
     }
 }

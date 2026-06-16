@@ -25,6 +25,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         return [
             'status' => TenantStatus::class,
             'expires_at' => 'datetime',
+            'data' => 'array',
         ];
     }
 
