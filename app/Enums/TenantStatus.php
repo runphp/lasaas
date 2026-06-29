@@ -14,6 +14,6 @@ enum TenantStatus: string implements HasLabel
 
     public function getLabel(): ?string
     {
-        return __('filament-resources.tenant.statuses.' . $this->value);
+        return __('filament-resources.tenant.statuses.'.$this->value);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\TenantStatus;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
@@ -37,5 +38,28 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);
+    }
+
+    public function tenantModules(): HasMany
+    {
+        return $this->hasMany(TenantModule::class);
+    }
+
+    public function getEnabledModules(): array
+    {
+        return $this->tenantModules()
+            ->where('enabled', true)
+            ->with('module')
+            ->get()
+            ->pluck('module.package_name')
+            ->toArray();
+    }
+
+    public function setModuleEnabled(string $moduleId, bool $enabled): void
+    {
+        $this->tenantModules()->updateOrCreate(
+            ['module_id' => $moduleId],
+            ['enabled' => $enabled]
+        );
     }
 }

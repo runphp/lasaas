@@ -28,4 +28,39 @@ return [
     'system' => [
         'group' => '系统管理',
     ],
+    'module' => [
+        'label' => '模块管理',
+        'statuses' => [
+            'active' => '启用',
+            'inactive' => '禁用',
+        ],
+        'areas' => [
+            'central' => '中央应用',
+            'tenant' => '租户应用',
+        ],
+        'sections' => [
+            'basic' => '基本信息',
+            'provider' => '服务提供者',
+            'ordering' => '加载配置',
+        ],
+        'fields' => [
+            'package_name' => '包名',
+            'name' => '模块名称',
+            'description' => '描述',
+            'version' => '版本',
+            'provider_class' => 'Provider 类',
+            'weight' => '权重',
+            'dependencies' => '依赖模块',
+            'after' => '排在之后',
+            'areas' => '生效区域',
+            'path' => '磁盘路径',
+            'status' => '状态',
+        ],
+        'helpers' => [
+            'package_name' => 'Composer 包名，如 my-saas/module-blog',
+            'weight' => '越小越先加载，默认 0',
+            'dependencies' => '由 modules:sync 从 composer require 自动分析得出',
+            'after' => '非强依赖但必须在这些模块之后加载',
+        ],
+    ],
 ];

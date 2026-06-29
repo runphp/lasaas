@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.3",
         "bezhansalleh/filament-shield": "^4.2",
+        "composer/installers": "^2.0",
         "filament/filament": "^5.6",
         "laravel-lang/common": "^6.8",
         "laravel/chisel": "^0.1.0",
@@ -92,6 +93,9 @@
         ]
     },
     "extra": {
+        "installer-paths": {
+            "packages/contrib/{$name}": ["type:lasaas-module"]
+        },
         "laravel": {
             "dont-discover": [],
             "installer": {
@@ -107,6 +111,7 @@
             "php": "8.3"
         },
         "allow-plugins": {
+            "composer/installers": true,
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
         }

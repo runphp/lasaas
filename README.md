@@ -333,6 +333,7 @@ lasaas/
 │   ├── Http/              # HTTP 相关（Controllers、Middleware、Responses）
 │   ├── Livewire/          # Livewire 组件
 │   ├── Models/            # Eloquent 数据模型（User、Team、Tenant、Membership等）
+│   ├── Modules/           # 模块管理器（ModuleManager、BaseModuleServiceProvider）
 │   ├── Notifications/     # 通知类
 │   ├── Policies/          # 授权策略类
 │   ├── Providers/         # 服务提供者
@@ -344,11 +345,21 @@ lasaas/
 │   │   └── tenant/        # 租户数据库迁移模板
 │   ├── seeders/           # 数据填充器
 │   └── factories/         # 模型工厂（测试用）
+├── packages/              # 功能模块（lasaas-module）
+│   ├── contrib/           # Composer 安装的第三方模块（.gitignore）
+│   │   ├── module-blog/   # 示例：博客模块
+│   │   └── module-shop/   # 示例：商城模块
+│   └── custom/            # 项目自定义模块（提交到 Git）
+│       └── ...
 ├── resources/
 │   ├── views/             # Blade 视图模板
 │   │   ├── components/    # Blade 组件
 │   │   ├── layouts/       # 布局模板
-│   │   ├── pages/         # 页面视图（auth、teams、profile）
+│   │   │   ├── landing/   # Landing 页面布局（default / tenant）
+│   │   │   ├── app/       # App 内页布局
+│   │   │   └── auth/      # 认证页面布局
+│   │   ├── pages/         # 中央应用页面（home、auth、teams、profile）
+│   │   ├── tenant/        # 租户应用页面
 │   │   └── flux/          # Flux UI 组件覆盖
 │   ├── js/                # JavaScript 文件
 │   └── css/               # CSS 样式文件
@@ -365,7 +376,7 @@ lasaas/
 ├── lang/                  # 多语言文件（en、zh_CN）
 ├── .ddev/                 # DDEV 开发环境配置
 ├── .env.example           # 环境变量示例
-├── composer.json          # Composer 依赖配置
+├── composer.json          # Composer 依赖配置（installer-paths 映射 lasaas-module）
 ├── package.json           # NPM 依赖配置
 ├── vite.config.js         # Vite 构建配置
 └── artisan                # Laravel Artisan 命令行工具
