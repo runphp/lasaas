@@ -59,7 +59,7 @@ return [
         'helpers' => [
             'package_name' => 'Composer 包名，如 my-saas/module-blog',
             'weight' => '越小越先加载，默认 0',
-            'dependencies' => '由 modules:sync 从 composer require 自动分析得出',
+            'dependencies' => '由 module:sync 从 composer require 自动分析得出',
             'after' => '非强依赖但必须在这些模块之后加载',
         ],
     ],

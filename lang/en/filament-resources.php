@@ -59,7 +59,7 @@ return [
         'helpers' => [
             'package_name' => 'Composer package name, e.g. my-saas/module-blog',
             'weight' => 'Lower loads first, default 0',
-            'dependencies' => 'Auto-analyzed from composer require by modules:sync',
+            'dependencies' => 'Auto-analyzed from composer require by module:sync',
             'after' => 'Non-hard dependency but must load after these modules',
         ],
     ],

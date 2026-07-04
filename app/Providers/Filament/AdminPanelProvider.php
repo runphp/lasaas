@@ -3,7 +3,9 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Dashboard;
+use App\Module\ModuleManager;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Contracts\Plugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -58,6 +60,26 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])->plugins([
                 FilamentShieldPlugin::make(),
+                ...static::getModulePlugins(),
             ]);
+    }
+
+    /**
+     * 从已安装的 central 区域模块中收集 Filament Plugin 实例。
+     *
+     * @return array<Plugin>
+     */
+    protected static function getModulePlugins(): array
+    {
+        /** @var ModuleManager $manager */
+        $manager = app(ModuleManager::class);
+
+        $plugins = [];
+
+        foreach ($manager->getCentralFilamentPlugins() as $pluginClass) {
+            $plugins[] = app($pluginClass);
+        }
+
+        return $plugins;
     }
 }

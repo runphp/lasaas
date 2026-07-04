@@ -17,7 +17,7 @@ class TenantModule extends Model
     protected function casts(): array
     {
         return [
-            'enabled'  => 'boolean',
+            'enabled' => 'boolean',
             'settings' => 'array',
         ];
     }

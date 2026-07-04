@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ModuleStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -19,15 +20,28 @@ class Module extends Model
         'areas',
         'path',
         'status',
+        'installed_at',
+        'config',
     ];
 
     protected function casts(): array
     {
         return [
             'dependencies' => 'array',
-            'after'        => 'array',
-            'areas'        => 'array',
+            'after' => 'array',
+            'areas' => 'array',
+            'status' => ModuleStatus::class,
+            'installed_at' => 'datetime',
+            'config' => 'array',
         ];
+    }
+
+    /**
+     * 判断模块是否已安装（曾被启用过）。
+     */
+    public function isInstalled(): bool
+    {
+        return $this->installed_at !== null;
     }
 
     public function tenantModules(): HasMany

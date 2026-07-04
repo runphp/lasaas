@@ -346,11 +346,11 @@ lasaas/
 │   ├── seeders/           # 数据填充器
 │   └── factories/         # 模型工厂（测试用）
 ├── packages/              # 功能模块（lasaas-module）
-│   ├── contrib/           # Composer 安装的第三方模块（.gitignore）
-│   │   ├── module-blog/   # 示例：博客模块
-│   │   └── module-shop/   # 示例：商城模块
+│   ├── contrib/           # Composer 安装的第三方模块（.gitignore，不提交到 Git）
 │   └── custom/            # 项目自定义模块（提交到 Git）
-│       └── ...
+│       └── lasaas/
+│           ├── demo-module/   # 示例模块
+│           └── ...            # 你的自定义模块
 ├── resources/
 │   ├── views/             # Blade 视图模板
 │   │   ├── components/    # Blade 组件
@@ -582,6 +582,101 @@ $user->can('edit-posts');
 $user->hasRole('manager');
 ```
 
+### 模块系统
+
+Lasaas 采用与 Drupal 类似的模块系统：模块的存亡以文件系统为准，autoload 由构建步骤生成，不依赖运行时扫描。
+
+#### 目录结构
+
+```
+packages/
+├── contrib/          # Composer 安装的第三方模块（.gitignore，提交到 Git）
+│   ├── vendor-a/
+│   │   └── module-x/     # contributor vendor-a/module-x
+│   └── vendor-b/
+│       └── module-y/     # contributor vendor-b/module-y
+└── custom/           # 项目自定义模块（提交到 Git）
+    └── lasaas/
+        ├── demo-module/  # 示例：lasaas/demo-module
+        └── blog/         # 示例：lasaas/blog
+```
+
+#### 模块生命周期
+
+| 操作 | 命令 | 说明 |
+|------|------|------|
+| 新增自定义模块 | 复制到 `packages/custom/vendor/name/` | 手动放目录 |
+| 删除自定义模块 | 直接删除目录 | `rm -rf packages/custom/vendor/name/` |
+| 安装第三方模块 | `composer require vendor/name` | 自动安装到 `packages/contrib/` |
+| 卸载第三方模块 | `composer remove vendor/name` | 自动清理 |
+| **同步模块元数据** | `composer dump-autoload` | 自动触发 `module:sync`，更新数据库 + autoload 缓存 |
+
+`composer dump-autoload` 的 `post-autoload-dump` 钩子会自动执行 `module:sync`，实现：
+1. 扫描 `packages/contrib/` 和 `packages/custom/` 中的 `lasaas-module` 类型包
+2. 将模块元数据写入数据库（`modules` 表）
+3. 生成 autoload 缓存文件 `bootstrap/cache/lasaas_modules_autoload.php`
+4. 物理删除磁盘上已移除的模块记录
+
+> **注意**：新增或删除模块后，必须执行 `composer dump-autoload` 或 `ddev composer dump-autoload`，让数据库和 autoload 与文件系统保持一致。
+
+#### 如何开发一个新模块
+
+1. 在 `packages/custom/lasaas/` 下创建模块目录：
+
+```
+packages/custom/lasaas/my-module/
+├── composer.json          # type 设为 "lasaas-module"
+├── src/
+│   └── MyModuleServiceProvider.php
+├── routes/
+│   └── web.php
+├── database/
+│   └── migrations/
+└── resources/
+    └── views/
+```
+
+2. `composer.json` 示例：
+
+```json
+{
+    "name": "lasaas/my-module",
+    "type": "lasaas-module",
+    "autoload": {
+        "psr-4": {
+            "Lasaas\\MyModule\\": "src/"
+        }
+    },
+    "extra": {
+        "lasaas-module": {
+            "name": "我的模块",
+            "areas": ["tenant"],
+            "weight": 0
+        }
+    }
+}
+```
+
+3. 执行同步：
+```bash
+ddev composer dump-autoload
+```
+
+4. 在 Filament 管理后台启用/禁用模块。
+
+#### 命令参考
+
+```bash
+# 查看模块同步状态
+ddev artisan module:sync --dry-run
+
+# 强制执行同步
+ddev artisan module:sync --force
+
+# 删除模块但保留数据库记录（仅标记 inactive）
+ddev artisan module:sync --soft
+```
+
 ### 测试
 
 运行所有测试：
@@ -644,6 +739,11 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 php artisan optimize
+
+# 模块同步
+php artisan module:sync
+php artisan module:sync --force
+php artisan module:sync --dry-run
 
 # 查看路由列表
 php artisan route:list
