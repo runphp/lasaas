@@ -166,7 +166,13 @@ class ModuleServiceProvider extends ServiceProvider
     {
         /** @var ModuleManager $manager */
         $manager = $this->app->make(ModuleManager::class);
-        $manager->loadCentralModules();
+
+        // 数据库可能尚未迁移（如首次部署或测试环境），优雅降级
+        try {
+            $manager->loadCentralModules();
+        } catch (\Throwable) {
+            // modules 表不存在时跳过，模块加载将在后续请求中正常执行
+        }
 
         $this->registerTenancyEventListeners();
     }

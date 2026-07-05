@@ -69,6 +69,11 @@ class AppServiceProvider extends ServiceProvider
                 return null; // 非 Team，交给其他 Policy
             }
 
+            // 个人 team 不允许删除
+            if ($ability === 'delete' && $model->is_personal) {
+                return false;
+            }
+
             $permission = $this->mapTeamAbility($ability);
 
             if ($permission === null) {

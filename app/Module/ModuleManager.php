@@ -53,10 +53,15 @@ class ModuleManager
             return $this->modules;
         }
 
-        $this->modules = Module::where('status', 'active')
-            ->orderBy('weight')
-            ->get()
-            ->keyBy('package_name');
+        try {
+            $this->modules = Module::where('status', 'active')
+                ->orderBy('weight')
+                ->get()
+                ->keyBy('package_name');
+        } catch (\Throwable) {
+            // 数据库可能尚未迁移（首次部署、测试环境等），返回空集合
+            $this->modules = collect();
+        }
 
         return $this->modules;
     }
