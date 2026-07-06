@@ -190,9 +190,6 @@ class ModuleManager
 
         foreach ($modules as $module) {
             $this->loadModule($module);
-
-            // 合并租户级别配置覆盖（模块默认 + 中央覆盖之上）
-            $this->mergeTenantConfig($tenant, $module);
         }
     }
 
