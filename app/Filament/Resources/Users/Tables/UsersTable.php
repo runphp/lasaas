@@ -17,6 +17,10 @@ class UsersTable
             ->columns([
                 TextColumn::make('name')
                     ->searchable(),
+                TextColumn::make('roles.name')
+                    ->label('Roles')
+                    ->badge()
+                    ->searchable(),
                 TextColumn::make('email')
                     ->label('Email address')
                     ->searchable(),

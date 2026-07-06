@@ -7,6 +7,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Spatie\Permission\Models\Role;
 
 class UserForm
 {
@@ -20,10 +21,16 @@ class UserForm
                     ->label('Email address')
                     ->email()
                     ->required(),
-                DateTimePicker::make('email_verified_at'),
+                Select::make('roles')
+                    ->options(fn () => Role::pluck('name', 'name'))
+                    ->multiple()
+                    ->preload(),
+                DateTimePicker::make('email_verified_at')
+                    ->hiddenOn('edit'),
                 TextInput::make('password')
                     ->password()
-                    ->required(),
+                    ->required(fn (string $operation) => $operation === 'create')
+                    ->dehydrated(fn (?string $state) => filled($state)),
                 Select::make('current_team_id')
                     ->relationship('currentTeam', 'name')
                     ->options(function ($record) {
@@ -32,11 +39,14 @@ class UserForm
                     ->default(null),
                 Textarea::make('two_factor_secret')
                     ->default(null)
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->hiddenOn('edit'),
                 Textarea::make('two_factor_recovery_codes')
                     ->default(null)
-                    ->columnSpanFull(),
-                DateTimePicker::make('two_factor_confirmed_at'),
+                    ->columnSpanFull()
+                    ->hiddenOn('edit'),
+                DateTimePicker::make('two_factor_confirmed_at')
+                    ->hiddenOn('edit'),
             ]);
     }
 }

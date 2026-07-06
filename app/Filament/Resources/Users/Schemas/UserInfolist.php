@@ -17,6 +17,11 @@ class UserInfolist
                 TextEntry::make('email_verified_at')
                     ->dateTime()
                     ->placeholder('-'),
+                TextEntry::make('roles.name')
+                    ->label('Roles')
+                    ->listWithLineBreaks()
+                    ->bulleted()
+                    ->placeholder('-'),
                 TextEntry::make('currentTeam.name')
                     ->label('Current team')
                     ->placeholder('-'),
