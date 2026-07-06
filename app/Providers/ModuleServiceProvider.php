@@ -184,7 +184,7 @@ class ModuleServiceProvider extends ServiceProvider
     {
         Event::listen(TenancyInitialized::class, function (TenancyInitialized $event) {
             /** @var Tenant $tenant */
-            $tenant = $event->tenant;
+            $tenant = $event->tenancy->tenant;
 
             /** @var ModuleManager $manager */
             $manager = app(ModuleManager::class);
