@@ -3,7 +3,7 @@
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-new #[Layout('layouts::tenant-landing')] class extends Component
+new #[Layout('tenant.layouts.landing')] class extends Component
 {
     public string $tenantName;
 

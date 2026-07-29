@@ -8,11 +8,13 @@ use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Features\SupportFileUploads\FilePreviewController;
 use Stancl\JobPipeline\JobPipeline;
 use Stancl\Tenancy\Events;
 use Stancl\Tenancy\Jobs;
 use Stancl\Tenancy\Listeners;
 use Stancl\Tenancy\Middleware;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 
 class TenancyServiceProvider extends ServiceProvider
 {
@@ -102,6 +104,8 @@ class TenancyServiceProvider extends ServiceProvider
     {
         $this->bootEvents();
         $this->mapRoutes();
+        $this->configureLivewireRoute();
+        $this->configureLivewireFileUploads();
 
         $this->makeTenancyMiddlewareHighestPriority();
     }
@@ -129,13 +133,29 @@ class TenancyServiceProvider extends ServiceProvider
         });
     }
 
+    protected function configureLivewireRoute(): void
+    {
+        \Livewire::setUpdateRoute(function ($handle, $path) {
+            return Route::post($path, $handle)
+                ->middleware(['web', 'universal', InitializeTenancyByDomain::class])
+                ->name('livewire.update');
+        });
+    }
+
+    protected function configureLivewireFileUploads(): void
+    {
+        FilePreviewController::$middleware = ['web', 'universal', InitializeTenancyByDomain::class];
+
+        config(['livewire.temporary_file_upload.middleware' => ['throttle:60,1', 'universal', InitializeTenancyByDomain::class]]);
+    }
+
     protected function makeTenancyMiddlewareHighestPriority()
     {
         $tenancyMiddleware = [
             // Even higher priority than the initialization middleware
             Middleware\PreventAccessFromCentralDomains::class,
 
-            Middleware\InitializeTenancyByDomain::class,
+            InitializeTenancyByDomain::class,
             Middleware\InitializeTenancyBySubdomain::class,
             Middleware\InitializeTenancyByDomainOrSubdomain::class,
             Middleware\InitializeTenancyByPath::class,

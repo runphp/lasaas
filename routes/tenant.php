@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
 use LaravelLang\Locales\Facades\Locales;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -20,12 +21,22 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 */
 $installedLocales = Locales::installed()->pluck('code')->all();
 Route::middleware([
-    'web',
     InitializeTenancyByDomain::class,
+    'web',
     PreventAccessFromCentralDomains::class,
 ])->group(function () use ($installedLocales) {
     Route::livewire('/{locale?}', 'tenant::home')
         ->name('tenant.home')
         ->whereIn('locale', $installedLocales)
         ->middleware('localization.home');
+
+    Route::prefix('{current_team}')
+        ->middleware(['auth', 'verified', EnsureTeamMembership::class])
+        ->group(function () {
+            Route::view('dashboard', 'tenant::dashboard')->name('tenant.dashboard');
+        });
+
+    Route::middleware(['localization.session', 'localization.model'])->group(function () {
+        require __DIR__.'/tenant-settings.php';
+    });
 });

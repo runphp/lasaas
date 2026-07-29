@@ -6,6 +6,8 @@ use App\Enums\TeamPermission;
 use App\Models\Team;
 use App\Models\User;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -29,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->configureTeamPermissions();
+        $this->configureGuestRedirect();
     }
 
     /**
@@ -95,5 +98,23 @@ class AppServiceProvider extends ServiceProvider
             'cancelInvitation' => TeamPermission::CancelInvitation,
             default => null,
         };
+    }
+
+    protected function configureGuestRedirect(): void
+    {
+        RedirectIfAuthenticated::redirectUsing(function (Request $request) {
+            if (! in_array($request->getHost(), config('tenancy.central_domains', []), true)) {
+                $user = $request->user();
+                $team = $user?->currentTeam ?? $user?->personalTeam();
+
+                if ($team) {
+                    return "/{$team->slug}/dashboard";
+                }
+
+                return '/';
+            }
+
+            return config('fortify.home', '/dashboard');
+        });
     }
 }

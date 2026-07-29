@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
             SetTeamUrlDefaults::class,
-        ])->alias([
+        ])->group('universal', [])->alias([
             'localization.parameter' => LocalizationByParameter::class,
             'localization.redirect' => LocalizationByParameterWithRedirect::class,
             'localization.header' => LocalizationByHeader::class,

@@ -18,6 +18,24 @@
     <div class="hidden lg:flex items-center gap-2">
         <livewire:locale-switcher/>
         <livewire:theme-switcher/>
+
+        <flux:navbar>
+            @auth
+                <flux:navbar.item href="/admin" wire:navigate>
+                    {{ __('Dashboard') }}
+                </flux:navbar.item>
+            @else
+                <flux:navbar.item variant="ghost" href="{{ route('login') }}" wire:navigate>
+                    {{ __('Log in') }}
+                </flux:navbar.item>
+
+                @if (Route::has('register'))
+                    <flux:navbar.item href="{{ route('register') }}" wire:navigate>
+                        {{ __('Register') }}
+                    </flux:navbar.item>
+                @endif
+            @endauth
+        </flux:navbar>
     </div>
 </flux:header>
 
@@ -34,6 +52,25 @@
         <livewire:locale-switcher/>
         <livewire:theme-switcher/>
     </div>
+
+    {{-- Mobile auth buttons --}}
+    <flux:sidebar.nav>
+        @auth
+            <flux:sidebar.item icon="layout-grid" href="/admin" wire:navigate>
+                {{ __('Dashboard') }}
+            </flux:sidebar.item>
+        @else
+            <flux:sidebar.item icon="arrow-right-end-on-rectangle" variant="ghost" href="{{ route('login') }}" wire:navigate>
+                {{ __('Log in') }}
+            </flux:sidebar.item>
+
+            @if (Route::has('register'))
+                <flux:sidebar.item icon="user-plus" href="{{ route('register') }}" wire:navigate>
+                    {{ __('Register') }}
+                </flux:sidebar.item>
+            @endif
+        @endauth
+    </flux:sidebar.nav>
 </flux:sidebar>
 
 {{-- Main content --}}
