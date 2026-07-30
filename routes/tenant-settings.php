@@ -24,9 +24,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         )
         ->name('tenant.security.edit');
 
-    Route::livewire('settings/teams', 'pages::teams.index')->name('tenant.teams.index');
+    Route::livewire('settings/teams', 'tenant::teams.index')->name('tenant.teams.index');
 
     Route::middleware(EnsureTeamMembership::class)->group(function () {
-        Route::livewire('settings/teams/{team}', 'pages::teams.edit')->name('tenant.teams.edit');
+        Route::livewire('settings/teams/{team}', 'tenant::teams.edit')->name('tenant.teams.edit');
     });
 });
