@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Enums\ModuleStatus;
 use App\Models\Module;
 use App\Module\ModuleManager;
 use Illuminate\Console\Command;
@@ -31,7 +32,7 @@ class ModuleEnable extends Command
             return self::FAILURE;
         }
 
-        if ($module->status === 'active') {
+        if ($module->status === ModuleStatus::ACTIVE) {
             $this->info("Module '{$packageName}' is already active.");
 
             return self::SUCCESS;

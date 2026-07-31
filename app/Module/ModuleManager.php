@@ -6,12 +6,17 @@ namespace App\Module;
 
 use App\Models\Module;
 use App\Models\Tenant;
+use App\Models\TenantModule;
+use Closure;
 use Filament\Contracts\Plugin;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 /**
  * 模块管理器 —— 负责模块发现、排序和加载。
@@ -191,6 +196,37 @@ class ModuleManager
         foreach ($modules as $module) {
             $this->loadModule($module);
         }
+
+        $this->registerTenantModuleRoutes();
+    }
+
+    /**
+     * 在中央引导阶段注册所有 tenant 区域模块的租户路由。
+     *
+     * 租户路由必须在 app boot 时注册（与框架自身 routes/tenant.php 同一约定），
+     * 因为路由匹配发生在 tenancy 初始化之前——若等到 TenancyInitialized 事件
+     * 加载模块时才注册路由，请求将因找不到路由而 404。
+     *
+     * 路由组使用与框架租户路由一致的中间件：先按域名初始化租户上下文，
+     * 再执行 web 中间件，最后拦截中央域名的访问。
+     */
+    public function registerTenantModuleRoutes(): void
+    {
+        $modules = $this->discover()->filter(fn (Module $m) => $this->supportsArea($m, 'tenant'));
+
+        foreach ($modules as $module) {
+            $path = $module->path.'/routes/tenant.php';
+
+            if (! file_exists($path)) {
+                continue;
+            }
+
+            Route::middleware([
+                InitializeTenancyByDomain::class,
+                'web',
+                PreventAccessFromCentralDomains::class,
+            ])->group($path);
+        }
     }
 
     /**
@@ -244,7 +280,12 @@ class ModuleManager
             $this->loadRoutes($module);
             $this->loadViews($module);
             $this->loadConfig($module);
+
+            return;
         }
+
+        // 第三步：合并中央级别设置（schema 默认配置之上，覆盖 modules.settings）
+        $this->mergeCentralSettings($module, $provider);
     }
 
     /**
@@ -294,10 +335,12 @@ class ModuleManager
     {
         $routeFiles = [
             'central' => $module->path.'/routes/central.php',
-            'tenant' => $module->path.'/routes/tenant.php',
             'web' => $module->path.'/routes/web.php',
             'api' => $module->path.'/routes/api.php',
         ];
+
+        // 注意：tenant.php 不在其中——租户路由统一由 registerTenantModuleRoutes()
+        // 在 app boot 阶段以租户中间件组注册，这里不再重复加载。
 
         // 根据模块支持的 area 决定加载哪些路由
         $areas = $module->areas ?? [];
@@ -309,11 +352,6 @@ class ModuleManager
 
             // central 路由只对 central 区域模块加载
             if ($type === 'central' && ! in_array('central', $areas, true)) {
-                continue;
-            }
-
-            // tenant 路由只对 tenant 区域模块加载
-            if ($type === 'tenant' && ! in_array('tenant', $areas, true)) {
                 continue;
             }
 
@@ -339,7 +377,8 @@ class ModuleManager
     /**
      * 加载模块配置文件，按优先级合并：模块默认 → 中央覆盖。
      *
-     * 租户覆盖在 loadTenantModules() 中额外合并（租户访问时才有）。
+     * 仅用于无 ServiceProvider 的模块（provider 存在的模块由 provider 自行 mergeConfigFrom，
+     * 中央设置经 mergeCentralSettings() 合并）。
      */
     protected function loadConfig(Module $module): void
     {
@@ -350,7 +389,7 @@ class ModuleManager
         }
 
         $namespace = str_replace('/', '.', $module->package_name);
-        $centralOverrides = $module->config ?? [];
+        $centralOverrides = $module->settings ?? [];
 
         foreach (File::files($configPath) as $file) {
             if ($file->getExtension() !== 'php') {
@@ -363,7 +402,7 @@ class ModuleManager
             // 1. 模块默认配置
             $config = require $file->getPathname();
 
-            // 2. 中央级别覆盖 (modules.config)
+            // 2. 中央级别覆盖 (modules.settings)
             if (isset($centralOverrides[$key]) && is_array($centralOverrides[$key])) {
                 $config = array_replace_recursive($config, $centralOverrides[$key]);
             }
@@ -373,9 +412,71 @@ class ModuleManager
     }
 
     /**
-     * 合并租户级别配置覆盖（仅租户上下文调用）。
+     * 把模块的中央设置合并到 provider 声明的 configKey 上。
      *
-     * 在模块默认 + 中央覆盖已加载的基础上，用 tenant_modules.settings 覆盖。
+     * 默认配置优先取两个设置 schema 中声明的 default（模块无需再提供 config 文件），
+     * 再叠加 modules.settings 的中央覆盖值。
+     */
+    protected function mergeCentralSettings(Module $module, ModuleServiceProvider $provider): void
+    {
+        $configKey = $provider->configKey();
+
+        if ($configKey === null) {
+            return;
+        }
+
+        $defaults = $this->settingsDefaultsFromSchemas($provider);
+
+        if (! empty($defaults)) {
+            $current = $this->app['config']->get($configKey, []);
+
+            $this->app['config']->set($configKey, array_replace_recursive($current, $defaults));
+        }
+
+        if (empty($module->settings)) {
+            return;
+        }
+
+        $this->mergeSettingsIntoConfig($configKey, $module->settings);
+    }
+
+    /**
+     * 从模块 provider 声明的两个设置 schema 提取默认值，作为模块默认配置。
+     *
+     * 中央 schema 的默认值优先；租户 schema 只为中央 schema 未声明的 key 提供默认值。
+     *
+     * @return array<string, mixed>
+     */
+    protected function settingsDefaultsFromSchemas(ModuleServiceProvider $provider): array
+    {
+        $defaults = [];
+
+        foreach ([
+            $provider->centralSettingsSchema(),
+            $provider->tenantSettingsSchema(),
+        ] as $schema) {
+            foreach ($schema as $component) {
+                $name = $component->getName();
+
+                if (array_key_exists($name, $defaults)) {
+                    continue;
+                }
+
+                $default = $component->getDefaultState();
+
+                if ($default !== null) {
+                    $defaults[$name] = $default;
+                }
+            }
+        }
+
+        return $defaults;
+    }
+
+    /**
+     * 合并租户级别设置（仅租户上下文调用）。
+     *
+     * 在模块默认 + 中央设置已生效的基础上，用 tenant_modules.settings 覆盖。
      */
     protected function mergeTenantConfig(Tenant $tenant, Module $module): void
     {
@@ -387,6 +488,21 @@ class ModuleManager
             return;
         }
 
+        $provider = $this->resolveModuleProvider($module);
+
+        if ($provider instanceof ModuleServiceProvider) {
+            $configKey = $provider->configKey();
+
+            if ($configKey === null) {
+                return;
+            }
+
+            $this->mergeSettingsIntoConfig($configKey, $tenantModule->settings);
+
+            return;
+        }
+
+        // provider 不存在时的兜底：settings 按配置文件 key 组织，逐文件合并
         $namespace = str_replace('/', '.', $module->package_name);
 
         foreach ($tenantModule->settings as $key => $value) {
@@ -399,6 +515,40 @@ class ModuleManager
 
             $this->app['config']->set($configKey, array_replace_recursive($current, $value));
         }
+    }
+
+    /**
+     * 把设置数组递归合并进指定配置 key（覆盖已加载的模块默认配置）。
+     */
+    protected function mergeSettingsIntoConfig(string $configKey, array $settings): void
+    {
+        $current = $this->app['config']->get($configKey, []);
+
+        $this->app['config']->set($configKey, array_replace_recursive($current, $settings));
+    }
+
+    /**
+     * 获取模块的中央设置表单结构（供后台「模块 → 设置」页使用）。
+     *
+     * @return array<int, Filament\Forms\Components\Component>
+     */
+    public function centralSettingsSchema(Module $module): array
+    {
+        $provider = $this->resolveModuleProvider($module);
+
+        return $provider instanceof ModuleServiceProvider ? $provider->centralSettingsSchema() : [];
+    }
+
+    /**
+     * 获取模块的租户设置表单结构（供后台「租户 → 模块管理」页使用）。
+     *
+     * @return array<int, Filament\Forms\Components\Component>
+     */
+    public function tenantSettingsSchema(Module $module): array
+    {
+        $provider = $this->resolveModuleProvider($module);
+
+        return $provider instanceof ModuleServiceProvider ? $provider->tenantSettingsSchema() : [];
     }
 
     // ---------------------------------------------------------------
@@ -487,6 +637,12 @@ class ModuleManager
         $provider = $this->resolveModuleProvider($module);
 
         if ($provider instanceof ModuleServiceProvider) {
+            $hasEnabledTenant = TenantModule::where('module_id', $module->id)->where('enabled', true)->exists();
+            // 如果还有启用该模块的租户，不执行卸载
+            if ($hasEnabledTenant) {
+                return;
+            }
+
             $provider->uninstall();
         }
 
@@ -495,8 +651,91 @@ class ModuleManager
         Cache::forget('lasaas.central_filament_plugins');
     }
 
+    // ---------------------------------------------------------------
+    // 租户侧安装/卸载
+    // ---------------------------------------------------------------
+
+    /**
+     * 为指定租户安装/启用模块。
+     *
+     * 首次安装：创建 tenant_modules 记录、在租户库运行模块迁移并调用 tenantInstall()；
+     * 重复启用：仅把 enabled 置为 true 并调用 tenantOnEnable()。
+     */
+    public function enableForTenant(Module $module, Tenant $tenant): void
+    {
+        $isFirstInstall = ! $tenant->tenantModules()
+            ->where('module_id', $module->id)
+            ->exists();
+
+        // 记录写入中央库，必须在初始化租户上下文之前完成
+        $tenant->setModuleEnabled($module->id, true);
+
+        $provider = $this->resolveModuleProvider($module);
+
+        if (! $provider instanceof ModuleServiceProvider) {
+            return;
+        }
+
+        if ($isFirstInstall) {
+            $this->withTenancy($tenant, fn () => $provider->tenantInstall($tenant));
+        }
+
+        $provider->tenantOnEnable($tenant);
+    }
+
+    /**
+     * 禁用指定租户的模块（enabled 置为 false），模块租户功能不再加载。
+     */
+    public function disableForTenant(Module $module, Tenant $tenant): void
+    {
+        $tenant->setModuleEnabled($module->id, false);
+
+        $provider = $this->resolveModuleProvider($module);
+
+        if ($provider instanceof ModuleServiceProvider) {
+            $provider->tenantOnDisable($tenant);
+        }
+    }
+
+    /**
+     * 从指定租户卸载模块：调用 tenantUninstall() 钩子（回滚租户库迁移等），然后删除记录。
+     */
+    public function uninstallForTenant(Module $module, Tenant $tenant): void
+    {
+        $provider = $this->resolveModuleProvider($module);
+
+        if ($provider instanceof ModuleServiceProvider) {
+            $this->withTenancy($tenant, fn () => $provider->tenantUninstall($tenant));
+        }
+
+        $tenant->tenantModules()->where('module_id', $module->id)->delete();
+    }
+
+    /**
+     * 在租户上下文中执行回调，结束后恢复中央上下文。
+     */
+    protected function withTenancy(Tenant $tenant, Closure $callback): void
+    {
+        if (tenancy()->initialized) {
+            $callback();
+
+            return;
+        }
+
+        tenancy()->initialize($tenant);
+
+        try {
+            $callback();
+        } finally {
+            tenancy()->end();
+        }
+    }
+
     /**
      * 解析模块的 ServiceProvider 实例（不注册，仅用于调用钩子）。
+     *
+     * 注意：不能用 make() 实例化——ServiceProvider 的构造参数没有类型提示，
+     * 容器无法自动注入，需要手动传入 app 实例。
      */
     protected function resolveModuleProvider(Module $module): ?ServiceProvider
     {
@@ -510,7 +749,7 @@ class ModuleManager
             return null;
         }
 
-        return $this->app->make($class);
+        return new $class($this->app);
     }
 
     /**

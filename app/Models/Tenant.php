@@ -78,7 +78,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             ->toArray();
     }
 
-    public function setModuleEnabled(string $moduleId, bool $enabled): void
+    public function setModuleEnabled(int|string $moduleId, bool $enabled): void
     {
         $this->tenantModules()->updateOrCreate(
             ['module_id' => $moduleId],

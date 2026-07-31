@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Modules;
 
+use App\Filament\Resources\Modules\Pages\EditModule;
 use App\Filament\Resources\Modules\Pages\ListModules;
 use App\Filament\Resources\Modules\Pages\ViewModule;
 use App\Filament\Resources\Modules\Schemas\ModuleForm;
@@ -75,6 +76,7 @@ class ModuleResource extends Resource
         return [
             'index' => ListModules::route('/'),
             'view' => ViewModule::route('/{record}'),
+            'edit' => EditModule::route('/{record}/edit'),
         ];
     }
 }

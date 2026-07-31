@@ -6,9 +6,12 @@ namespace App\Providers;
 
 use App\Models\Module as ModuleModel;
 use App\Models\Tenant;
+use App\Module\Http\Middleware\EnsureModuleEnabled;
 use App\Module\ModuleManager;
+use App\Module\ModuleServiceProvider as ModuleBaseProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Stancl\Tenancy\Events\TenancyEnded;
 use Stancl\Tenancy\Events\TenancyInitialized;
@@ -120,7 +123,8 @@ class ModuleServiceProvider extends ServiceProvider
             }
         }
 
-        // 合并中央级别配置覆盖（modules.config）
+        // 合并中央级别设置覆盖（modules.settings）
+        // 有 provider 的模块按 provider 声明的 configKey() 合并，否则按配置文件 key 兜底。
         // try-catch：config:cache 首次执行时数据库可能还不存在
         if (empty($packageNames)) {
             return;
@@ -128,13 +132,28 @@ class ModuleServiceProvider extends ServiceProvider
 
         try {
             $moduleRecords = ModuleModel::whereIn('package_name', $packageNames)
-                ->whereNotNull('config')
+                ->whereNotNull('settings')
                 ->get()
                 ->keyBy('package_name');
 
             foreach ($moduleRecords as $packageName => $moduleRecord) {
-                $overrides = $moduleRecord->config ?? [];
+                $overrides = $moduleRecord->settings ?? [];
                 if (empty($overrides)) {
+                    continue;
+                }
+
+                $providerClass = $moduleRecord->provider_class;
+                $configKey = null;
+
+                if ($providerClass && is_subclass_of($providerClass, ModuleBaseProvider::class)) {
+                    $configKey = (new $providerClass($this->app))->configKey();
+                }
+
+                if ($configKey !== null) {
+                    $current = $this->app['config']->get($configKey, []);
+
+                    $this->app['config']->set($configKey, array_replace_recursive($current, $overrides));
+
                     continue;
                 }
 
@@ -164,6 +183,9 @@ class ModuleServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // 框架级守卫：任何模块的租户路由均可使用 module.enabled:{package_name}
+        Route::aliasMiddleware('module.enabled', EnsureModuleEnabled::class);
+
         /** @var ModuleManager $manager */
         $manager = $this->app->make(ModuleManager::class);
 

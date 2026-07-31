@@ -313,24 +313,28 @@ class ModulesSync extends Command
 
     /**
      * 解析模块的 ServiceProvider 类名。
+     *
+     * 显式声明的 provider（extra.lasaas-module.providers / extra.laravel.providers）
+     * 直接信任，不要求类当前可加载——模块的 PSR-4 autoload 由 module:sync 生成的
+     * 缓存文件提供，首次同步时类必然尚未注册，class_exists 校验会导致永远失败。
      */
     protected function resolveProviderClass(array $composerJson, string $path): string
     {
-        // 方式 1: extra.lasaas-module.providers
+        // 方式 1: extra.lasaas-module.providers（显式声明）
         $providers = $composerJson['extra']['lasaas-module']['providers'] ?? [];
         if (is_string($providers)) {
             $providers = [$providers];
         }
-        if (! empty($providers[0]) && class_exists($providers[0])) {
+        if (! empty($providers[0])) {
             return $providers[0];
         }
 
-        // 方式 2: extra.laravel.providers（标准约定）
+        // 方式 2: extra.laravel.providers（标准约定，同样信任）
         $laravelProviders = $composerJson['extra']['laravel']['providers'] ?? [];
         if (is_string($laravelProviders)) {
             $laravelProviders = [$laravelProviders];
         }
-        if (! empty($laravelProviders[0]) && class_exists($laravelProviders[0])) {
+        if (! empty($laravelProviders[0])) {
             return $laravelProviders[0];
         }
 

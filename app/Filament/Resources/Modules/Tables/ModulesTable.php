@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Modules\Tables;
 
 use App\Enums\ModuleStatus;
+use App\Models\TenantModule;
 use App\Module\ModuleManager;
 use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
@@ -80,6 +81,20 @@ class ModulesTable
                         return "确定要卸载模块 \"{$name}\" ({$pkg}) 吗？{$installed}";
                     })
                     ->action(function ($record) {
+                        $hasEnabledTenant = TenantModule::where('module_id', $record->id)
+                            ->where('enabled', true)
+                            ->exists();
+
+                        // 预校验：存在启用该模块的租户
+                        if ($hasEnabledTenant) {
+                            Notification::make()
+                                ->title('无法卸载模块')
+                                ->body('仍有租户正在启用此模块，请先在所有租户内禁用/卸载该模块后重试。')
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
                         $manager = app(ModuleManager::class);
                         $manager->uninstall($record);
 

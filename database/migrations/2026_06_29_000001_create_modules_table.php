@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('path', 500)->comment('模块磁盘路径，用于拼接 migration、视图路径');
             $table->enum('status', ['active', 'inactive'])->default('inactive')->comment('全局开关：active 正常，inactive 关闭');
             $table->timestamp('installed_at')->nullable()->comment('首次启用时间，NULL 表示尚未安装');
-            $table->json('config')->nullable()->comment('中央级别配置覆盖（合并到模块默认配置之上，租户配置之下）');
+            $table->json('settings')->nullable()->comment('模块设置 JSON（中央级别），由模块 centralSettingsSchema() 声明结构；合并到模块默认配置之上，租户设置之下');
             $table->timestamps();
         });
     }
