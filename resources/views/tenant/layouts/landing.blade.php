@@ -21,7 +21,7 @@
 
         <flux:navbar>
             @auth
-                <flux:navbar.item href="/admin" wire:navigate>
+                <flux:navbar.item href="{{ route('tenant.dashboard') }}" wire:navigate>
                     {{ __('Dashboard') }}
                 </flux:navbar.item>
             @else
@@ -56,7 +56,7 @@
     {{-- Mobile auth buttons --}}
     <flux:sidebar.nav>
         @auth
-            <flux:sidebar.item icon="layout-grid" href="/admin" wire:navigate>
+            <flux:sidebar.item icon="layout-grid" href="{{ route('tenant.dashboard') }}" wire:navigate>
                 {{ __('Dashboard') }}
             </flux:sidebar.item>
         @else
