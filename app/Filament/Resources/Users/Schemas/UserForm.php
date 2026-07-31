@@ -34,7 +34,7 @@ class UserForm
                 Select::make('current_team_id')
                     ->relationship('currentTeam', 'name')
                     ->options(function ($record) {
-                        return $record->teams()->pluck('teams.name', 'teams.id');
+                        return $record?->teams()->pluck('teams.name', 'teams.id') ?? [];
                     })
                     ->default(null),
                 Textarea::make('two_factor_secret')

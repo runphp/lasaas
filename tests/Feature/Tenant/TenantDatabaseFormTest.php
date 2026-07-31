@@ -1,6 +1,8 @@
 <?php
 
+use App\Enums\TeamRole;
 use App\Filament\Resources\Tenants\Pages\CreateTenant;
+use App\Models\Team;
 use App\Models\Tenant;
 use App\Models\User;
 use Filament\Facades\Filament;
@@ -100,6 +102,56 @@ test('tenant form saves a sqlite file database configuration', function () {
     expect($tenant->tenantDatabase->host)->toBeNull();
     expect($tenant->tenantDatabase->username)->toBeNull();
     expect($tenant->tenantDatabase->password)->toBeNull();
+});
+
+test('tenant form saves advanced database options', function () {
+    $tenant = createTenantThroughForm([
+        'connection' => 'mariadb',
+        'database' => 'shop_form_adv',
+        'unix_socket' => null,
+        'prefix' => 'shop_',
+        'prefix_indexes' => '1',
+        'strict' => '0',
+        'engine' => 'InnoDB',
+        'options' => [
+            'PDO::ATTR_TIMEOUT' => 5,
+        ],
+    ]);
+
+    expect($tenant->tenantDatabase->prefix)->toBe('shop_');
+    expect($tenant->tenantDatabase->prefix_indexes)->toBeTrue();
+    expect($tenant->tenantDatabase->strict)->toBeFalse();
+    expect($tenant->tenantDatabase->engine)->toBe('InnoDB');
+    expect($tenant->tenantDatabase->options)->toBe([
+        'PDO::ATTR_TIMEOUT' => 5,
+    ]);
+});
+
+test('team select only lists teams owned by the selected user', function () {
+    Event::fake([TenantCreated::class]);
+
+    $admin = createTenantAdmin();
+    $other = User::factory()->create();
+
+    $ownedTeam = Team::create(['name' => 'Owned Team']);
+    $ownedTeam->members()->attach($admin, ['role' => TeamRole::Owner->value]);
+
+    $foreignTeam = Team::create(['name' => 'Foreign Team']);
+    $foreignTeam->members()->attach($other, ['role' => TeamRole::Owner->value]);
+
+    test()->actingAs($admin);
+
+    Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+    $livewire = Livewire::test(CreateTenant::class);
+    $livewire->fillForm(['user_id' => $admin->id]);
+
+    $teamSelect = $livewire->instance()->form->getComponent('team_id');
+
+    $options = $teamSelect->getOptions();
+
+    expect($options)->toHaveKey($ownedTeam->id, 'Owned Team');
+    expect($options)->not->toHaveKey($foreignTeam->id);
 });
 
 test('tenant form shows per-database-type examples that react to the connection', function () {
