@@ -28,10 +28,9 @@ class TenancyServiceProvider extends ServiceProvider
             Events\CreatingTenant::class => [],
             Events\TenantCreated::class => [
                 JobPipeline::make([
-                    Jobs\CreateDatabase::class,
+                    // 数据库由人工手动创建并配置，不使用自动建库（Jobs\CreateDatabase）。
                     Jobs\MigrateDatabase::class,
                     // Jobs\SeedDatabase::class,
-
                     // Your own jobs to prepare the tenant.
                     // Provision API keys, create S3 buckets, anything you want!
 
@@ -45,11 +44,13 @@ class TenancyServiceProvider extends ServiceProvider
             Events\TenantUpdated::class => [],
             Events\DeletingTenant::class => [],
             Events\TenantDeleted::class => [
-                JobPipeline::make([
+                // 删除租户时保留数据库，由人工手动清理，不执行 Jobs\DeleteDatabase。
+                /*JobPipeline::make([
                     Jobs\DeleteDatabase::class,
                 ])->send(function (Events\TenantDeleted $event) {
                     return $event->tenant;
                 })->shouldBeQueued(false), // `false` by default, but you probably want to make this `true` for production.
+                */
             ],
 
             // Domain events
