@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Stancl\Tenancy\Jobs\MigrateDatabase;
 
 class TenantDatabase extends Model
 {
@@ -16,6 +17,19 @@ class TenantDatabase extends Model
     protected $keyType = 'string';
 
     protected $guarded = [];
+
+    protected static function booted(): void
+    {
+        static::saved(function (TenantDatabase $tenantDatabase) {
+            if ($tenantDatabase->wasRecentlyCreated) {
+                return;
+            }
+
+            if ($tenantDatabase->wasChanged(['connection', 'database', 'prefix', 'prefix_indexes'])) {
+                MigrateDatabase::dispatchSync($tenantDatabase->tenant);
+            }
+        });
+    }
 
     protected function casts(): array
     {
