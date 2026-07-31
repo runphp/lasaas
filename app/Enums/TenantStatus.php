@@ -16,4 +16,15 @@ enum TenantStatus: string implements HasLabel
     {
         return __('filament-resources.tenant.statuses.'.$this->value);
     }
+
+    public function getColorClass(): string
+    {
+        return match ($this) {
+            self::PENDING => 'text-amber-500',
+            self::ACTIVE => 'text-green-500',
+            self::SUSPENDED => 'text-orange-500',
+            self::EXPIRED => 'text-red-500',
+            self::DISABLED => 'text-gray-500',
+        };
+    }
 }
