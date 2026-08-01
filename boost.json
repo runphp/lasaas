@@ -1,6 +1,6 @@
 {
     "agents": [
-        "amp"
+        "opencode"
     ],
     "cloud": false,
     "guidelines": true,

@@ -26,7 +26,7 @@ class TenantDatabase extends Model
             }
 
             if ($tenantDatabase->wasChanged(['connection', 'database', 'prefix', 'prefix_indexes'])) {
-                MigrateDatabase::dispatchSync($tenantDatabase->tenant);
+                MigrateDatabase::dispatch($tenantDatabase->tenant);
             }
         });
     }
