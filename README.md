@@ -192,7 +192,7 @@ php artisan boost:install
 ### 🏢 多租户架构
 - **独立数据库隔离**：每个租户拥有独立的数据库，确保数据安全和隐私
 - **独立域名支持**：每个租户可配置专属域名访问（如 tenant.example.com）
-- **自动租户初始化**：创建租户时自动完成数据库创建、迁移等流程
+- **租户初始化**：创建租户时自动执行数据库迁移（数据库需提前手动创建，并在 `tenant_databases` 表登记连接信息）
 - **资源隔离**：缓存、文件系统、队列等资源按租户隔离
 - **租户状态管理**：支持租户激活、过期、禁用等状态管理
 - **灵活的数据库驱动**：支持 MySQL、PostgreSQL、SQLite 等多种数据库
@@ -367,7 +367,8 @@ lasaas/
 ├── routes/                # 路由定义
 │   ├── web.php            # 中央应用路由
 │   ├── tenant.php         # 租户应用路由
-│   ├── settings.php       # 设置相关路由
+│   ├── settings.php       # 中央应用设置相关路由
+│   ├── tenant-settings.php# 租户应用设置相关路由
 │   └── console.php        # Artisan 命令路由
 ├── tests/                 # 测试文件
 │   ├── Feature/           # 功能测试
@@ -478,16 +479,36 @@ composer run dev
 访问注册页面创建管理员账户
 
 2. **创建第一个租户**
-在管理后台或通过 Artisan 命令：
+   先在数据库服务器上提前创建好物理数据库（SQLite 除外），再到中央管理后台「租户」页面创建租户，在"数据库连接"区块填写该租户的数据库连接信息。
+
+   或通过代码创建：
 ```bash
 php artisan tinker
->>> \App\Models\Tenant::create(['id' => 'demo']);
+>>> $tenant = \App\Models\Tenant::create(['id' => 'demo', 'name' => '演示租户']);
+>>> $tenant->setDatabaseConnection([
+...     'connection' => 'mariadb',
+...     'database'   => 'tenant_demo',
+...     'host'       => '127.0.0.1',
+...     'username'   => 'root',
+...     'password'   => '',
+... ]);
 >>> \App\Models\Domain::create(['domain' => 'demo.lasaas.test', 'tenant_id' => 'demo']);
 ```
 
 3. **运行租户迁移**
 ```bash
 php artisan tenants:migrate
+```
+
+4. **为租户生成 Shield 权限**（否则租户后台看不到角色/权限菜单）
+```bash
+php artisan tenants:run shield:generate --option=panel=tenant-admin --option=all=1 --option=option=permissions
+php artisan tenants:run permission:cache-reset
+```
+
+5. **为租户超管分配 `super_admin` 角色**（先在租户后台注册/创建用户，再替换 `user_id`）
+```bash
+php artisan tenants:run shield:super-admin --option=user=<user_id> --option=panel=tenant-admin
 ```
 
 ## 📝 使用说明
@@ -561,6 +582,12 @@ php artisan make:filament-resource Post --tenant
 php artisan tenants:migrate
 ```
 
+5. **重新生成租户 Shield 权限**（新资源会自动纳入权限体系）
+```bash
+php artisan tenants:run shield:generate --option=panel=tenant-admin --option=all=1 --option=option=permissions
+php artisan tenants:run permission:cache-reset
+```
+
 ### 自定义权限
 
 1. **定义角色和权限**
@@ -582,6 +609,33 @@ $user->can('edit-posts');
 // 检查角色
 $user->hasRole('manager');
 ```
+
+### 租户 Shield 权限（Filament Shield）
+
+每个租户拥有独立的数据库和权限数据，Shield 的权限**必须在租户上下文内生成**。
+
+> ⚠️ **常见坑**：`tenants:run shield:install` 看起来能跑通，但 `shield:install` 内部通过 `Process::run()` 启动子进程执行 `shield:generate`，子进程**没有初始化租户**，会把权限写入**中心数据库**，导致租户后台看不到角色/权限菜单，同时中心库被写入多余的租户权限。
+
+正确做法是使用 `tenants:run` 在租户上下文内直接执行生成命令：
+
+```bash
+# 1. 生成 tenant-admin 面板权限，并自动挂到 super_admin 角色
+php artisan tenants:run shield:generate --option=panel=tenant-admin --option=all=1 --option=option=permissions
+
+# 2. 重置权限缓存
+php artisan tenants:run permission:cache-reset
+
+# 3. 为租户超管分配 super_admin 角色
+php artisan tenants:run shield:super-admin --option=user=<user_id> --option=panel=tenant-admin
+```
+
+要点：
+
+- 命令默认对所有租户执行，指定租户用 `--tenants=<tenant_id>`（支持逗号分隔）
+- `tenants:run` 传参必须是 `key=value` 形式，布尔开关要写成 `--option=all=1`
+- 权限生成使用 `firstOrCreate`，重复执行幂等、安全
+- `--all` 会扫描 tenant-admin 面板注册的所有资源、页面、小组件（`Dashboard`、`AccountWidget` 等已在 `config/filament-shield.php` 中排除），后续在 `app/Filament/TenantAdmin/Resources` 新增资源后重新执行即可自动纳入
+- 租户 Shield 初始化完整流程：`tenants:migrate` → 生成权限 → 重置缓存 → 分配角色
 
 ### 模块系统
 
@@ -606,10 +660,13 @@ packages/
 
 | 操作 | 命令 | 说明 |
 |------|------|------|
-| 新增自定义模块 | 复制到 `packages/custom/vendor/name/` | 手动放目录 |
-| 删除自定义模块 | 直接删除目录 | `rm -rf packages/custom/vendor/name/` |
+| 新增自定义模块 | 复制到 `packages/custom/{vendor}/{name}/` | 手动放目录 |
+| 删除自定义模块 | 直接删除目录 | `rm -rf packages/custom/{vendor}/{name}/` |
 | 安装第三方模块 | `composer require vendor/name` | 自动安装到 `packages/contrib/` |
 | 卸载第三方模块 | `composer remove vendor/name` | 自动清理 |
+| 启用 / 禁用模块 | `php artisan module:enable {package}` / `module:disable {package}` | 切换模块启用状态 |
+| 卸载模块 | `php artisan module:uninstall {package}` | 卸载并清理模块数据 |
+| 按租户启用/禁用/卸载 | `module:tenant-enable` / `module:tenant-disable` / `module:tenant-uninstall {tenant} {package}` | 单租户维度的模块开关 |
 | **同步模块元数据** | `composer dump-autoload` | 自动触发 `module:sync`，更新数据库 + autoload 缓存 |
 
 `composer dump-autoload` 的 `post-autoload-dump` 钩子会自动执行 `module:sync`，实现：
@@ -676,6 +733,18 @@ ddev artisan module:sync --force
 
 # 删除模块但保留数据库记录（仅标记 inactive）
 ddev artisan module:sync --soft
+
+# 启用 / 禁用模块
+ddev artisan module:enable {package}
+ddev artisan module:disable {package}
+
+# 卸载模块并清理数据
+ddev artisan module:uninstall {package}
+
+# 按租户启用 / 禁用 / 卸载模块
+ddev artisan module:tenant-enable {tenant} {package}
+ddev artisan module:tenant-disable {tenant} {package}
+ddev artisan module:tenant-uninstall {tenant} {package}
 ```
 
 ### 测试
@@ -696,9 +765,6 @@ php artisan test --filter=TeamTest
 
 #### 租户管理
 ```bash
-# 创建新租户
-php artisan tenants:create
-
 # 列出所有租户
 php artisan tenants:list
 
@@ -711,21 +777,41 @@ php artisan tenants:migrate --tenants=demo,prod
 # 填充租户数据
 php artisan tenants:seed
 
-# 删除租户及其数据库
-php artisan tenants:delete {tenant_id}
+# 在租户上下文执行任意命令（可指定租户，默认对所有租户）
+php artisan tenants:run {command} --tenants=demo,prod
+
+# 向租户上下文命令传递参数/选项（key=value 形式）
+php artisan tenants:run shield:generate --option=panel=tenant-admin
+
+# 删除租户记录（数据库不会自动删除，需手动清理物理数据库）
+php artisan tinker
+>>> \App\Models\Tenant::find('demo')?->delete();
 ```
+
+> 说明：本项目**不提供 `tenants:create` / `tenants:delete` 命令**。租户创建请通过中央管理后台「租户」页面完成（会同时登记域名与 `tenant_databases` 连接信息），数据库需提前手动创建。
 
 #### 权限管理（Filament Shield）
 ```bash
-# 生成所有资源的权限
+# 中央管理平台：生成所有资源的权限
 php artisan shield:generate --all
 
-# 生成特定资源的权限
+# 中央管理平台：生成特定资源的权限
 php artisan shield:generate --resource=User
 
-# 安装 Shield
-php artisan shield:install
+# 租户面板：为所有租户生成 tenant-admin 权限（在租户上下文内执行）
+php artisan tenants:run shield:generate --option=panel=tenant-admin --option=all=1 --option=option=permissions
+
+# 租户面板：重置权限缓存
+php artisan tenants:run permission:cache-reset
+
+# 租户面板：为租户超管分配 super_admin 角色
+php artisan tenants:run shield:super-admin --option=user=1 --option=panel=tenant-admin
+
+# 指定单个租户执行（默认对所有租户）
+php artisan tenants:run shield:generate --option=panel=tenant-admin --option=all=1 --option=option=permissions --tenants=demo
 ```
+
+> ⚠️ **不要对租户使用 `tenants:run shield:install`**：`shield:install` 内部通过子进程执行 `shield:generate`，子进程启动时丢失租户上下文，权限会被错误写入**中心数据库**，导致租户后台看不到角色/权限菜单。
 
 #### 常规命令
 ```bash
@@ -961,14 +1047,15 @@ A: 在 Filament 管理后台的 Tenants 页面，编辑租户并添加域名。�
 ```
 
 #### Q: 租户数据库在哪里？
-A: 每个租户有独立的数据库，命名格式为 `tenant_{tenant_id}`。可以在中央数据库中查看 `tenants` 表获取租户列表。
+A: 每个租户有独立的数据库，名称在 `tenant_databases` 表的 `database` 字段中配置（通常为 `tenant_{tenant_id}`），连接信息（类型、主机、账号等）也登记在该表。中央数据库中可查看 `tenants` 表获取租户列表。
 
 #### Q: 如何删除租户及其数据？
-A: 使用 Artisan 命令：
+A: 本项目不提供删除命令，且删除租户记录**不会自动删除物理数据库**：
 ```bash
-php artisan tenants:delete {tenant_id}
+php artisan tinker
+>>> \App\Models\Tenant::find('demo')?->delete();
 ```
-这会删除租户记录和其独立数据库。
+删除记录会一并清理其域名和 `tenant_databases` 配置，之后需手动到数据库服务器删除对应的物理数据库。
 
 #### Q: 如何在中央应用和租户应用之间切换？
 A: 
@@ -1028,6 +1115,15 @@ A: 在服务提供者或 Seeder 中：
 use Spatie\Permission\Models\Permission;
 Permission::create(['name' => 'custom-permission']);
 ```
+
+#### Q: 租户后台看不到角色/权限（Shield）菜单？
+A: 说明租户的权限被写到了**中心数据库**。检查租户库（`tenant_{id}`）的 `permissions` 表是否为空，若为空则按以下命令在租户上下文内重新生成：
+```bash
+php artisan tenants:run shield:generate --option=panel=tenant-admin --option=all=1 --option=option=permissions
+php artisan tenants:run permission:cache-reset
+php artisan tenants:run shield:super-admin --option=user=<user_id> --option=panel=tenant-admin
+```
+注意不要用 `tenants:run shield:install`（详见"开发指南 → 租户 Shield 权限"一节）。
 
 ### 性能相关
 
