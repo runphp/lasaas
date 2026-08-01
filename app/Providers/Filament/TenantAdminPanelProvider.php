@@ -2,12 +2,16 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\Pages\PageResource;
+use App\Filament\Resources\Roles\RoleResource;
+use App\Filament\Resources\Teams\TeamResource;
+use App\Filament\Resources\Users\UserResource;
+use App\Filament\TenantAdmin\Pages\Dashboard;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -33,6 +37,12 @@ class TenantAdminPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->discoverResources(in: app_path('Filament/TenantAdmin/Resources'), for: 'App\Filament\TenantAdmin\Resources')
+            ->resources([
+                UserResource::class,
+                RoleResource::class,
+                PageResource::class,
+                TeamResource::class,
+            ])
             ->discoverPages(in: app_path('Filament/TenantAdmin/Pages'), for: 'App\Filament\TenantAdmin\Pages')
             ->pages([
                 Dashboard::class,
