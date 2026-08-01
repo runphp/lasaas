@@ -1,0 +1,9 @@
+{
+    "name": "test/panel-ext-module",
+    "type": "lasaas-module",
+    "autoload": {
+        "psr-4": {
+            "Tests\\Fixtures\\Modules\\PanelExt\\": ""
+        }
+    }
+}

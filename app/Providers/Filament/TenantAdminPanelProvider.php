@@ -7,7 +7,9 @@ use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Teams\TeamResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Filament\TenantAdmin\Pages\Dashboard;
+use App\Module\ModuleManager;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Contracts\Plugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -71,6 +73,29 @@ class TenantAdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])->plugins([
                 FilamentShieldPlugin::make(),
+                ...static::getModulePlugins(),
             ]);
+    }
+
+    /**
+     * 从支持 tenant 区域的模块中收集租户 admin 面板插件实例。
+     *
+     * 约定（约定大于配置）：模块实现 TenantAdminPanelPlugin 接口的类即自动注册，
+     * 无需在 composer.json 中声明。
+     *
+     * @return array<Plugin>
+     */
+    protected static function getModulePlugins(): array
+    {
+        /** @var ModuleManager $manager */
+        $manager = app(ModuleManager::class);
+
+        $plugins = [];
+
+        foreach ($manager->getTenantAdminPanelPlugins() as $pluginClass) {
+            $plugins[] = app($pluginClass);
+        }
+
+        return $plugins;
     }
 }

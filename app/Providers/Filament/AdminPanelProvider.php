@@ -66,7 +66,10 @@ class AdminPanelProvider extends PanelProvider
     }
 
     /**
-     * 从已安装的 central 区域模块中收集 Filament Plugin 实例。
+     * 从已安装的 central 区域模块中收集中央 admin 面板插件实例。
+     *
+     * 约定（约定大于配置）：模块实现 AdminPanelPlugin 接口的类即自动注册，
+     * 无需在 composer.json 中声明。
      *
      * @return array<Plugin>
      */
@@ -77,7 +80,7 @@ class AdminPanelProvider extends PanelProvider
 
         $plugins = [];
 
-        foreach ($manager->getCentralFilamentPlugins() as $pluginClass) {
+        foreach ($manager->getAdminPanelPlugins() as $pluginClass) {
             $plugins[] = app($pluginClass);
         }
 

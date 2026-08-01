@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Module;
 
+use App\Http\Middleware\EnsureTenantAccessible;
 use App\Models\Module;
 use App\Models\Tenant;
 use App\Models\TenantModule;
+use App\Module\Contracts\AdminPanelPlugin;
+use App\Module\Contracts\TenantAdminPanelPlugin;
 use Closure;
 use Filament\Contracts\Plugin;
 use Illuminate\Contracts\Foundation\Application;
@@ -223,6 +226,7 @@ class ModuleManager
 
             Route::middleware([
                 InitializeTenancyByDomain::class,
+                EnsureTenantAccessible::class,
                 'web',
                 PreventAccessFromCentralDomains::class,
             ])->group($path);
@@ -352,6 +356,11 @@ class ModuleManager
 
             // central 路由只对 central 区域模块加载
             if ($type === 'central' && ! in_array('central', $areas, true)) {
+                continue;
+            }
+
+            // web 路由属于中央应用上下文，只对 central 区域模块加载
+            if ($type === 'web' && ! in_array('central', $areas, true)) {
                 continue;
             }
 
@@ -601,7 +610,7 @@ class ModuleManager
             'installed_at' => $module->installed_at ?? now(),
         ]);
 
-        Cache::forget('lasaas.central_filament_plugins');
+        $this->flushPanelPluginsCache();
 
         // 注册 Provider 以调用钩子
         $provider = $this->resolveModuleProvider($module);
@@ -648,7 +657,7 @@ class ModuleManager
 
         $module->delete();
 
-        Cache::forget('lasaas.central_filament_plugins');
+        $this->flushPanelPluginsCache();
     }
 
     // ---------------------------------------------------------------
@@ -753,47 +762,128 @@ class ModuleManager
     }
 
     /**
-     * 获取所有 central 区域模块中声明的 Filament Plugin 类名列表。
+     * 获取所有 central 区域模块的中央 admin 面板插件类名列表。
      *
-     * 结果会被缓存，module:sync、enable、uninstall 操作会清除缓存。
+     * 约定（约定大于配置）：扫描模块 PSR-4 根目录下 Filament/Plugins 子目录中
+     * 实现 AdminPanelPlugin 接口的类，无需在 composer.json 中声明。
      *
-     * @return array<class-string<Plugin>>
+     * @return array<class-string<AdminPanelPlugin>>
      */
-    public function getCentralFilamentPlugins(): array
+    public function getAdminPanelPlugins(): array
     {
-        return Cache::rememberForever('lasaas.central_filament_plugins', function (): array {
+        return $this->discoverPanelPlugins(
+            AdminPanelPlugin::class,
+            'admin_panel_plugins',
+            fn (Module $module): bool => $this->supportsArea($module, 'central'),
+        );
+    }
+
+    /**
+     * 获取所有支持 tenant 区域的模块的租户 admin 面板插件类名列表。
+     *
+     * 约定（约定大于配置）：扫描模块 PSR-4 根目录下 Filament/Plugins 子目录中
+     * 实现 TenantAdminPanelPlugin 接口的类，无需在 composer.json 中声明。
+     *
+     * @return array<class-string<TenantAdminPanelPlugin>>
+     */
+    public function getTenantAdminPanelPlugins(): array
+    {
+        return $this->discoverPanelPlugins(
+            TenantAdminPanelPlugin::class,
+            'tenant_admin_panel_plugins',
+            fn (Module $module): bool => $this->supportsArea($module, 'tenant'),
+        );
+    }
+
+    /**
+     * 清除面板插件发现缓存，模块启用/禁用/卸载及 module:sync 后调用。
+     */
+    public function flushPanelPluginsCache(): void
+    {
+        Cache::forget('lasaas.admin_panel_plugins');
+        Cache::forget('lasaas.tenant_admin_panel_plugins');
+    }
+
+    /**
+     * 按约定发现指定面板插件接口的实现类。
+     *
+     * @param  class-string  $interface
+     * @param  Closure(Module): bool  $filter
+     * @return array<class-string>
+     */
+    protected function discoverPanelPlugins(string $interface, string $cacheKey, Closure $filter): array
+    {
+        return Cache::rememberForever("lasaas.{$cacheKey}", function () use ($interface, $filter): array {
             $plugins = [];
 
-            $centralModules = $this->discover()
-                ->filter(fn (Module $m) => $this->supportsArea($m, 'central'));
-
-            foreach ($centralModules as $module) {
-                $composerPath = $module->path.'/composer.json';
-
-                if (! file_exists($composerPath)) {
-                    continue;
-                }
-
-                $composerJson = json_decode(file_get_contents($composerPath), true);
-
-                if (! is_array($composerJson)) {
-                    continue;
-                }
-
-                $pluginClasses = $composerJson['extra']['lasaas-module']['plugins'] ?? [];
-
-                if (is_string($pluginClasses)) {
-                    $pluginClasses = [$pluginClasses];
-                }
-
-                foreach ($pluginClasses as $pluginClass) {
-                    if (class_exists($pluginClass) && is_subclass_of($pluginClass, Plugin::class)) {
+            foreach ($this->discover()->filter($filter) as $module) {
+                foreach ($this->findPanelPluginClasses($module) as $pluginClass) {
+                    if (class_exists($pluginClass) && is_subclass_of($pluginClass, $interface)) {
                         $plugins[] = $pluginClass;
                     }
                 }
             }
 
-            return $plugins;
+            return array_values(array_unique($plugins));
         });
+    }
+
+    /**
+     * 从模块的 PSR-4 根目录下 Filament/Plugins 子目录解析候选插件类名。
+     *
+     * @return array<class-string>
+     */
+    protected function findPanelPluginClasses(Module $module): array
+    {
+        $composerPath = $module->path.'/composer.json';
+
+        if (! file_exists($composerPath)) {
+            return [];
+        }
+
+        $composerJson = json_decode(file_get_contents($composerPath), true);
+
+        if (! is_array($composerJson)) {
+            return [];
+        }
+
+        $classes = [];
+
+        foreach ($composerJson['autoload']['psr-4'] ?? [] as $namespace => $srcDir) {
+            $basePath = $module->path.'/'.rtrim(is_array($srcDir) ? $srcDir[0] : $srcDir, '/');
+
+            if (! is_dir($basePath)) {
+                continue;
+            }
+
+            $pluginsDir = rtrim($basePath, '/').'/Filament/Plugins';
+
+            if (! is_dir($pluginsDir)) {
+                continue;
+            }
+
+            foreach (File::allFiles($pluginsDir) as $file) {
+                if ($file->getExtension() !== 'php') {
+                    continue;
+                }
+
+                $relative = substr($file->getPathname(), strlen(rtrim($basePath, '/')) + 1, -4);
+                $classes[] = $namespace.str_replace('/', '\\', $relative);
+            }
+        }
+
+        return $classes;
+    }
+
+    /**
+     * 获取所有 central 区域模块中声明的 Filament Plugin 类名列表。
+     *
+     * @deprecated 使用 getAdminPanelPlugins() 按约定发现
+     *
+     * @return array<class-string<Plugin>>
+     */
+    public function getCentralFilamentPlugins(): array
+    {
+        return $this->getAdminPanelPlugins();
     }
 }

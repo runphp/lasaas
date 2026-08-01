@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\Module;
+use App\Module\ModuleManager;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 
 /**
@@ -104,8 +104,8 @@ class ModulesSync extends Command
         // 生成模块 autoload 文件，Composer 静态加载，参考 Drupal 设计
         $this->generateAutoloadFile();
 
-        // 清除 Filament plugins 缓存，下次请求自动重建
-        Cache::forget('lasaas.central_filament_plugins');
+        // 清除面板插件发现缓存，下次请求自动重建
+        app(ModuleManager::class)->flushPanelPluginsCache();
 
         return self::SUCCESS;
     }
