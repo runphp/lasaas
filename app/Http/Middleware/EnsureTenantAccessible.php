@@ -7,6 +7,8 @@ use App\Models\Tenant;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
@@ -34,13 +36,10 @@ class EnsureTenantAccessible
             return $this->statusUnavailableResponse($tenant);
         }
 
-        if ($this->tenantDatabaseIsUnreachable($tenant)) {
-            return response()
-                ->view('tenant.unavailable', [
-                    'title' => __('tenant.unavailable.title'),
-                    'message' => __('tenant.unavailable.database'),
-                    'retry' => true,
-                ], 503);
+        $failure = $this->findTenantDatabaseFailure($tenant);
+
+        if ($failure !== null) {
+            return $this->databaseUnavailableResponse($tenant, $failure);
         }
 
         return $next($request);
@@ -63,25 +62,54 @@ class EnsureTenantAccessible
             ], 403);
     }
 
-    protected function tenantDatabaseIsUnreachable(Tenant $tenant): bool
+    protected function databaseUnavailableResponse(Tenant $tenant, Throwable $failure): Response
     {
-        try {
-            if (! $this->tenantDatabaseExists($tenant)) {
-                return true;
-            }
+        Log::warning('Tenant database unreachable', [
+            'tenant_id' => $tenant->getTenantKey(),
+            'database' => $tenant->database()->getName(),
+            'exception' => $failure,
+        ]);
 
-            DB::connection()->getPdo();
-        } catch (Throwable) {
-            return true;
+        $message = __('tenant.unavailable.database');
+
+        if (app()->environment('local')) {
+            $message .= ' '.$failure->getMessage();
         }
 
-        return false;
+        return response()
+            ->view('tenant.unavailable', [
+                'title' => __('tenant.unavailable.title'),
+                'message' => $message,
+                'retry' => true,
+            ], 503);
     }
 
-    protected function tenantDatabaseExists(Tenant $tenant): bool
+    /**
+     * Returns the underlying reason the tenant database is unreachable, or null when it is reachable.
+     */
+    protected function findTenantDatabaseFailure(Tenant $tenant): ?Throwable
     {
-        $name = $tenant->database()->getName();
+        $database = $tenant->database();
 
-        return $name !== null && $tenant->database()->manager()->databaseExists($name);
+        try {
+            if ($database->getName() === null) {
+                return new RuntimeException('tenant_databases 表没有该租户的数据库配置记录。');
+            }
+
+            if (! $database->manager()->databaseExists($database->getName())) {
+                return new RuntimeException("租户数据库 [{$database->getName()}] 不存在。");
+            }
+
+            // Bootstrap 失败时租户连接不会被配置，这里补充构建以便拿到真实的错误原因。
+            if (config('database.connections.tenant') === null) {
+                config()->set('database.connections.tenant', $database->connection());
+            }
+
+            DB::connection('tenant')->getPdo();
+        } catch (Throwable $exception) {
+            return $exception;
+        }
+
+        return null;
     }
 }

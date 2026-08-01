@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Stancl\Tenancy\Tenancy;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -38,6 +39,10 @@ function runTenantAccessibilityMiddleware(?Tenant $tenant, bool $initialized = t
     $tenancy->initialized = $initialized;
     $tenancy->tenant = $tenant;
     app()->instance(Tenancy::class, $tenancy);
+
+    if ($tenant?->tenantDatabase !== null) {
+        config()->set('database.connections.tenant', $tenant->database()->connection());
+    }
 
     return (new EnsureTenantAccessible)->handle(Request::create('/'), fn (Request $request) => response('ok'));
 }
@@ -129,4 +134,26 @@ it('returns a 503 when the tenant database cannot be reached', function () {
 
     expect($response->getStatusCode())->toBe(503)
         ->and($response->getContent())->toContain(__('tenant.unavailable.database'));
+});
+
+it('logs the underlying reason when the tenant database is unreachable', function () {
+    Log::spy();
+    $tenant = createAccessibleTenant(TenantStatus::ACTIVE, 'shop-missing-'.Str::uuid().'.sqlite');
+
+    runTenantAccessibilityMiddleware($tenant);
+
+    Log::shouldHaveReceived('warning')
+        ->withArgs(fn (string $message, array $context): bool => $message === 'Tenant database unreachable'
+            && $context['tenant_id'] === $tenant->id
+            && str_contains($context['exception']->getMessage(), '不存在'));
+});
+
+it('surfaces the underlying reason in the local environment', function () {
+    app()->detectEnvironment(fn () => 'local');
+
+    $tenant = createAccessibleTenant(TenantStatus::ACTIVE, 'shop-missing-'.Str::uuid().'.sqlite');
+
+    $response = runTenantAccessibilityMiddleware($tenant);
+
+    expect($response->getContent())->toContain('不存在');
 });
