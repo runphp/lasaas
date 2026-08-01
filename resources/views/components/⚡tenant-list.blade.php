@@ -76,7 +76,7 @@ new class extends Component
                             <div class="text-xs text-neutral-400 mt-1">
                                 绑定域名：
                                 @foreach ($domains as $item)
-                                    <a href="https://{{ $item->domain }}/admin" target="_blank" class="mr-2 text-blue-500 hover:underline">
+                                    <a href="https://{{ $item->domain }}" target="_blank" class="mr-2 text-blue-500 hover:underline">
                                         {{ $item->domain }}
                                     </a>
                                 @endforeach
