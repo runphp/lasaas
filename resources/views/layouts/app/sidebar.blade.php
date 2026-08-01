@@ -20,6 +20,25 @@
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 
+            @php
+                $moduleNavItems = new \Illuminate\Support\Collection;
+                event(new \App\Events\FrontendNavigationCollecting($moduleNavItems, 'central'));
+            @endphp
+
+            @if ($moduleNavItems->isNotEmpty())
+                <flux:sidebar.nav>
+                    @foreach ($moduleNavItems->groupBy(fn (array $item): string => $item['group'] ?? '') as $group => $items)
+                        <flux:sidebar.group :heading="$group !== '' ? __($group) : null">
+                            @foreach ($items as $item)
+                                <flux:sidebar.item :icon="$item['icon'] ?? null" :href="$item['url']" wire:navigate>
+                                    {{ $item['label'] }}
+                                </flux:sidebar.item>
+                            @endforeach
+                        </flux:sidebar.group>
+                    @endforeach
+                </flux:sidebar.nav>
+            @endif
+
             <flux:spacer />
 
             <flux:sidebar.nav>
