@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ModuleStatus;
 use App\Enums\TenantStatus;
 use App\Tenancy\TenantDatabaseConfig;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -68,10 +69,17 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         return $this->hasMany(TenantModule::class);
     }
 
+    /**
+     * 获取租户当前启用的模块包名列表。
+     *
+     * 仅返回中央应用仍处于 active 状态的模块——中央禁用后，
+     * 即使租户侧 tenant_modules.enabled 仍为 true，也不视为启用。
+     */
     public function getEnabledModules(): array
     {
         return $this->tenantModules()
             ->where('enabled', true)
+            ->whereHas('module', fn ($query) => $query->where('status', ModuleStatus::ACTIVE))
             ->with('module')
             ->get()
             ->pluck('module.package_name')

@@ -192,3 +192,34 @@ test('EnsureModuleEnabled returns 404 when no tenant is identified', function ()
         $module->package_name,
     ))->toThrow(NotFoundHttpException::class);
 });
+
+test('central disable makes the module unavailable to all tenants despite enabled flags', function () {
+    $module = createTenantAreaModule();
+    $tenant = createTestTenantModel();
+
+    $tenant->setModuleEnabled($module->id, true);
+
+    expect($tenant->getEnabledModules())->toContain($module->package_name);
+
+    $module->update(['status' => ModuleStatus::INACTIVE]);
+
+    expect($tenant->getEnabledModules())->not->toContain($module->package_name);
+});
+
+test('EnsureModuleEnabled returns 404 when the module was disabled in the central app', function () {
+    $module = createTenantAreaModule();
+    $tenant = createTestTenantModel();
+
+    $tenant->setModuleEnabled($module->id, true);
+    $module->update(['status' => ModuleStatus::INACTIVE]);
+
+    fakeTenancyAlreadyInitialized()->tenant = $tenant;
+
+    $middleware = new EnsureModuleEnabled;
+
+    expect(fn () => $middleware->handle(
+        request(),
+        fn (): Response => new Response('ok'),
+        $module->package_name,
+    ))->toThrow(NotFoundHttpException::class);
+});
