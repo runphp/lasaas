@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Http\Middleware\EnsureTenantAccessible;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
@@ -138,16 +139,16 @@ class TenancyServiceProvider extends ServiceProvider
     {
         \Livewire::setUpdateRoute(function ($handle, $path) {
             return Route::post($path, $handle)
-                ->middleware(['web', 'universal', InitializeTenancyByDomain::class])
+                ->middleware(['web', 'universal', InitializeTenancyByDomain::class, EnsureTenantAccessible::class])
                 ->name('livewire.update');
         });
     }
 
     protected function configureLivewireFileUploads(): void
     {
-        FilePreviewController::$middleware = ['web', 'universal', InitializeTenancyByDomain::class];
+        FilePreviewController::$middleware = ['web', 'universal', InitializeTenancyByDomain::class, EnsureTenantAccessible::class];
 
-        config(['livewire.temporary_file_upload.middleware' => ['throttle:60,1', 'universal', InitializeTenancyByDomain::class]]);
+        config(['livewire.temporary_file_upload.middleware' => ['throttle:60,1', 'universal', InitializeTenancyByDomain::class, EnsureTenantAccessible::class]]);
     }
 
     protected function makeTenancyMiddlewareHighestPriority()

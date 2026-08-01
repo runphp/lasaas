@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Middleware\EnsureTeamMembership;
+use App\Http\Middleware\EnsureTenantAccessible;
 use Illuminate\Support\Facades\Route;
 use LaravelLang\Locales\Facades\Locales;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -22,6 +23,7 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 $installedLocales = Locales::installed()->pluck('code')->all();
 Route::middleware([
     InitializeTenancyByDomain::class,
+    EnsureTenantAccessible::class,
     'web',
     PreventAccessFromCentralDomains::class,
 ])->group(function () use ($installedLocales) {
