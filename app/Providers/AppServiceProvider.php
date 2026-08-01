@@ -103,15 +103,11 @@ class AppServiceProvider extends ServiceProvider
     protected function configureGuestRedirect(): void
     {
         RedirectIfAuthenticated::redirectUsing(function (Request $request) {
-            if (! in_array($request->getHost(), config('tenancy.central_domains', []), true)) {
-                $user = $request->user();
-                $team = $user?->currentTeam ?? $user?->personalTeam();
+            $user = $request->user();
+            $team = $user?->currentTeam ?? $user?->personalTeam();
 
-                if ($team) {
-                    return "/{$team->slug}/dashboard";
-                }
-
-                return '/';
+            if ($team) {
+                return "/{$team->slug}/dashboard";
             }
 
             return config('fortify.home', '/dashboard');
