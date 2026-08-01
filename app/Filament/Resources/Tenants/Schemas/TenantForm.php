@@ -55,14 +55,6 @@ class TenantForm
             'sqlite' => [
                 'database' => 'shop_001.sqlite',
             ],
-            'sqlsrv' => [
-                'database' => 'shop_001',
-                'host' => '127.0.0.1',
-                'port' => '1433',
-                'username' => 'shop_user',
-                'password' => '123456',
-                'charset' => 'UTF-8',
-            ],
         ];
     }
 
@@ -161,7 +153,6 @@ class TenantForm
                                 'mysql' => 'MySQL',
                                 'pgsql' => 'PostgreSQL',
                                 'sqlite' => 'SQLite（文件数据库）',
-                                'sqlsrv' => 'SQL Server',
                             ])
                             ->default('mariadb')
                             ->required()
