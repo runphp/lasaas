@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Stancl\Tenancy\Tenancy;
+use Stancl\Tenancy\TenantDatabaseManagers\MySQLDatabaseManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -145,7 +146,7 @@ it('logs the underlying reason when the tenant database is unreachable', functio
     Log::shouldHaveReceived('warning')
         ->withArgs(fn (string $message, array $context): bool => $message === 'Tenant database unreachable'
             && $context['tenant_id'] === $tenant->id
-            && str_contains($context['exception']->getMessage(), '不存在'));
+            && str_contains($context['exception']->getMessage(), $tenant->database()->getName()));
 });
 
 it('surfaces the underlying reason in the local environment', function () {
@@ -155,5 +156,36 @@ it('surfaces the underlying reason in the local environment', function () {
 
     $response = runTenantAccessibilityMiddleware($tenant);
 
-    expect($response->getContent())->toContain('不存在');
+    expect($response->getContent())->toContain($tenant->database()->getName());
+});
+
+it('probes the tenant connection directly instead of checking existence over the central connection', function () {
+    config()->set('database.connections.mysql', [
+        'driver' => 'mysql',
+        'host' => '127.0.0.1',
+        'database' => 'central',
+        'username' => 'root',
+        'password' => '',
+        'charset' => 'utf8mb4',
+        'collation' => 'utf8mb4_unicode_ci',
+    ]);
+
+    $tenant = createAccessibleTenant(TenantStatus::ACTIVE, 'shop-mysql-'.Str::uuid().'.sqlite');
+    $tenant->tenantDatabase()->update([
+        'connection' => 'mysql',
+        'database' => 'tenant_'.Str::uuid(),
+    ]);
+    $tenant->unsetRelation('tenantDatabase');
+
+    $manager = Mockery::mock(MySQLDatabaseManager::class)->makePartial();
+    $manager->shouldNotReceive('databaseExists');
+    app()->instance(MySQLDatabaseManager::class, $manager);
+
+    $connection = Mockery::mock();
+    $connection->shouldReceive('getPdo')->andReturnNull();
+    DB::shouldReceive('connection')->andReturn($connection);
+
+    $response = runTenantAccessibilityMiddleware($tenant);
+
+    expect($response->getStatusCode())->toBe(200);
 });

@@ -96,10 +96,6 @@ class EnsureTenantAccessible
                 return new RuntimeException('tenant_databases 表没有该租户的数据库配置记录。');
             }
 
-            if (! $database->manager()->databaseExists($database->getName())) {
-                return new RuntimeException("租户数据库 [{$database->getName()}] 不存在。");
-            }
-
             // Bootstrap 失败时租户连接不会被配置，这里补充构建以便拿到真实的错误原因。
             if (config('database.connections.tenant') === null) {
                 config()->set('database.connections.tenant', $database->connection());
