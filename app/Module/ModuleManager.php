@@ -333,37 +333,21 @@ class ModuleManager
     }
 
     /**
-     * 加载模块的路由文件。
+     * 加载模块的中央应用路由文件。
+     *
+     * 与框架约定一致：模块只需 routes/web.php（中央应用）与 routes/tenant.php（租户）。
+     * web.php 只对 central 区域模块加载；tenant.php 由 registerTenantModuleRoutes()
+     * 在 app boot 阶段以租户中间件组注册，这里不重复加载。
      */
     protected function loadRoutes(Module $module): void
     {
-        $routeFiles = [
-            'central' => $module->path.'/routes/central.php',
-            'web' => $module->path.'/routes/web.php',
-            'api' => $module->path.'/routes/api.php',
-        ];
+        if (! in_array('central', $module->areas ?? [], true)) {
+            return;
+        }
 
-        // 注意：tenant.php 不在其中——租户路由统一由 registerTenantModuleRoutes()
-        // 在 app boot 阶段以租户中间件组注册，这里不再重复加载。
+        $path = $module->path.'/routes/web.php';
 
-        // 根据模块支持的 area 决定加载哪些路由
-        $areas = $module->areas ?? [];
-
-        foreach ($routeFiles as $type => $path) {
-            if (! file_exists($path)) {
-                continue;
-            }
-
-            // central 路由只对 central 区域模块加载
-            if ($type === 'central' && ! in_array('central', $areas, true)) {
-                continue;
-            }
-
-            // web 路由属于中央应用上下文，只对 central 区域模块加载
-            if ($type === 'web' && ! in_array('central', $areas, true)) {
-                continue;
-            }
-
+        if (file_exists($path)) {
             require $path;
         }
     }

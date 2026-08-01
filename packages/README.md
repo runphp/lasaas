@@ -21,9 +21,7 @@ packages/custom/{vendor}/{name}/
 │               ├── AdminBlogPlugin.php    # 中央 admin 面板
 │               └── TenantBlogPlugin.php   # 租户 admin 面板
 ├── routes/
-│   ├── central.php                # 中央应用路由（仅 central 区域模块加载）
-│   ├── web.php                    # 中央应用前台路由（仅 central 区域模块加载）
-│   ├── api.php                    # API 路由
+│   ├── web.php                    # 中央应用路由（仅 central 区域模块加载，与框架 routes/web.php 对应）
 │   └── tenant.php                 # 租户路由，自动挂载租户中间件组
 ├── database/
 │   └── migrations/                # 中央迁移（install 时运行，uninstall 时回滚）
@@ -170,7 +168,7 @@ Event::listen(function (FrontendNavigationCollecting $event) {
 
 ### 5.3 路由
 
-- `routes/central.php`、`routes/web.php`、`routes/api.php`：仅 `central` 区域模块加载，用于中央应用。
+- `routes/web.php`：仅 `central` 区域模块加载，用于中央应用（与框架 `routes/web.php` 对应）。
 - `routes/tenant.php`：统一挂载 `EnsureTenantAccessible` 等租户中间件组，在租户上下文生效。
 - 路由守卫：可用 `module.enabled:{package_name}` 中间件限制仅模块启用时访问。
 
