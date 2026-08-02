@@ -31,6 +31,11 @@ class TeamResource extends Resource
         return __('filament-resources.team.label');
     }
 
+    public static function getModelLabel(): string
+    {
+        return __('filament-resources.team.model.label');
+    }
+
     public static function getNavigationGroup(): ?string
     {
         return __('filament-resources.system.group');

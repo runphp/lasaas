@@ -78,5 +78,7 @@ return [
         'reorder' => '重新排序',
         'restore_any' => '批量恢复',
         'replicate' => '复制',
+        'settings' => '设置',
+        'uninstall' => '卸载',
     ],
 ];

@@ -38,6 +38,11 @@ class ModuleResource extends Resource
         return __('filament-resources.module.label');
     }
 
+    public static function getModelLabel(): string
+    {
+        return __('filament-resources.module.model.label');
+    }
+
     public static function getNavigationGroup(): ?string
     {
         return __('filament-resources.system.group');

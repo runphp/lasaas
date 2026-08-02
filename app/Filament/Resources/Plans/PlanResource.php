@@ -29,6 +29,11 @@ class PlanResource extends Resource
         return __('filament-resources.plan.label');
     }
 
+    public static function getModelLabel(): string
+    {
+        return __('filament-resources.plan.model.label');
+    }
+
     public static function getNavigationGroup(): ?string
     {
         return __('filament-resources.system.group');

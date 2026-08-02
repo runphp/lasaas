@@ -29,6 +29,11 @@ class PageResource extends Resource
         return __('filament-resources.page.label');
     }
 
+    public static function getModelLabel(): string
+    {
+        return __('filament-resources.page.model.label');
+    }
+
     public static function getNavigationGroup(): ?string
     {
         return __('filament-resources.system.group');

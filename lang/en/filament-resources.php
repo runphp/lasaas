@@ -5,15 +5,27 @@ declare(strict_types=1);
 return [
     'team' => [
         'label' => 'Team Management',
+        'model' => [
+            'label' => 'Team',
+        ],
     ],
     'plan' => [
         'label' => 'Plan Management',
+        'model' => [
+            'label' => 'Plan',
+        ],
     ],
     'page' => [
         'label' => 'Page Management',
+        'model' => [
+            'label' => 'Page',
+        ],
     ],
     'tenant' => [
         'label' => 'Tenant Management',
+        'model' => [
+            'label' => 'Tenant',
+        ],
         'statuses' => [
             'pending' => 'Pending',
             'active' => 'Active',
@@ -21,15 +33,33 @@ return [
             'expired' => 'Expired',
             'disabled' => 'Disabled',
         ],
+        'fields' => [
+            'name' => 'name',
+            'domain' => 'domain',
+            'email' => 'email',
+            'phone' => 'phone',
+            'team' => 'team',
+            'user' => 'user',
+            'status' => 'status',
+            'expired_at' => 'expire time',
+            'created_at' => 'create time',
+            'updated_at' => 'update time',
+        ],
     ],
     'user' => [
         'label' => 'User Management',
+        'model' => [
+            'label' => 'User',
+        ],
     ],
     'system' => [
         'group' => 'System Management',
     ],
     'module' => [
         'label' => 'Module Management',
+        'model' => [
+            'label' => 'Module',
+        ],
         'statuses' => [
             'active' => 'Active',
             'inactive' => 'Inactive',
@@ -48,7 +78,7 @@ return [
             'name' => 'Module Name',
             'description' => 'Description',
             'version' => 'Version',
-            'provider_class' => 'Provider Class',
+            'providers' => 'Provider Classes',
             'weight' => 'Weight',
             'dependencies' => 'Dependencies',
             'after' => 'After',
