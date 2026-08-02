@@ -60,6 +60,25 @@ return [
         'model' => [
             'label' => '模块',
         ],
+        'settings' => [
+            'label' => '模块设置',
+            'saved' => '设置已保存',
+        ],
+        'uninstall' => [
+            'label' => '卸载模块',
+            'modal' => [
+                'heading' => '卸载模块 :label',
+                'description' => '卸载模块将删除所有相关数据，且无法恢复，请谨慎操作。',
+                'actions' => [
+                    'uninstall' => [
+                        'label' => '卸载',
+                    ],
+                    'cancel' => [
+                        'label' => '取消',
+                    ],
+                ],
+            ],
+        ],
         'statuses' => [
             'active' => '启用',
             'inactive' => '禁用',

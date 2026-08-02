@@ -60,6 +60,25 @@ return [
         'model' => [
             'label' => 'Module',
         ],
+        'settings' => [
+            'label' => 'Settings',
+            'saved' => 'Settings saved',
+        ],
+        'uninstall' => [
+            'label' => 'Uninstall Module',
+            'modal' => [
+                'heading' => 'Uninstall Module :label',
+                'description' => 'Uninstalling the module will delete all related data and cannot be undone. Please proceed with caution.',
+                'actions' => [
+                    'uninstall' => [
+                        'label' => 'Uninstall',
+                    ],
+                    'cancel' => [
+                        'label' => 'Cancel',
+                    ],
+                ],
+            ],
+        ],
         'statuses' => [
             'active' => 'Active',
             'inactive' => 'Inactive',

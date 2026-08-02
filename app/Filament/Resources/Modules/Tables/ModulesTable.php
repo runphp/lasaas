@@ -71,7 +71,7 @@ class ModulesTable
                 ViewAction::make(),
                 Action::make('settings')
                     ->authorize('settings')
-                    ->label(__('Setting'))
+                    ->label(__('filament-resources.module.settings.label'))
                     ->icon('heroicon-o-cog-6-tooth')
                     ->visible(fn (Module $record): bool => ! empty(app(ModuleManager::class)->platformSettingsSchema($record)))
                     ->schema(fn (Module $record): array => app(ModuleManager::class)->platformSettingsSchema($record))
@@ -79,20 +79,20 @@ class ModulesTable
                     ->action(function (Module $record, array $data): void {
                         app(ModuleManager::class)->resolvePlatformSettings($record)?->fill($data)?->save();
 
-                        Notification::make()->success()->title(__('设置已保存'))->send();
+                        Notification::make()->success()->title(__('filament-resources.module.settings.saved'))->send();
                     }),
                 Action::make('uninstall')
                     ->authorize('uninstall')
-                    ->label(__('Uninstall'))
+                    ->label(__('filament-resources.module.uninstall.label'))
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()
                     ->modalDescription(function ($record) {
                         $name = $record->name;
                         $pkg = $record->package_name;
-                        $installed = $record->isInstalled() ? '（将执行 uninstall 钩子）' : '';
+                        $installed = $record->isInstalled() ? __('filament-resources.module.uninstall.modal.actions.uninstall.label').' ' : '';
 
-                        return "确定要卸载模块 \"{$name}\" ({$pkg}) 吗？{$installed}";
+                        return __('filament-resources.module.uninstall.modal.heading', ['label' => $name]);
                     })
                     ->action(function ($record) {
                         $hasEnabledTenant = TenantModule::where('module_id', $record->id)
@@ -102,8 +102,8 @@ class ModulesTable
                         // 预校验：存在启用该模块的租户
                         if ($hasEnabledTenant) {
                             Notification::make()
-                                ->title('无法卸载模块')
-                                ->body('仍有租户正在启用此模块，请先在所有租户内禁用/卸载该模块后重试。')
+                                ->title(__('filament-resources.module.uninstall.modal.heading'))
+                                ->body(__('filament-resources.module.uninstall.modal.description'))
                                 ->danger()
                                 ->send();
 
