@@ -24,33 +24,41 @@ class TenantsTable
                     ->label('ID')
                     ->searchable(),
                 TextColumn::make('name')
+                    ->label(__('filament-resources.tenant.fields.name'))
                     ->searchable(),
                 TextColumn::make('domains.domain')
-                    ->label('域名')
+                    ->label(__('filament-resources.tenant.fields.domain'))
                     ->listWithLineBreaks()
                     ->bulleted(),
                 TextColumn::make('email')
-                    ->label('Email address')
+                    ->label(__('filament-resources.tenant.fields.email'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('phone')
+                    ->label(__('filament-resources.tenant.fields.phone'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('user.name')
+                    ->label(__('filament-resources.tenant.fields.user'))
                     ->searchable(),
                 TextColumn::make('team.name')
+                    ->label(__('filament-resources.tenant.fields.team'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('status')
+                    ->label(__('filament-resources.tenant.fields.status'))
                     ->badge(),
                 TextColumn::make('expired_at')
+                    ->label(__('filament-resources.tenant.fields.expired_at'))
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
+                    ->label(__('filament-resources.tenant.fields.created_at'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label(__('filament-resources.tenant.fields.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -62,7 +70,7 @@ class TenantsTable
                 ViewAction::make(),
                 EditAction::make(),
                 Action::make('modules')
-                    ->label(__('模块管理'))
+                    ->label(__('filament-resources.module.label'))
                     ->icon(Heroicon::Squares2x2)
                     ->modalWidth(Width::SevenExtraLarge)
                     ->modalSubmitAction(false)

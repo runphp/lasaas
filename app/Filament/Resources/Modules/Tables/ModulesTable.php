@@ -70,7 +70,8 @@ class ModulesTable
             ->recordActions([
                 ViewAction::make(),
                 Action::make('settings')
-                    ->label(__('设置'))
+                    ->authorize('settings')
+                    ->label(__('Setting'))
                     ->icon('heroicon-o-cog-6-tooth')
                     ->visible(fn (Module $record): bool => ! empty(app(ModuleManager::class)->platformSettingsSchema($record)))
                     ->schema(fn (Module $record): array => app(ModuleManager::class)->platformSettingsSchema($record))
@@ -81,7 +82,8 @@ class ModulesTable
                         Notification::make()->success()->title(__('设置已保存'))->send();
                     }),
                 Action::make('uninstall')
-                    ->label('卸载')
+                    ->authorize('uninstall')
+                    ->label(__('Uninstall'))
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()

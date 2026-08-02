@@ -1,6 +1,8 @@
 <?php
 
 declare(strict_types=1);
+
+use App\Filament\Resources\Modules\ModuleResource;
 use BezhanSalleh\FilamentShield\Resources\Roles\RoleResource;
 use Filament\Pages\Dashboard;
 use Filament\Widgets\AccountWidget;
@@ -175,6 +177,14 @@ return [
                 'create',
                 'update',
                 'delete',
+            ],
+            ModuleResource::class => [
+                'viewAny',
+                'view',
+                'update',
+                'reorder',
+                'settings',
+                'uninstall',
             ],
         ],
         'exclude' => [
