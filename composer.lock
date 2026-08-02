@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cc307b7aae148780b807a6b4aaf935bb",
+    "content-hash": "188917cdf18a73c97ca2cc158ce17308",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -5151,11 +5151,12 @@
             "dist": {
                 "type": "path",
                 "url": "packages/custom/lasaas/example",
-                "reference": "9505f44a391415877b6c065a92b675dac8009895"
+                "reference": "9292a387933288126744a8fae016810a0fede96a"
             },
             "type": "lasaas-module",
             "extra": {
                 "lasaas-module": {
+                    "name": "示例模块",
                     "areas": [
                         "central",
                         "tenant"

@@ -10,7 +10,7 @@
     },
     "extra": {
         "lasaas-module": {
-            "name": "示例模块1",
+            "name": "示例模块",
             "areas": ["central", "tenant"],
             "weight": 0,
             "after": [],
