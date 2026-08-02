@@ -1,0 +1,21 @@
+{
+    "name": "lasaas/example",
+    "description": "示例模块（配置演示）",
+    "type": "lasaas-module",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Lasaas\\Example\\": "src/"
+        }
+    },
+    "extra": {
+        "lasaas-module": {
+            "name": "示例模块",
+            "description": "示例模块，用于演示如何开发Lasaas模块",
+            "areas": ["central", "tenant"],
+            "weight": 0,
+            "after": [],
+            "providers": ["Lasaas\\Example\\ExampleServiceProvider"]
+        }
+    }
+}

@@ -2,41 +2,52 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\Tenants\Pages;
+namespace App\Livewire\Actions;
 
-use App\Filament\Resources\Tenants\TenantResource;
 use App\Models\Module;
+use App\Models\Tenant;
 use App\Models\TenantModule;
 use App\Module\ModuleManager;
 use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Notifications\Notification;
-use Filament\Resources\Pages\Concerns\InteractsWithRecord;
-use Filament\Resources\Pages\Page;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Illuminate\Contracts\View\View;
+use Livewire\Component;
 
-class ManageTenantModules extends Page implements HasTable
+class ManageTenantModules extends Component implements HasActions, HasSchemas, HasTable
 {
-    use InteractsWithRecord;
+    use InteractsWithActions;
+    use InteractsWithSchemas;
     use InteractsWithTable;
 
-    protected static string $resource = TenantResource::class;
+    public ?Tenant $record = null;
 
-    protected string $view = 'filament.resources.tenants.pages.manage-tenant-modules';
-
-    public function mount(int|string $record): void
+    public function mount(Tenant $record): void
     {
-        $this->record = $this->resolveRecord($record);
+        $this->record = $record;
+    }
 
-        $this->mountCanAuthorizeAccess();
+    public function render(): View
+    {
+        return view('livewire.actions.manage-tenant-modules');
+    }
+
+    public function getTenant(): Tenant
+    {
+        return $this->record;
     }
 
     public function table(Table $table): Table
     {
-        $tenant = $this->getRecord();
+        $tenant = $this->getTenant();
         $manager = app(ModuleManager::class);
 
         $tenantAreaModuleIds = $manager->discover()
@@ -78,9 +89,9 @@ class ManageTenantModules extends Page implements HasTable
                     ->icon(Heroicon::Cog6Tooth)
                     ->visible(fn (Module $record): bool => $this->tenantModuleFor($record) !== null)
                     ->schema(fn (Module $record): array => $manager->tenantSettingsSchema($record))
-                    ->fillForm(fn (Module $record): array => $this->tenantModuleFor($record)?->settings ?? [])
+                    ->fillForm(fn (Module $record): array => $manager->resolveTenantSettings($record, $tenant)?->toArray() ?? [])
                     ->action(function (Module $record, array $data): void {
-                        $this->tenantModuleFor($record)?->update(['settings' => $data]);
+                        app(ModuleManager::class)->resolveTenantSettings($record, $this->getTenant())?->fill($data)?->save();
 
                         Notification::make()->success()->title(__('已保存'))->send();
                     }),
@@ -123,7 +134,7 @@ class ManageTenantModules extends Page implements HasTable
 
     protected function installModule(Module $module): void
     {
-        app(ModuleManager::class)->enableForTenant($module, $this->getRecord());
+        app(ModuleManager::class)->enableForTenant($module, $this->getTenant());
 
         Notification::make()->success()->title(__('模块已安装并启用'))->send();
     }
@@ -133,21 +144,21 @@ class ManageTenantModules extends Page implements HasTable
         $manager = app(ModuleManager::class);
 
         if ($enabled) {
-            $manager->enableForTenant($module, $this->getRecord());
+            $manager->enableForTenant($module, $this->getTenant());
 
             Notification::make()->success()->title(__('模块已启用'))->send();
 
             return;
         }
 
-        $manager->disableForTenant($module, $this->getRecord());
+        $manager->disableForTenant($module, $this->getTenant());
 
         Notification::make()->success()->title(__('模块已禁用'))->send();
     }
 
     protected function uninstallModule(Module $module): void
     {
-        app(ModuleManager::class)->uninstallForTenant($module, $this->getRecord());
+        app(ModuleManager::class)->uninstallForTenant($module, $this->getTenant());
 
         Notification::make()->success()->title(__('模块已卸载'))->send();
     }

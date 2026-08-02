@@ -10,6 +10,9 @@ use App\Models\Tenant;
 use App\Models\TenantModule;
 use App\Module\Contracts\AdminPanelPlugin;
 use App\Module\Contracts\TenantAdminPanelPlugin;
+use App\Module\Settings\ModulePlatformSettings;
+use App\Module\Settings\ModuleSettingsScope;
+use App\Module\Settings\ModuleTenantSettings;
 use Closure;
 use Filament\Contracts\Plugin;
 use Illuminate\Contracts\Foundation\Application;
@@ -18,6 +21,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Spatie\LaravelSettings\Models\SettingsProperty;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
@@ -246,6 +250,9 @@ class ModuleManager
             return;
         }
 
+        // 设置租户设置作用域，使模块租户设置类解析 group 时指向当前租户
+        app(ModuleSettingsScope::class)->setTenant($tenant->getTenantKey());
+
         $modules = $this->sortedModules(
             $this->discover()
                 ->filter(fn (Module $m) => $this->supportsArea($m, 'tenant'))
@@ -254,9 +261,6 @@ class ModuleManager
 
         foreach ($modules as $module) {
             $this->loadModule($module);
-
-            // 合并租户级别配置覆盖（模块默认 + 中央覆盖之上）
-            $this->mergeTenantConfig($tenant, $module);
         }
     }
 
@@ -284,12 +288,7 @@ class ModuleManager
             $this->loadRoutes($module);
             $this->loadViews($module);
             $this->loadConfig($module);
-
-            return;
         }
-
-        // 第三步：合并中央级别设置（schema 默认配置之上，覆盖 modules.settings）
-        $this->mergeCentralSettings($module, $provider);
     }
 
     /**
@@ -368,10 +367,9 @@ class ModuleManager
     }
 
     /**
-     * 加载模块配置文件，按优先级合并：模块默认 → 中央覆盖。
+     * 加载模块配置文件。
      *
-     * 仅用于无 ServiceProvider 的模块（provider 存在的模块由 provider 自行 mergeConfigFrom，
-     * 中央设置经 mergeCentralSettings() 合并）。
+     * 仅用于无 ServiceProvider 的模块（provider 存在的模块由 provider 自行 mergeConfigFrom）。
      */
     protected function loadConfig(Module $module): void
     {
@@ -382,7 +380,6 @@ class ModuleManager
         }
 
         $namespace = str_replace('/', '.', $module->package_name);
-        $centralOverrides = $module->settings ?? [];
 
         foreach (File::files($configPath) as $file) {
             if ($file->getExtension() !== 'php') {
@@ -390,158 +387,178 @@ class ModuleManager
             }
 
             $key = $file->getBasename('.php');
-            $configKey = $namespace.'.'.$key;
 
-            // 1. 模块默认配置
-            $config = require $file->getPathname();
-
-            // 2. 中央级别覆盖 (modules.settings)
-            if (isset($centralOverrides[$key]) && is_array($centralOverrides[$key])) {
-                $config = array_replace_recursive($config, $centralOverrides[$key]);
-            }
-
-            $this->app['config']->set($configKey, $config);
+            $this->app['config']->set($namespace.'.'.$key, require $file->getPathname());
         }
     }
 
+    // ---------------------------------------------------------------
+    // 设置（Settings）
+    // ---------------------------------------------------------------
+
     /**
-     * 把模块的中央设置合并到 provider 声明的 configKey 上。
+     * 获取模块的平台设置类名。
      *
-     * 默认配置优先取两个设置 schema 中声明的 default（模块无需再提供 config 文件），
-     * 再叠加 modules.settings 的中央覆盖值。
+     * @return class-string<ModulePlatformSettings>|null
      */
-    protected function mergeCentralSettings(Module $module, ModuleServiceProvider $provider): void
+    public function platformSettingsClass(Module $module): ?string
     {
-        $configKey = $provider->configKey();
+        $class = $this->settingsClasses($module)['platform'] ?? null;
 
-        if ($configKey === null) {
-            return;
-        }
-
-        $defaults = $this->settingsDefaultsFromSchemas($provider);
-
-        if (! empty($defaults)) {
-            $current = $this->app['config']->get($configKey, []);
-
-            $this->app['config']->set($configKey, array_replace_recursive($current, $defaults));
-        }
-
-        if (empty($module->settings)) {
-            return;
-        }
-
-        $this->mergeSettingsIntoConfig($configKey, $module->settings);
+        return $class && is_subclass_of($class, ModulePlatformSettings::class) ? $class : null;
     }
 
     /**
-     * 从模块 provider 声明的两个设置 schema 提取默认值，作为模块默认配置。
+     * 获取模块的租户设置类名。
      *
-     * 中央 schema 的默认值优先；租户 schema 只为中央 schema 未声明的 key 提供默认值。
-     *
-     * @return array<string, mixed>
+     * @return class-string<ModuleTenantSettings>|null
      */
-    protected function settingsDefaultsFromSchemas(ModuleServiceProvider $provider): array
+    public function tenantSettingsClass(Module $module): ?string
     {
-        $defaults = [];
+        $class = $this->settingsClasses($module)['tenant'] ?? null;
 
-        foreach ([
-            $provider->centralSettingsSchema(),
-            $provider->tenantSettingsSchema(),
-        ] as $schema) {
-            foreach ($schema as $component) {
-                $name = $component->getName();
-
-                if (array_key_exists($name, $defaults)) {
-                    continue;
-                }
-
-                $default = $component->getDefaultState();
-
-                if ($default !== null) {
-                    $defaults[$name] = $default;
-                }
-            }
-        }
-
-        return $defaults;
+        return $class && is_subclass_of($class, ModuleTenantSettings::class) ? $class : null;
     }
 
     /**
-     * 合并租户级别设置（仅租户上下文调用）。
+     * 获取模块声明的设置类映射（「设置类型 key => 设置类」）。
      *
-     * 在模块默认 + 中央设置已生效的基础上，用 tenant_modules.settings 覆盖。
+     * @return array<string, class-string>
      */
-    protected function mergeTenantConfig(Tenant $tenant, Module $module): void
+    protected function settingsClasses(Module $module): array
     {
-        $tenantModule = $tenant->tenantModules()
-            ->where('module_id', $module->id)
-            ->first();
-
-        if (! $tenantModule || empty($tenantModule->settings)) {
-            return;
-        }
-
         $provider = $this->resolveModuleProvider($module);
 
-        if ($provider instanceof ModuleServiceProvider) {
-            $configKey = $provider->configKey();
+        return $provider instanceof ModuleServiceProvider ? $provider->settingsClasses() : [];
+    }
 
-            if ($configKey === null) {
-                return;
+    /**
+     * 解析模块平台设置实例（读取中央库 settings 表中 "module:{groupKey}" 分组）。
+     */
+    public function resolvePlatformSettings(Module $module): ?ModulePlatformSettings
+    {
+        $class = $this->platformSettingsClass($module);
+
+        return $class ? new $class : null;
+    }
+
+    /**
+     * 解析模块在指定租户下的设置实例（读取 "tenant_module:{tenant_id}:{groupKey}" 分组）。
+     *
+     * $tenant 传 null 时作用于中央上下文（无租户数据，返回默认值）。
+     *
+     * spatie 的 group() 在懒加载/保存时才动态读取，而租户 key 来自共享的可变作用域，
+     * 同一请求内多次解析不同租户会把作用域互相覆盖，导致实例错读其他租户的分组。
+     * 因此这里为每个 (设置类, 租户) 生成一个 group() 固定为该租户分组的设置子类，
+     * 使实例完全按租户隔离。
+     */
+    public function resolveTenantSettings(Module $module, ?Tenant $tenant = null): ?ModuleTenantSettings
+    {
+        $class = $this->tenantSettingsClass($module);
+
+        if (! $class) {
+            return null;
+        }
+
+        $group = 'tenant_module:'.($tenant?->getTenantKey() ?? 'central').':'.$class::groupKey();
+
+        $settingsClass = $this->generateTenantSettingsClass($class, $group);
+
+        $settings = new $settingsClass;
+
+        // 同名回退：未存储的字段读取模块平台设置值（未覆盖的租户跟随平台默认修改）
+        $platform = $this->resolvePlatformSettings($module);
+
+        if ($platform) {
+            $settings->applyCentralFallbacks($platform->toCollection());
+        }
+
+        return $settings;
+    }
+
+    /**
+     * 生成按 (设置类, 分组) 缓存的租户设置子类，其 group() 固定返回给定分组。
+     *
+     * PHP 匿名类无法继承变量指定的基类，因此用 eval 声明一个确定命名的派生类
+     * （基类名 + 分组的哈希后缀），类名确定且按 (基类, 分组) 缓存，避免重复声明。
+     */
+    protected function generateTenantSettingsClass(string $baseClass, string $group): string
+    {
+        static $classes = [];
+
+        $cacheKey = $baseClass.'|'.$group;
+
+        if (isset($classes[$cacheKey])) {
+            return $classes[$cacheKey];
+        }
+
+        $name = class_basename($baseClass).'ForTenant'.substr(md5($baseClass.'|'.$group), 0, 16);
+        $extends = '\\'.ltrim($baseClass, '\\');
+        $groupLiteral = var_export($group, true);
+
+        if (! class_exists($name)) {
+            eval(<<<PHP
+            class {$name} extends {$extends}
+            {
+                public static function group(): string
+                {
+                    return {$groupLiteral};
+                }
             }
+            PHP);
+        }
 
-            $this->mergeSettingsIntoConfig($configKey, $tenantModule->settings);
+        return $classes[$cacheKey] = $name;
+    }
+
+    /**
+     * 删除模块的设置数据（卸载时清理，保持与 modules/tenant_modules 记录的关联一致）。
+     *
+     * $tenant 传 null 时删除中央设置及所有租户的设置；传租户时仅删除该租户的设置。
+     */
+    public function deleteSettingsFor(Module $module, ?Tenant $tenant = null): void
+    {
+        $query = SettingsProperty::query();
+
+        if ($tenant !== null) {
+            $query->where('group', "tenant_module:{$tenant->getTenantKey()}:{$module->package_name}");
+
+            $query->delete();
 
             return;
         }
 
-        // provider 不存在时的兜底：settings 按配置文件 key 组织，逐文件合并
-        $namespace = str_replace('/', '.', $module->package_name);
-
-        foreach ($tenantModule->settings as $key => $value) {
-            if (! is_array($value)) {
-                continue;
-            }
-
-            $configKey = $namespace.'.'.$key;
-            $current = $this->app['config']->get($configKey, []);
-
-            $this->app['config']->set($configKey, array_replace_recursive($current, $value));
-        }
+        $query->where('group', "module:{$module->package_name}")
+            ->orWhere('group', 'like', "tenant_module:%:{$module->package_name}")
+            ->delete();
     }
 
     /**
-     * 把设置数组递归合并进指定配置 key（覆盖已加载的模块默认配置）。
-     */
-    protected function mergeSettingsIntoConfig(string $configKey, array $settings): void
-    {
-        $current = $this->app['config']->get($configKey, []);
-
-        $this->app['config']->set($configKey, array_replace_recursive($current, $settings));
-    }
-
-    /**
-     * 获取模块的中央设置表单结构（供后台「模块 → 设置」页使用）。
+     * 获取模块的平台设置表单结构（供后台「模块 → 设置」页使用）。
+     *
+     * 表单结构由设置类自身的 schema() 方法提供，字段名与设置类 public 属性一一对应。
      *
      * @return array<int, Filament\Forms\Components\Component>
      */
-    public function centralSettingsSchema(Module $module): array
+    public function platformSettingsSchema(Module $module): array
     {
-        $provider = $this->resolveModuleProvider($module);
+        $class = $this->platformSettingsClass($module);
 
-        return $provider instanceof ModuleServiceProvider ? $provider->centralSettingsSchema() : [];
+        return $class ? $class::schema() : [];
     }
 
     /**
      * 获取模块的租户设置表单结构（供后台「租户 → 模块管理」页使用）。
      *
+     * 表单结构由设置类自身的 schema() 方法提供，字段名与设置类 public 属性一一对应。
+     *
      * @return array<int, Filament\Forms\Components\Component>
      */
     public function tenantSettingsSchema(Module $module): array
     {
-        $provider = $this->resolveModuleProvider($module);
+        $class = $this->tenantSettingsClass($module);
 
-        return $provider instanceof ModuleServiceProvider ? $provider->tenantSettingsSchema() : [];
+        return $class ? $class::schema() : [];
     }
 
     // ---------------------------------------------------------------
@@ -639,6 +656,8 @@ class ModuleManager
             $provider->uninstall();
         }
 
+        $this->deleteSettingsFor($module);
+
         $module->delete();
 
         $this->flushPanelPluginsCache();
@@ -702,6 +721,8 @@ class ModuleManager
         }
 
         $tenant->tenantModules()->where('module_id', $module->id)->delete();
+
+        $this->deleteSettingsFor($module, $tenant);
     }
 
     /**

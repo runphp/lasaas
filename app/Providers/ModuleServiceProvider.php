@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Models\Module as ModuleModel;
-use App\Models\Tenant;
 use App\Module\Http\Middleware\EnsureModuleEnabled;
 use App\Module\ModuleManager;
-use App\Module\ModuleServiceProvider as ModuleBaseProvider;
+use App\Module\Settings\ModuleSettingsScope;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +31,9 @@ class ModuleServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(ModuleManager::class, fn ($app) => new ModuleManager($app));
+
+        // 租户设置作用域：scoped，每请求一个实例，供模块租户设置类解析 group
+        $this->app->scoped(ModuleSettingsScope::class);
 
         // 加载模块 autoload 缓存文件（由 module:sync 命令生成）
         // 参考 Drupal：autoload 是构建产物，不依赖运行时扫描
@@ -65,10 +66,6 @@ class ModuleServiceProvider extends ServiceProvider
             base_path('packages/custom'),
         ];
 
-        // 收集所有模块包名，用于批量查询中央覆盖配置
-        $packageNames = [];
-        $seen = [];
-
         foreach ($scanDirs as $basePath) {
             if (! is_dir($basePath)) {
                 continue;
@@ -96,19 +93,12 @@ class ModuleServiceProvider extends ServiceProvider
                         continue;
                     }
 
-                    $packageName = $composerJson['name'] ?? basename(dirname($packageDir)).'/'.basename($packageDir);
-
-                    if (isset($seen[$packageName])) {
-                        continue;
-                    }
-                    $seen[$packageName] = true;
-                    $packageNames[] = $packageName;
-
                     $configPath = $packageDir.'/config';
                     if (! is_dir($configPath)) {
                         continue;
                     }
 
+                    $packageName = $composerJson['name'] ?? basename(dirname($packageDir)).'/'.basename($packageDir);
                     $namespace = str_replace('/', '.', $packageName);
 
                     foreach (File::files($configPath) as $file) {
@@ -121,57 +111,6 @@ class ModuleServiceProvider extends ServiceProvider
                     }
                 }
             }
-        }
-
-        // 合并中央级别设置覆盖（modules.settings）
-        // 有 provider 的模块按 provider 声明的 configKey() 合并，否则按配置文件 key 兜底。
-        // try-catch：config:cache 首次执行时数据库可能还不存在
-        if (empty($packageNames)) {
-            return;
-        }
-
-        try {
-            $moduleRecords = ModuleModel::whereIn('package_name', $packageNames)
-                ->whereNotNull('settings')
-                ->get()
-                ->keyBy('package_name');
-
-            foreach ($moduleRecords as $packageName => $moduleRecord) {
-                $overrides = $moduleRecord->settings ?? [];
-                if (empty($overrides)) {
-                    continue;
-                }
-
-                $providerClass = $moduleRecord->provider_class;
-                $configKey = null;
-
-                if ($providerClass && is_subclass_of($providerClass, ModuleBaseProvider::class)) {
-                    $configKey = (new $providerClass($this->app))->configKey();
-                }
-
-                if ($configKey !== null) {
-                    $current = $this->app['config']->get($configKey, []);
-
-                    $this->app['config']->set($configKey, array_replace_recursive($current, $overrides));
-
-                    continue;
-                }
-
-                $namespace = str_replace('/', '.', $packageName);
-
-                foreach ($overrides as $fileKey => $value) {
-                    if (! is_array($value)) {
-                        continue;
-                    }
-
-                    $configKey = $namespace.'.'.$fileKey;
-                    $current = $this->app['config']->get($configKey, []);
-
-                    $this->app['config']->set($configKey, array_replace_recursive($current, $value));
-                }
-            }
-        } catch (\Throwable) {
-            // 数据库不可用时跳过中央覆盖，模块默认配置仍然生效
         }
     }
 
@@ -218,6 +157,8 @@ class ModuleServiceProvider extends ServiceProvider
             /** @var ModuleManager $manager */
             $manager = app(ModuleManager::class);
             $manager->flushCache();
+
+            app(ModuleSettingsScope::class)->setTenant(null);
         });
     }
 }

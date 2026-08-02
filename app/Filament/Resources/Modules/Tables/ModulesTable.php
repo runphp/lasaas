@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Modules\Tables;
 
 use App\Enums\ModuleStatus;
+use App\Models\Module;
 use App\Models\TenantModule;
 use App\Module\ModuleManager;
 use Filament\Actions\Action;
@@ -68,6 +69,17 @@ class ModulesTable
             ])
             ->recordActions([
                 ViewAction::make(),
+                Action::make('settings')
+                    ->label(__('设置'))
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->visible(fn (Module $record): bool => ! empty(app(ModuleManager::class)->platformSettingsSchema($record)))
+                    ->schema(fn (Module $record): array => app(ModuleManager::class)->platformSettingsSchema($record))
+                    ->fillForm(fn (Module $record): array => app(ModuleManager::class)->resolvePlatformSettings($record)?->toArray() ?? [])
+                    ->action(function (Module $record, array $data): void {
+                        app(ModuleManager::class)->resolvePlatformSettings($record)?->fill($data)?->save();
+
+                        Notification::make()->success()->title(__('设置已保存'))->send();
+                    }),
                 Action::make('uninstall')
                     ->label('卸载')
                     ->icon('heroicon-o-trash')

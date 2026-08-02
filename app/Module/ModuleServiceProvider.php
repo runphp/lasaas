@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Module;
 
 use App\Models\Tenant;
+use App\Module\Settings\ModulePlatformSettings;
+use App\Module\Settings\ModuleTenantSettings;
 use Illuminate\Support\ServiceProvider;
 use ReflectionClass;
 
@@ -160,43 +162,29 @@ abstract class ModuleServiceProvider extends ServiceProvider
     // ---------------------------------------------------------------
 
     /**
-     * 模块运行时配置的根 key（config() 读取时使用）。
+     * 模块设置类声明。
      *
-     * 返回后，中央设置（modules.settings）与租户设置（tenant_modules.settings）
-     * 会按「模块默认配置 → 中央设置 → 租户设置」的优先级合并到该 key 下。
+     * 以「设置类型 key => 设置类」映射数组返回模块的所有设置类，例如：
      *
-     * 例如博客模块返回 'blog'，控制器通过 config('blog.per_page') 读取。
-     * 返回 null 表示该模块不做运行时配置合并。
+     *     return [
+     *         'platform' => ExamplePlatformSettings::class,
+     *         'tenant'   => ExampleTenantSettings::class,
+     *     ];
+     *
+     * 内置设置类型：
+     *  - platform：平台级设置，后台「模块 → 设置」页编辑，持久化到中央库 settings 表，
+     *    group 固定为 "module:{groupKey}"，对所有租户统一生效；
+     *  - tenant：租户级设置，后台「租户 → 模块管理」页编辑，
+     *    group 为 "tenant_module:{tenant_id}:{groupKey}"，按租户隔离。
+     *
+     * 后续新增设置类型时只需约定新的 key 与对应的设置基类。
+     *
+     * @return array{
+     *     platform?: class-string<ModulePlatformSettings>,
+     *     tenant?: class-string<ModuleTenantSettings>,
+     * }
      */
-    public function configKey(): ?string
-    {
-        return null;
-    }
-
-    /**
-     * 中央设置表单结构（后台「模块 → 设置」页使用）。
-     *
-     * 返回 Filament Form 组件数组，字段名即 modules.settings JSON 的 key，
-     * 合并进 configKey() 指向的模块配置。
-     *
-     * 与 tenantSettingsSchema() 不同——这里定义的是「对所有租户统一生效」的全局设置，
-     * 例如默认每页条数、是否开启评论等平台级选项。
-     */
-    public function centralSettingsSchema(): array
-    {
-        return [];
-    }
-
-    /**
-     * 租户设置表单结构（后台「租户 → 模块管理」页使用）。
-     *
-     * 返回 Filament Form 组件数组，字段名即 tenant_modules.settings JSON 的 key，
-     * 会覆盖中央设置在 configKey() 指向的模块配置上的值。
-     *
-     * 与 centralSettingsSchema() 不同——这里定义的是「某个租户自己的模块设置」，
-     * 例如该租户的每页条数、主题色、展示选项等，可包含与中央设置相同或不同的选项。
-     */
-    public function tenantSettingsSchema(): array
+    public function settingsClasses(): array
     {
         return [];
     }

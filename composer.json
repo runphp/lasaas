@@ -7,6 +7,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+         "ext-pdo": "*",
         "bezhansalleh/filament-shield": "^4.2",
         "composer/installers": "^2.0",
         "filament/filament": "^5.6",
@@ -18,8 +19,8 @@
         "livewire/flux": "^2.13.1",
         "livewire/livewire": "^4.1",
         "spatie/laravel-permission": "^7.4",
-        "stancl/tenancy": "^3.10",
-        "ext-pdo": "*"
+        "spatie/laravel-settings": "^3.9",
+        "stancl/tenancy": "^3.10"
     },
     "require-dev": {
         "fakerphp/faker": "^1.24",

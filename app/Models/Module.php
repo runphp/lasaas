@@ -21,7 +21,6 @@ class Module extends Model
         'path',
         'status',
         'installed_at',
-        'settings',
     ];
 
     protected function casts(): array
@@ -32,7 +31,6 @@ class Module extends Model
             'areas' => 'array',
             'status' => ModuleStatus::class,
             'installed_at' => 'datetime',
-            'settings' => 'array',
         ];
     }
 

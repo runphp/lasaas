@@ -94,16 +94,102 @@ module:tenant-enable（首次：tenantInstall）→ tenant_modules.enabled = tru
 
 ## 4. 配置与设置
 
-模块运行时配置统一合并到 `configKey()` 指定的 key 下（如博客返回 `'blog'`，代码通过 `config('blog.per_page')` 读取）。
+模块设置基于 `spatie/laravel-settings`，由模块包内定义设置类持久化到**中央库** `settings` 表，运行时通过设置类直接读写，不做 config() 合并。
 
-**优先级**：模块默认配置 → 中央设置（`modules.settings`）→ 租户设置（`tenant_modules.settings`），逐 key 深合并。
+### 4.1 设置类
 
-| 方法 | 表单来源 | 存储位置 | 作用 |
-| --- | --- | --- | --- |
-| `centralSettingsSchema()` | 中央后台「模块 → 设置」 | `modules.settings` | 对所有租户统一生效的全局设置 / 限制基线 |
-| `tenantSettingsSchema()` | 中央后台「租户 → 模块管理」 | `tenant_modules.settings` | 某个租户自己的设置，覆盖中央设置 |
+模块包内定义两个可选设置类，分别继承框架基类。**设置类自身通过 `schema()` 声明后台表单**（字段名与 public 属性一一对应），一个类即「字段 + 表单」的单一数据源：
 
-两套 schema 的字段结构允许不同，由模块开发者自行设计。
+```php
+use App\Module\Settings\ModulePlatformSettings;
+use App\Module\Settings\ModuleTenantSettings;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+
+class BlogPlatformSettings extends ModulePlatformSettings
+{
+    public int $per_page = 10;          // PHP 默认值即默认设置
+
+    public bool $allow_comments = false;
+
+    public static function groupKey(): string
+    {
+        return 'lasaas/blog';           // 通常与模块包名一致
+    }
+
+    public static function schema(): array
+    {
+        return [
+            TextInput::make('per_page')->label('每页条数')->numeric(),
+            Toggle::make('allow_comments')->label('允许评论'),
+        ];
+    }
+}
+
+class BlogTenantSettings extends ModuleTenantSettings
+{
+    public string $theme_color = '#6366f1';
+
+    public static function groupKey(): string
+    {
+        return 'lasaas/blog';
+    }
+
+    public static function schema(): array
+    {
+        return [
+            TextInput::make('theme_color')->label('主题色'),
+        ];
+    }
+}
+```
+
+不覆盖 `schema()` 时默认返回空数组（无后台表单）。
+
+### 4.2 Provider 钩子
+
+在模块的 ServiceProvider（继承 `App\Module\ModuleServiceProvider`）中声明设置类（表单结构由设置类自身的 `schema()` 提供）：
+
+| 方法 | 返回 | 作用 |
+| --- | --- | --- |
+| `settingsClasses()` | `['platform' => 类名, 'tenant' => 类名]` 映射数组 | 声明模块的所有设置类，用 key 区分设置类型，方便扩展 |
+
+内置 key：
+
+| key | 设置类必须继承 | 作用 |
+| --- | --- | --- |
+| `platform` | `ModulePlatformSettings` | 平台设置，group 为 `module:{groupKey}`，对所有租户统一生效 |
+| `tenant` | `ModuleTenantSettings` | 租户设置，group 为 `tenant_module:{tenant_id}:{groupKey}`，按租户隔离 |
+
+```php
+class BlogServiceProvider extends ModuleServiceProvider
+{
+    public function settingsClasses(): array
+    {
+        return [
+            'platform' => BlogPlatformSettings::class,
+            'tenant' => BlogTenantSettings::class,
+        ];
+    }
+}
+```
+
+两套 schema 的字段结构允许不同，字段名需与对应设置类的 public 属性一一对应，由模块开发者自行设计。
+
+### 4.3 运行时读取
+
+- 平台设置：`app(ModuleManager::class)->resolvePlatformSettings($module)` 或直接 `app(BlogPlatformSettings::class)`。
+- 租户设置（租户上下文已初始化）：直接 `app(BlogTenantSettings::class)`，group 自动指向当前租户。
+- 卸载模块/租户模块时，框架自动清理对应的 settings 分组。
+
+> 注意：中央后台管理某个租户的模块设置时，用 `ModuleManager::resolveTenantSettings($module, $tenant)` 显式指定租户。
+
+**租户设置与平台设置的关系是「同名覆盖、其余回退」（不是继承）：**
+
+- 平台设置类声明全部设置项（平台默认值）；租户设置类只声明租户可定制的子集。
+- 读取顺序：租户已存值 > 平台设置值（字段同名）> PHP 默认值。
+- 保存租户设置时，只有「被显式修改」的字段才写入租户分组；等于回退值的字段不落库，
+  因此平台设置修改后，未覆盖的租户会自动跟随新值。
 
 ## 5. 扩展点
 

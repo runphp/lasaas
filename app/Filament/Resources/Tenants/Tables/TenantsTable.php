@@ -2,10 +2,15 @@
 
 namespace App\Filament\Resources\Tenants\Tables;
 
+use App\Livewire\Actions\ManageTenantModules;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Schemas\Components\EmbeddedTable;
+use Filament\Support\Enums\Width;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -56,6 +61,15 @@ class TenantsTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                Action::make('modules')
+                    ->label(__('模块管理'))
+                    ->icon(Heroicon::Squares2x2)
+                    ->modalWidth(Width::SevenExtraLarge)
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel(__('关闭'))
+                    ->schema([
+                        EmbeddedTable::make(ManageTenantModules::class),
+                    ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

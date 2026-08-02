@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('tenant_id')->comment('租户ID，关联 tenants.id');
             $table->unsignedBigInteger('module_id')->comment('模块ID，关联 modules.id');
             $table->boolean('enabled')->default(true)->comment('是否启用：true 启用，false 禁用（保留数据不删）');
-            $table->json('settings')->nullable()->comment('模块设置 JSON，由模块 settingsSchema() 声明结构');
             $table->timestamps();
 
             $table->unique(['tenant_id', 'module_id'], 'uk_tenant_module');

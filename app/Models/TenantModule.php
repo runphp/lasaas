@@ -11,14 +11,12 @@ class TenantModule extends Model
         'tenant_id',
         'module_id',
         'enabled',
-        'settings',
     ];
 
     protected function casts(): array
     {
         return [
             'enabled' => 'boolean',
-            'settings' => 'array',
         ];
     }
 
