@@ -96,7 +96,7 @@ function createSettingsModule(string $providerClass): Module
     return Module::create([
         'package_name' => $providerClass === TestSettingsModuleProvider::class ? 'test/settings-module' : 'test/nosettings-module',
         'name' => 'Settings Module',
-        'provider_class' => $providerClass,
+        'providers' => [$providerClass],
         'path' => base_path('packages/custom/test/settings-module'),
         'areas' => ['central', 'tenant'],
         'status' => ModuleStatus::ACTIVE,

@@ -52,7 +52,7 @@ function createTenantAreaModule(string $packageName = 'test/tenant-module'): Mod
     return Module::create([
         'package_name' => $packageName,
         'name' => 'Tenant Module',
-        'provider_class' => TestTenantModuleProvider::class,
+        'providers' => [TestTenantModuleProvider::class],
         'path' => base_path('packages/custom/test/tenant-module'),
         'areas' => ['central', 'tenant'],
         'status' => ModuleStatus::ACTIVE,

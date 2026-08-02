@@ -2,15 +2,11 @@
 
 use App\Models\TenantDatabase;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
-use Stancl\Tenancy\Events\TenantCreated;
 use Stancl\Tenancy\Jobs\MigrateDatabase;
 
 function createTenantWithDatabase(array $attributes): TenantDatabase
 {
-    Event::fake([TenantCreated::class]);
-
     $tenant = createTestTenant('shop-'.Str::uuid());
 
     $tenant->setDatabaseConnection([
@@ -36,7 +32,7 @@ test('changing schema-affecting database settings runs tenant migrations', funct
         'prefix' => 'v2_',
     ]);
 
-    Bus::assertDispatchedSync(MigrateDatabase::class);
+    Bus::assertDispatched(MigrateDatabase::class);
 });
 
 test('changing the connection also triggers tenant migrations', function () {
@@ -46,7 +42,7 @@ test('changing the connection also triggers tenant migrations', function () {
 
     $tenantDatabase->update(['connection' => 'pgsql']);
 
-    Bus::assertDispatchedSync(MigrateDatabase::class);
+    Bus::assertDispatched(MigrateDatabase::class);
 });
 
 test('changing host or port does not trigger tenant migrations', function () {

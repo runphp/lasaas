@@ -753,16 +753,27 @@ class ModuleManager
      */
     protected function resolveModuleProvider(Module $module): ?ServiceProvider
     {
-        $class = $module->provider_class;
+        $providers = $module->providers;
 
-        if (! $class || ! class_exists($class)) {
+        // 数组为空直接返回
+        if (empty($providers)) {
             return null;
         }
 
+        // 取第一个为主服务提供者
+        $class = $providers[0];
+
+        // 类不存在
+        if (! class_exists($class)) {
+            return null;
+        }
+
+        // 必须继承 ServiceProvider
         if (! is_subclass_of($class, ServiceProvider::class)) {
             return null;
         }
 
+        // 实例化并返回
         return new $class($this->app);
     }
 

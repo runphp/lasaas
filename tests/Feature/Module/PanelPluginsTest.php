@@ -15,7 +15,7 @@ function createPanelExtensionModule(): Module
     return Module::create([
         'package_name' => 'test/panel-ext-module',
         'name' => 'Panel Extension Module',
-        'provider_class' => PanelExtServiceProvider::class,
+        'providers' => [PanelExtServiceProvider::class],
         'path' => base_path('tests/Fixtures/Modules/PanelExt'),
         'areas' => ['central', 'tenant'],
         'status' => ModuleStatus::ACTIVE,
