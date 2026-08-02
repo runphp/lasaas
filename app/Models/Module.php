@@ -13,7 +13,7 @@ class Module extends Model
         'name',
         'description',
         'version',
-        'provider_class',
+        'providers',
         'weight',
         'dependencies',
         'after',
@@ -27,6 +27,7 @@ class Module extends Model
     {
         return [
             'dependencies' => 'array',
+            'providers' => 'array',
             'after' => 'array',
             'areas' => 'array',
             'status' => ModuleStatus::class,

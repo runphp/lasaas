@@ -1,6 +1,6 @@
 {
     "name": "lasaas/example",
-    "description": "示例模块（配置演示）",
+    "description": "示例模块，用于演示如何开发Lasaas模块",
     "type": "lasaas-module",
     "license": "MIT",
     "autoload": {
@@ -10,8 +10,7 @@
     },
     "extra": {
         "lasaas-module": {
-            "name": "示例模块",
-            "description": "示例模块，用于演示如何开发Lasaas模块",
+            "name": "示例模块1",
             "areas": ["central", "tenant"],
             "weight": 0,
             "after": [],

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1ea5c6275a29ff14b84f98f135897868",
+    "content-hash": "cc307b7aae148780b807a6b4aaf935bb",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -5144,6 +5144,42 @@
                 "source": "https://github.com/laravel/tinker/tree/v3.0.2"
             },
             "time": "2026-03-17T14:54:13+00:00"
+        },
+        {
+            "name": "lasaas/example",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/custom/lasaas/example",
+                "reference": "9505f44a391415877b6c065a92b675dac8009895"
+            },
+            "type": "lasaas-module",
+            "extra": {
+                "lasaas-module": {
+                    "areas": [
+                        "central",
+                        "tenant"
+                    ],
+                    "weight": 0,
+                    "after": [],
+                    "providers": [
+                        "Lasaas\\Example\\ExampleServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Lasaas\\Example\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "示例模块，用于演示如何开发Lasaas模块",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         },
         {
             "name": "league/commonmark",
@@ -15828,7 +15864,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "lasaas/example": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

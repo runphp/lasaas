@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Models\Module;
 use App\Module\ModuleManager;
+use Composer\InstalledVersions;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
@@ -66,12 +67,14 @@ class ModulesSync extends Command
             }
 
             $data = $this->buildModuleData($packageName, $packageInfo);
-
+            if ($module) {
+                unset($data['status']);
+            }
             if ($this->option('dry-run')) {
                 $action = $module ? 'UPDATE' : 'CREATE';
                 $this->line("  <fg=green>{$action}</> {$packageName}");
-                $this->line('    name: '.$data['name']);
-                $this->line('    provider: '.$data['provider_class']);
+                $this->line('    description: '.$data['description']);
+                $this->line('    providers: '.json_encode($data['providers']));
                 $this->line('    areas: '.json_encode($data['areas']));
                 $this->line('    dependencies: '.json_encode($data['dependencies']));
                 $module ? $updated++ : $added++;
@@ -231,37 +234,13 @@ class ModulesSync extends Command
                         'path' => $packageDir,
                         'origin' => $origin,
                         'composer_json' => $composerJson,
-                        'version' => $composerJson['version'] ?? $this->resolveInstalledVersion($packageName),
+                        'version' => InstalledVersions::getPrettyVersion($packageName),
                     ];
                 }
             }
         }
 
         return $result;
-    }
-
-    /**
-     * 从 composer.lock 或 installed.json 中获取已安装版本号。
-     */
-    protected function resolveInstalledVersion(string $packageName): ?string
-    {
-        // 优先从 composer.lock 查找
-        $lockPath = base_path('composer.lock');
-        if (file_exists($lockPath)) {
-            $lock = json_decode(file_get_contents($lockPath), true);
-            $packages = array_merge(
-                $lock['packages'] ?? [],
-                $lock['packages-dev'] ?? [],
-            );
-
-            foreach ($packages as $pkg) {
-                if (($pkg['name'] ?? '') === $packageName) {
-                    return $pkg['version'] ?? null;
-                }
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -274,16 +253,11 @@ class ModulesSync extends Command
         $composerJson = $packageInfo['composer_json'];
         $path = $packageInfo['path'];
 
-        // 提取名称
-        $name = $composerJson['extra']['lasaas-module']['name']
-            ?? $composerJson['description']
-            ?? $packageName;
-
         // 提取描述
         $description = $composerJson['description'] ?? null;
 
         // 检测 Provider 类
-        $providerClass = $this->resolveProviderClass($composerJson, $path);
+        $providers = $composerJson['extra']['lasaas-module']['providers'] ?? [];
 
         // 检测生效区域
         $areas = $this->resolveAreas($composerJson);
@@ -298,10 +272,11 @@ class ModulesSync extends Command
         $weight = $composerJson['extra']['lasaas-module']['weight'] ?? 0;
 
         return [
-            'name' => $name,
+            'package_name' => $packageName,
+            'name' => $composerJson['extra']['lasaas-module']['name'] ?? $packageName,
             'description' => $description,
             'version' => $packageInfo['version'],
-            'provider_class' => $providerClass,
+            'providers' => $providers,
             'weight' => $weight,
             'dependencies' => $dependencies,
             'after' => is_array($after) ? $after : [],
@@ -309,87 +284,6 @@ class ModulesSync extends Command
             'path' => $path,
             'status' => 'inactive', // 新模块默认不激活，需管理员手动启用
         ];
-    }
-
-    /**
-     * 解析模块的 ServiceProvider 类名。
-     *
-     * 显式声明的 provider（extra.lasaas-module.providers / extra.laravel.providers）
-     * 直接信任，不要求类当前可加载——模块的 PSR-4 autoload 由 module:sync 生成的
-     * 缓存文件提供，首次同步时类必然尚未注册，class_exists 校验会导致永远失败。
-     */
-    protected function resolveProviderClass(array $composerJson, string $path): string
-    {
-        // 方式 1: extra.lasaas-module.providers（显式声明）
-        $providers = $composerJson['extra']['lasaas-module']['providers'] ?? [];
-        if (is_string($providers)) {
-            $providers = [$providers];
-        }
-        if (! empty($providers[0])) {
-            return $providers[0];
-        }
-
-        // 方式 2: extra.laravel.providers（标准约定，同样信任）
-        $laravelProviders = $composerJson['extra']['laravel']['providers'] ?? [];
-        if (is_string($laravelProviders)) {
-            $laravelProviders = [$laravelProviders];
-        }
-        if (! empty($laravelProviders[0])) {
-            return $laravelProviders[0];
-        }
-
-        // 方式 3: 自动扫描 src/ 目录查找 *ServiceProvider
-        $detected = $this->autoDetectProvider($composerJson, $path);
-        if ($detected) {
-            return $detected;
-        }
-
-        // 兜底：返回空字符串（模块仍需手动配置）
-        return '';
-    }
-
-    /**
-     * 自动扫描模块代码目录查找 ServiceProvider。
-     */
-    protected function autoDetectProvider(array $composerJson, string $path): ?string
-    {
-        $psr4 = $composerJson['autoload']['psr-4'] ?? [];
-        if (empty($psr4)) {
-            return null;
-        }
-
-        foreach ($psr4 as $namespace => $srcDir) {
-            $nsPrefix = rtrim($namespace, '\\');
-            $srcDir = rtrim($srcDir, '/');
-            $fullSrcPath = $path.'/'.$srcDir;
-
-            if (! is_dir($fullSrcPath)) {
-                continue;
-            }
-
-            // 递归查找 *ServiceProvider.php 文件
-            $files = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($fullSrcPath, \RecursiveDirectoryIterator::SKIP_DOTS)
-            );
-
-            foreach ($files as $file) {
-                if ($file->getExtension() !== 'php') {
-                    continue;
-                }
-
-                $relativePath = str_replace($fullSrcPath, '', $file->getPath());
-                $relativePath = ltrim(str_replace('/', '\\', $relativePath), '\\');
-
-                $className = $nsPrefix.($relativePath ? '\\'.$relativePath : '');
-                $className .= '\\'.$file->getBasename('.php');
-
-                if (str_ends_with($className, 'ServiceProvider') && class_exists($className)) {
-                    return $className;
-                }
-            }
-        }
-
-        return null;
     }
 
     /**

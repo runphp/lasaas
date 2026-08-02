@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('name')->comment('模块展示名称，如 博客');
             $table->text('description')->nullable()->comment('模块描述');
             $table->string('version', 50)->nullable()->comment('当前版本号，如 1.0.0，由 module:sync 命令更新');
-            $table->string('provider_class')->comment('ServiceProvider 完整类名，ModuleManager 用容器实例化');
+            $table->json('providers')->comment('模块全部ServiceProvider完整类名数组，对应composer lasaas-module.providers');
             $table->integer('weight')->default(0)->comment('加载权重，越小越先加载，依赖关系满足后的同级排序');
             $table->json('dependencies')->nullable()->comment('依赖模块包名列表（自动从 composer require 中筛选 lasaas-module 得出）');
             $table->json('after')->nullable()->comment('非强依赖但必须在这些模块之后加载，如 ["my-saas/module-seo"]');
