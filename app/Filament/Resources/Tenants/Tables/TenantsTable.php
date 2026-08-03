@@ -21,44 +21,44 @@ class TenantsTable
         return $table
             ->columns([
                 TextColumn::make('id')
-                    ->label('ID')
+                    ->label(__('models.tenant.id'))
                     ->searchable(),
                 TextColumn::make('name')
-                    ->label(__('filament-resources.tenant.fields.name'))
+                    ->label(__('models.tenant.name'))
                     ->searchable(),
                 TextColumn::make('domains.domain')
-                    ->label(__('filament-resources.tenant.fields.domain'))
+                    ->label(__('models.tenant.domains'))
                     ->listWithLineBreaks()
                     ->bulleted(),
                 TextColumn::make('email')
-                    ->label(__('filament-resources.tenant.fields.email'))
+                    ->label(__('models.tenant.email'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('phone')
-                    ->label(__('filament-resources.tenant.fields.phone'))
+                    ->label(__('models.tenant.phone'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('user.name')
-                    ->label(__('filament-resources.tenant.fields.user'))
+                    ->label(__('models.tenant.user'))
                     ->searchable(),
                 TextColumn::make('team.name')
-                    ->label(__('filament-resources.tenant.fields.team'))
+                    ->label(__('models.tenant.team'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('status')
-                    ->label(__('filament-resources.tenant.fields.status'))
+                    ->label(__('models.tenant.status'))
                     ->badge(),
                 TextColumn::make('expired_at')
-                    ->label(__('filament-resources.tenant.fields.expired_at'))
+                    ->label(__('models.tenant.expired_at'))
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
-                    ->label(__('filament-resources.tenant.fields.created_at'))
+                    ->label(__('validation.attributes.created_at'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->label(__('filament-resources.tenant.fields.updated_at'))
+                    ->label(__('validation.attributes.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

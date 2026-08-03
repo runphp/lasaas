@@ -1,7 +1,7 @@
 {
     "amp.mcpServers": {
         "laravel-boost": {
-            "command": "php",
+            "command": "ddev",
             "args": [
                 "artisan",
                 "boost:mcp"

@@ -20,15 +20,19 @@ class ModulesTable
         return $table
             ->columns([
                 TextColumn::make('package_name')
+                    ->label(__('models.module.package_name'))
                     ->searchable(),
                 TextColumn::make('name')
+                    ->label(__('models.module.name'))
                     ->searchable(),
                 TextColumn::make('version')
+                    ->label(__('models.module.version'))
                     ->searchable(),
                 TextColumn::make('weight')
-                    ->numeric()
-                    ->sortable(),
+                    ->label(__('models.module.weight'))
+                    ->sortable()->numeric(),
                 ToggleColumn::make('status')
+                    ->label(__('models.module.status'))
                     ->onColor('success')
                     ->offColor('gray')
                     ->onIcon('heroicon-o-check-circle')
@@ -44,22 +48,31 @@ class ModulesTable
                         }
                     })
                     ->afterStateUpdated(function ($record, $state) {
-                        $label = $state ? '启用' : '禁用';
+                        $statusText = $state
+                            ? __('models.module.statuses.active')
+                            : __('models.module.statuses.inactive');
+
                         Notification::make()
-                            ->title("模块 {$record->package_name} 已{$label}")
+                            ->title(__('filament-resources.module.notify.toggle_title', [
+                                'pkg' => $record->package_name,
+                                'status' => $statusText,
+                            ]))
                             ->success()
                             ->send();
                     }),
                 TextColumn::make('installed_at')
+                    ->label(__('models.module.installed_at'))
                     ->dateTime()
-                    ->placeholder('未安装')
+                    ->placeholder(__('models.module.placeholders.installed_at'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
+                    ->label(__('validation.attributes.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label(__('validation.attributes.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -87,13 +100,10 @@ class ModulesTable
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->modalDescription(function ($record) {
-                        $name = $record->name;
-                        $pkg = $record->package_name;
-                        $installed = $record->isInstalled() ? __('filament-resources.module.uninstall.modal.actions.uninstall.label').' ' : '';
-
-                        return __('filament-resources.module.uninstall.modal.heading', ['label' => $name]);
-                    })
+                    ->modalHeading(fn ($record) => __('filament-resources.module.uninstall.modal.heading', ['label' => $record->name]))
+                    ->modalDescription(__('filament-resources.module.uninstall.modal.description'))
+                    ->modalSubmitActionLabel(__('filament-resources.module.uninstall.modal.actions.uninstall.label'))
+                    ->modalCancelActionLabel(__('filament-resources.module.uninstall.modal.actions.cancel.label'))
                     ->action(function ($record) {
                         $hasEnabledTenant = TenantModule::where('module_id', $record->id)
                             ->where('enabled', true)
@@ -102,8 +112,8 @@ class ModulesTable
                         // 预校验：存在启用该模块的租户
                         if ($hasEnabledTenant) {
                             Notification::make()
-                                ->title(__('filament-resources.module.uninstall.modal.heading'))
-                                ->body(__('filament-resources.module.uninstall.modal.description'))
+                                ->title(__('filament-resources.module.uninstall.notify.fail'))
+                                ->body(__('filament-resources.module.uninstall.notify.fail_body'))
                                 ->danger()
                                 ->send();
 
@@ -113,7 +123,9 @@ class ModulesTable
                         $manager->uninstall($record);
 
                         Notification::make()
-                            ->title("模块 {$record->package_name} 已卸载")
+                            ->title(__('filament-resources.module.uninstall.notify.success', [
+                                'pkg' => $record->package_name,
+                            ]))
                             ->success()
                             ->send();
                     }),
