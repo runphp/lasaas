@@ -78,7 +78,7 @@ class TenantForm
         $examples = self::connectionExamples()[$connection] ?? [];
 
         if ($connection === 'sqlite') {
-            return 'SQLite 使用本地文件数据库，只需填写“数据库名”（文件名），文件保存在 Laravel 的 database_path() 目录下。';
+            return __('filament-resources.tenant.database.hints.connection_sqlite_summary');
         }
 
         $parts = [];
@@ -95,15 +95,18 @@ class TenantForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('models.tenant.name'))
                     ->default(null),
                 TextInput::make('email')
-                    ->label('Email address')
+                    ->label(__('models.tenant.email'))
                     ->email()
                     ->default(null),
                 TextInput::make('phone')
+                    ->label(__('models.tenant.phone'))
                     ->tel()
                     ->default(null),
                 Select::make('user_id')
+                    ->label(__('models.tenant.user'))
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload()
@@ -111,6 +114,7 @@ class TenantForm
                     ->live()
                     ->afterStateUpdated(fn (Set $set) => $set('team_id', null)),
                 Select::make('team_id')
+                    ->label(__('models.tenant.team'))
                     ->relationship('team', 'name', modifyQueryUsing: function (Builder $query, Get $get): Builder {
                         $userId = $get('user_id');
 
@@ -126,33 +130,36 @@ class TenantForm
                     ->preload()
                     ->default(null),
                 Select::make('status')
+                    ->label(__('models.tenant.status'))
                     ->options(TenantStatus::class)
                     ->default('pending')
                     ->required(),
-                DateTimePicker::make('expired_at'),
+                DateTimePicker::make('expired_at')
+                    ->label(__('models.tenant.expired_at')),
                 Repeater::make('domains')
+                    ->label(__('models.tenant.domains'))
                     ->relationship('domains')
                     ->schema([
                         TextInput::make('domain')
                             ->required()
                             ->unique('domains', 'domain', ignoreRecord: true)
-                            ->helperText('如：myshop.tenant.ddev.site'),
+                            ->helperText(__('filament-resources.tenant.database.hints.domain')),
                     ])
-                    ->addActionLabel('添加域名')
+                    ->addActionLabel(__('filament-resources.tenant.database.hints.domain_add'))
                     ->collapsible()
                     ->defaultItems(1)
                     ->columnSpanFull(),
-                Section::make('数据库连接')
-                    ->description('手动指定该租户使用的数据库，数据库需提前创建好')
+                Section::make(__('filament-resources.tenant.database.section'))
+                    ->description(__('filament-resources.tenant.database.description'))
                     ->relationship('tenantDatabase')
                     ->schema([
                         Select::make('connection')
-                            ->label('数据库类型')
+                            ->label(__('models.tenant.database.connection'))
                             ->options([
-                                'mariadb' => 'MariaDB',
-                                'mysql' => 'MySQL',
-                                'pgsql' => 'PostgreSQL',
-                                'sqlite' => 'SQLite（文件数据库）',
+                                'mariadb' => __('models.tenant.connection_types.mariadb'),
+                                'mysql' => __('models.tenant.connection_types.mysql'),
+                                'pgsql' => __('models.tenant.connection_types.pgsql'),
+                                'sqlite' => __('models.tenant.connection_types.sqlite'),
                             ])
                             ->default('mariadb')
                             ->required()
@@ -167,72 +174,72 @@ class TenantForm
                                 }
                             }),
                         TextInput::make('database')
-                            ->label('数据库名')
+                            ->label(__('models.tenant.database.database'))
                             ->required()
                             ->placeholder(fn (Get $get): ?string => self::example($get, 'database'))
                             ->helperText(fn (Get $get): string => self::isSqlite($get)
-                                ? 'SQLite 文件数据库，如 database/shop_001.sqlite'
-                                : '该数据库需提前在数据库服务器上创建好'),
+                                ? __('filament-resources.tenant.database.hints.database_sqlite')
+                                : __('filament-resources.tenant.database.hints.database_non_sqlite')),
                         TextInput::make('host')
-                            ->label('主机')
+                            ->label(__('models.tenant.database.host'))
                             ->placeholder(fn (Get $get): ?string => self::example($get, 'host'))
-                            ->helperText('留空则使用 config/database.php 中该连接的默认配置')
+                            ->helperText(__('filament-resources.tenant.database.placeholders.host'))
                             ->visible(fn (Get $get): bool => ! self::isSqlite($get)),
                         TextInput::make('port')
-                            ->label('端口')
+                            ->label(__('models.tenant.database.port'))
                             ->numeric()
                             ->placeholder(fn (Get $get): ?string => self::example($get, 'port'))
-                            ->helperText('留空则使用 config/database.php 中该连接的默认配置')
+                            ->helperText(__('filament-resources.tenant.database.placeholders.port'))
                             ->visible(fn (Get $get): bool => ! self::isSqlite($get)),
                         TextInput::make('username')
-                            ->label('用户名')
+                            ->label(__('models.tenant.database.username'))
                             ->placeholder(fn (Get $get): ?string => self::example($get, 'username'))
                             ->visible(fn (Get $get): bool => ! self::isSqlite($get)),
                         TextInput::make('password')
-                            ->label('密码')
+                            ->label(__('models.tenant.database.password'))
                             ->password()
                             ->revealable()
                             ->placeholder(fn (Get $get): ?string => self::example($get, 'password'))
                             ->visible(fn (Get $get): bool => ! self::isSqlite($get)),
                         TextInput::make('charset')
-                            ->label('字符集')
+                            ->label(__('models.tenant.database.charset'))
                             ->placeholder(fn (Get $get): ?string => self::example($get, 'charset'))
                             ->visible(fn (Get $get): bool => ! self::isSqlite($get)),
                         TextInput::make('collation')
-                            ->label('排序规则')
+                            ->label(__('models.tenant.database.collation'))
                             ->placeholder(fn (Get $get): ?string => self::example($get, 'collation'))
                             ->visible(fn (Get $get): bool => ! self::isSqlite($get)),
-                        Section::make('高级选项')
-                            ->description('可选，留空则使用 config/database.php 中该连接的默认配置')
+                        Section::make(__('filament-resources.tenant.database.advanced'))
+                            ->description(__('filament-resources.tenant.database.advanced_description'))
                             ->collapsible()
                             ->collapsed()
                             ->schema([
                                 TextInput::make('unix_socket')
-                                    ->label('Unix Socket')
+                                    ->label(__('models.tenant.database.unix_socket'))
                                     ->visible(fn (Get $get): bool => ! self::isSqlite($get)),
                                 TextInput::make('prefix')
-                                    ->label('表前缀'),
+                                    ->label(__('models.tenant.database.prefix')),
                                 Select::make('prefix_indexes')
-                                    ->label('索引是否使用前缀')
+                                    ->label(__('models.tenant.database.prefix_indexes'))
                                     ->options([
-                                        '1' => '使用',
-                                        '0' => '不使用',
+                                        '1' => __('models.tenant.database.prefix_indexes_options.1'),
+                                        '0' => __('models.tenant.database.prefix_indexes_options.0'),
                                     ])
-                                    ->placeholder('使用默认'),
+                                    ->placeholder(__('filament-resources.tenant.database.placeholders.prefix_indexes')),
                                 Select::make('strict')
-                                    ->label('严格模式')
+                                    ->label(__('models.tenant.database.strict'))
                                     ->options([
-                                        '1' => '启用',
-                                        '0' => '关闭',
+                                        '1' => __('models.tenant.database.strict_options.1'),
+                                        '0' => __('models.tenant.database.strict_options.0'),
                                     ])
-                                    ->placeholder('使用默认'),
+                                    ->placeholder(__('filament-resources.tenant.database.placeholders.strict')),
                                 TextInput::make('engine')
-                                    ->label('存储引擎')
-                                    ->placeholder('如 InnoDB'),
+                                    ->label(__('models.tenant.database.engine'))
+                                    ->placeholder(__('filament-resources.tenant.database.placeholders.engine')),
                                 KeyValue::make('options')
-                                    ->label('PDO 选项')
-                                    ->keyLabel('选项')
-                                    ->valueLabel('值')
+                                    ->label(__('models.tenant.database.options'))
+                                    ->keyLabel(__('filament-resources.tenant.database.options_key_label'))
+                                    ->valueLabel(__('filament-resources.tenant.database.options_value_label'))
                                     ->columnSpanFull(),
                             ])
                             ->columns(2)

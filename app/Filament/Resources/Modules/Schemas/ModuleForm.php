@@ -13,6 +13,7 @@ class ModuleForm
         return $schema
             ->components([
                 Select::make('status')
+                    ->label(__('models.module.status'))
                     ->options(ModuleStatus::class)
                     ->default('inactive')
                     ->required(),

@@ -20,20 +20,26 @@ class TeamsTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('models.team.name'))
                     ->searchable(),
                 TextColumn::make('slug')
+                    ->label(__('models.team.slug'))
                     ->searchable(),
                 IconColumn::make('is_personal')
+                    ->label(__('models.team.is_personal'))
                     ->boolean(),
                 TextColumn::make('created_at')
+                    ->label(__('validation.attributes.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label(__('validation.attributes.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('deleted_at')
+                    ->label(__('models.team.deleted_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

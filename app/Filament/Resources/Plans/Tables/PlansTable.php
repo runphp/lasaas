@@ -17,38 +17,38 @@ class PlansTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('Name'))
+                    ->label(__('models.plan.name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('slug')
-                    ->label(__('Slug'))
+                    ->label(__('models.plan.slug'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('price')
-                    ->label(__('Price'))
+                    ->label(__('models.plan.price'))
                     ->money('CNY')
                     ->sortable(),
                 TextColumn::make('billing_cycle')
-                    ->label(__('Billing Cycle'))
+                    ->label(__('models.plan.billing_cycle'))
                     ->badge()
                     ->formatStateUsing(fn ($state) => $state->label()),
                 TextColumn::make('sort_order')
-                    ->label(__('Sort Order'))
+                    ->label(__('models.plan.sort_order'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_featured')
-                    ->label(__('Featured'))
+                    ->label(__('models.plan.is_featured'))
                     ->boolean(),
                 IconColumn::make('is_active')
-                    ->label(__('Active'))
+                    ->label(__('models.plan.is_active'))
                     ->boolean(),
                 TextColumn::make('created_at')
-                    ->label(__('Created at'))
+                    ->label(__('validation.attributes.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->label(__('Updated at'))
+                    ->label(__('validation.attributes.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

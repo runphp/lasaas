@@ -13,17 +13,23 @@ class TeamInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('name'),
-                TextEntry::make('slug'),
+                TextEntry::make('name')
+                    ->label(__('models.team.name')),
+                TextEntry::make('slug')
+                    ->label(__('models.team.slug')),
                 IconEntry::make('is_personal')
+                    ->label(__('models.team.is_personal'))
                     ->boolean(),
                 TextEntry::make('created_at')
+                    ->label(__('validation.attributes.created_at'))
                     ->dateTime()
                     ->placeholder('-'),
                 TextEntry::make('updated_at')
+                    ->label(__('validation.attributes.updated_at'))
                     ->dateTime()
                     ->placeholder('-'),
                 TextEntry::make('deleted_at')
+                    ->label(__('models.team.deleted_at'))
                     ->dateTime()
                     ->visible(fn (Team $record): bool => $record->trashed()),
             ]);

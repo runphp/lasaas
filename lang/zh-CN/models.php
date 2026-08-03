@@ -18,9 +18,6 @@ return [
         'path' => '磁盘路径',
         'status' => '状态',
         'installed_at' => '首次安装时间',
-        'placeholders' => [
-            'installed_at' => '未安装',
-        ],
         'created_at' => '创建时间',
         'updated_at' => '更新时间',
 
@@ -31,24 +28,9 @@ return [
         ],
 
         // 区域枚举
-        'areas' => [
+        'area_options' => [
             'central' => '中央应用',
             'tenant' => '租户应用',
-        ],
-
-        // 表单分组标题
-        'sections' => [
-            'basic' => '基本信息',
-            'provider' => '服务提供者',
-            'ordering' => '加载配置',
-        ],
-
-        // 输入框提示文案
-        'hints' => [
-            'package_name' => 'Composer 包名，如 my-saas/module-blog',
-            'weight' => '数值越小加载优先级越高，默认0',
-            'dependencies' => '由 module:sync 命令自动分析composer依赖得出',
-            'after' => '非强依赖，但需要在这些模块加载完成后再加载',
         ],
     ],
     'page' => [
@@ -76,6 +58,59 @@ return [
             'expired' => '已过期',
             'disabled' => '已禁用',
         ],
+        'database' => [
+            'connection' => '数据库类型',
+            'database' => '数据库名',
+            'host' => '主机',
+            'port' => '端口',
+            'username' => '用户名',
+            'password' => '密码',
+            'charset' => '字符集',
+            'collation' => '排序规则',
+            'unix_socket' => 'Unix Socket',
+            'prefix' => '表前缀',
+            'prefix_indexes' => '索引是否使用前缀',
+            'strict' => '严格模式',
+            'engine' => '存储引擎',
+            'options' => 'PDO 选项',
+            'prefix_indexes_options' => [
+                '1' => '使用',
+                '0' => '不使用',
+            ],
+            'strict_options' => [
+                '1' => '启用',
+                '0' => '关闭',
+            ],
+        ],
+        'connection_types' => [
+            'mariadb' => 'MariaDB',
+            'mysql' => 'MySQL',
+            'pgsql' => 'PostgreSQL',
+            'sqlite' => 'SQLite（文件数据库）',
+        ],
+    ],
+    'team' => [
+        'name' => '团队名称',
+        'slug' => '标识',
+        'is_personal' => '是否个人团队',
+        'created_at' => '创建时间',
+        'updated_at' => '更新时间',
+        'deleted_at' => '删除时间',
+    ],
+    'plan' => [
+        'name' => '套餐名称',
+        'slug' => '标识',
+        'description' => '描述',
+        'badge' => '徽章',
+        'price' => '价格',
+        'original_price' => '原价',
+        'billing_cycle' => '计费周期',
+        'features' => '功能特性',
+        'sort_order' => '排序',
+        'is_featured' => '是否推荐',
+        'is_active' => '是否启用',
+        'created_at' => '创建时间',
+        'updated_at' => '更新时间',
     ],
     'user' => [
         'name' => '姓名',

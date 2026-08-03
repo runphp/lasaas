@@ -14,55 +14,56 @@ class PlanInfolist
     {
         return $schema
             ->components([
-                Section::make(__('Basic Info'))
+                Section::make(__('filament-resources.plan.sections.basic'))
                     ->columns(2)
                     ->schema([
                         TextEntry::make('name')
-                            ->label(__('Name')),
+                            ->label(__('models.plan.name')),
                         TextEntry::make('slug')
-                            ->label(__('Slug')),
+                            ->label(__('models.plan.slug')),
                         TextEntry::make('description')
-                            ->label(__('Description'))
+                            ->label(__('models.plan.description'))
                             ->placeholder('-')
                             ->columnSpanFull(),
                         TextEntry::make('badge')
-                            ->label(__('Badge'))
+                            ->label(__('models.plan.badge'))
                             ->placeholder('-'),
                     ]),
 
-                Section::make(__('Pricing'))
+                Section::make(__('filament-resources.plan.sections.pricing'))
                     ->columns(3)
                     ->schema([
                         TextEntry::make('price')
-                            ->label(__('Price'))
+                            ->label(__('models.plan.price'))
                             ->money('CNY'),
                         TextEntry::make('original_price')
-                            ->label(__('Original Price'))
+                            ->label(__('models.plan.original_price'))
                             ->money('CNY')
                             ->placeholder('-'),
                         TextEntry::make('billing_cycle')
-                            ->label(__('Billing Cycle'))
+                            ->label(__('models.plan.billing_cycle'))
                             ->badge()
                             ->formatStateUsing(fn ($state) => $state->label()),
                     ]),
 
-                Section::make(__('Features'))
+                Section::make(__('filament-resources.plan.sections.features'))
                     ->schema([
                         KeyValueEntry::make('features')
-                            ->keyLabel(__('Feature'))
-                            ->valueLabel(__('Limit')),
+                            ->label(__('models.plan.features'))
+                            ->keyLabel(__('filament-resources.plan.key_value.feature'))
+                            ->valueLabel(__('filament-resources.plan.key_value.limit')),
                     ]),
 
-                Section::make(__('Display'))
+                Section::make(__('filament-resources.plan.sections.display'))
                     ->columns(3)
                     ->schema([
                         TextEntry::make('sort_order')
-                            ->label(__('Sort Order')),
+                            ->label(__('models.plan.sort_order')),
                         IconEntry::make('is_featured')
-                            ->label(__('Featured'))
+                            ->label(__('models.plan.is_featured'))
                             ->boolean(),
                         IconEntry::make('is_active')
-                            ->label(__('Active'))
+                            ->label(__('models.plan.is_active'))
                             ->boolean(),
                     ]),
 
@@ -70,10 +71,10 @@ class PlanInfolist
                     ->columns(2)
                     ->schema([
                         TextEntry::make('created_at')
-                            ->label(__('Created at'))
+                            ->label(__('validation.attributes.created_at'))
                             ->dateTime(),
                         TextEntry::make('updated_at')
-                            ->label(__('Updated at'))
+                            ->label(__('validation.attributes.updated_at'))
                             ->dateTime(),
                     ]),
             ]);

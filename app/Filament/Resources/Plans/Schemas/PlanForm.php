@@ -17,73 +17,74 @@ class PlanForm
     {
         return $schema
             ->components([
-                Section::make(__('Basic Info'))
+                Section::make(__('filament-resources.plan.sections.basic'))
                     ->columns(2)
                     ->schema([
                         TextInput::make('name')
-                            ->label(__('Name'))
+                            ->label(__('models.plan.name'))
                             ->required()
                             ->maxLength(255),
                         TextInput::make('slug')
-                            ->label(__('Slug'))
+                            ->label(__('models.plan.slug'))
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
                         Textarea::make('description')
-                            ->label(__('Description'))
+                            ->label(__('models.plan.description'))
                             ->columnSpanFull()
                             ->maxLength(500),
                         TextInput::make('badge')
-                            ->label(__('Badge'))
+                            ->label(__('models.plan.badge'))
                             ->maxLength(50)
-                            ->hint(__('e.g. Recommended, Hot')),
+                            ->hint(__('filament-resources.plan.hints.badge')),
                     ]),
 
-                Section::make(__('Pricing'))
+                Section::make(__('filament-resources.plan.sections.pricing'))
                     ->columns(3)
                     ->schema([
                         TextInput::make('price')
-                            ->label(__('Price'))
+                            ->label(__('models.plan.price'))
                             ->numeric()
                             ->prefix('¥')
                             ->default(0)
                             ->required(),
                         TextInput::make('original_price')
-                            ->label(__('Original Price'))
+                            ->label(__('models.plan.original_price'))
                             ->numeric()
                             ->prefix('¥')
                             ->nullable()
-                            ->hint(__('Strikethrough original price, leave empty if no discount')),
+                            ->hint(__('filament-resources.plan.hints.original_price')),
                         Select::make('billing_cycle')
-                            ->label(__('Billing Cycle'))
+                            ->label(__('models.plan.billing_cycle'))
                             ->options(BillingCycle::class)
                             ->default(BillingCycle::Monthly)
                             ->required(),
                     ]),
 
-                Section::make(__('Features'))
+                Section::make(__('filament-resources.plan.sections.features'))
                     ->schema([
                         KeyValue::make('features')
-                            ->keyLabel(__('Feature'))
-                            ->valueLabel(__('Limit'))
-                            ->addActionLabel(__('Add feature'))
+                            ->label(__('models.plan.features'))
+                            ->keyLabel(__('filament-resources.plan.key_value.feature'))
+                            ->valueLabel(__('filament-resources.plan.key_value.limit'))
+                            ->addActionLabel(__('filament-resources.plan.key_value.add_feature'))
                             ->default([
                                 'max_users' => '10',
                                 'max_teams' => '5',
                             ]),
                     ]),
 
-                Section::make(__('Display'))
+                Section::make(__('filament-resources.plan.sections.display'))
                     ->columns(3)
                     ->schema([
                         TextInput::make('sort_order')
-                            ->label(__('Sort Order'))
+                            ->label(__('models.plan.sort_order'))
                             ->numeric()
                             ->default(0),
                         Toggle::make('is_featured')
-                            ->label(__('Featured')),
+                            ->label(__('models.plan.is_featured')),
                         Toggle::make('is_active')
-                            ->label(__('Active'))
+                            ->label(__('models.plan.is_active'))
                             ->default(true),
                     ]),
             ]);

@@ -18,9 +18,9 @@ return [
         'path' => 'Disk Path',
         'status' => 'Status',
         'installed_at' => 'First Installation Time',
-        'placeholders' => [
-            'installed_at' => 'Not Installed',
-        ],
+        'created_at' => 'Created At',
+        'updated_at' => 'Updated At',
+
         // 状态枚举
         'statuses' => [
             'active' => 'Active',
@@ -28,24 +28,9 @@ return [
         ],
 
         // 区域枚举
-        'areas' => [
+        'area_options' => [
             'central' => 'Central Application',
             'tenant' => 'Tenant Application',
-        ],
-
-        // 表单分组标题
-        'sections' => [
-            'basic' => 'Basic Information',
-            'provider' => 'Service Providers',
-            'ordering' => 'Loading Configuration',
-        ],
-
-        // 输入框提示文案 helpers
-        'hints' => [
-            'package_name' => 'Composer Package Name, e.g., my-saas/module-blog',
-            'weight' => 'The smaller the value, the higher the loading priority. Default is 0.',
-            'dependencies' => 'Automatically analyzed from composer dependencies by the module:sync command.',
-            'after' => 'Not a strong dependency, but needs to be loaded after these modules are completed.',
         ],
     ],
     'page' => [
@@ -73,6 +58,59 @@ return [
             'expired' => 'Expired',
             'disabled' => 'Disabled',
         ],
+        'database' => [
+            'connection' => 'Database Type',
+            'database' => 'Database Name',
+            'host' => 'Host',
+            'port' => 'Port',
+            'username' => 'Username',
+            'password' => 'Password',
+            'charset' => 'Charset',
+            'collation' => 'Collation',
+            'unix_socket' => 'Unix Socket',
+            'prefix' => 'Table Prefix',
+            'prefix_indexes' => 'Use Prefix Indexes',
+            'strict' => 'Strict Mode',
+            'engine' => 'Storage Engine',
+            'options' => 'PDO Options',
+            'prefix_indexes_options' => [
+                '1' => 'Yes',
+                '0' => 'No',
+            ],
+            'strict_options' => [
+                '1' => 'Enabled',
+                '0' => 'Disabled',
+            ],
+        ],
+        'connection_types' => [
+            'mariadb' => 'MariaDB',
+            'mysql' => 'MySQL',
+            'pgsql' => 'PostgreSQL',
+            'sqlite' => 'SQLite (File Database)',
+        ],
+    ],
+    'team' => [
+        'name' => 'Name',
+        'slug' => 'Slug',
+        'is_personal' => 'Personal',
+        'created_at' => 'Created At',
+        'updated_at' => 'Updated At',
+        'deleted_at' => 'Deleted At',
+    ],
+    'plan' => [
+        'name' => 'Name',
+        'slug' => 'Slug',
+        'description' => 'Description',
+        'badge' => 'Badge',
+        'price' => 'Price',
+        'original_price' => 'Original Price',
+        'billing_cycle' => 'Billing Cycle',
+        'features' => 'Features',
+        'sort_order' => 'Sort Order',
+        'is_featured' => 'Featured',
+        'is_active' => 'Active',
+        'created_at' => 'Created At',
+        'updated_at' => 'Updated At',
     ],
     'user' => [
         'name' => 'Name',

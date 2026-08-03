@@ -14,56 +14,63 @@ class TenantInfolist
         return $schema
             ->components([
                 TextEntry::make('id')
-                    ->label('ID'),
+                    ->label(__('models.tenant.id')),
                 TextEntry::make('name')
+                    ->label(__('models.tenant.name'))
                     ->placeholder('-'),
                 TextEntry::make('email')
-                    ->label('Email address')
+                    ->label(__('models.tenant.email'))
                     ->placeholder('-'),
                 TextEntry::make('phone')
+                    ->label(__('models.tenant.phone'))
                     ->placeholder('-'),
                 TextEntry::make('user.name')
-                    ->label('User'),
+                    ->label(__('models.tenant.user')),
                 TextEntry::make('team.name')
-                    ->label('Team')
+                    ->label(__('models.tenant.team'))
                     ->placeholder('-'),
                 TextEntry::make('status')
+                    ->label(__('models.tenant.status'))
                     ->badge(),
                 TextEntry::make('expired_at')
+                    ->label(__('models.tenant.expired_at'))
                     ->dateTime()
                     ->placeholder('-'),
                 RepeatableEntry::make('domains')
+                    ->label(__('models.tenant.domains'))
                     ->schema([
                         TextEntry::make('domain'),
                     ])
                     ->columnSpanFull(),
-                Section::make('数据库连接')
+                Section::make(__('filament-resources.tenant.database.section'))
                     ->columns(2)
                     ->schema([
                         TextEntry::make('tenantDatabase.database')
-                            ->label('数据库名')
+                            ->label(__('models.tenant.database.database'))
                             ->placeholder('-'),
                         TextEntry::make('tenantDatabase.connection')
-                            ->label('数据库类型')
+                            ->label(__('models.tenant.database.connection'))
                             ->placeholder('-'),
                         TextEntry::make('tenantDatabase.host')
-                            ->label('主机')
+                            ->label(__('models.tenant.database.host'))
                             ->placeholder('-'),
                         TextEntry::make('tenantDatabase.port')
-                            ->label('端口')
+                            ->label(__('models.tenant.database.port'))
                             ->placeholder('-'),
                         TextEntry::make('tenantDatabase.username')
-                            ->label('用户名')
+                            ->label(__('models.tenant.database.username'))
                             ->placeholder('-'),
                         TextEntry::make('tenantDatabase.charset')
-                            ->label('字符集')
+                            ->label(__('models.tenant.database.charset'))
                             ->placeholder('-'),
                     ])
                     ->columnSpanFull(),
                 TextEntry::make('created_at')
+                    ->label(__('validation.attributes.created_at'))
                     ->dateTime()
                     ->placeholder('-'),
                 TextEntry::make('updated_at')
+                    ->label(__('validation.attributes.updated_at'))
                     ->dateTime()
                     ->placeholder('-'),
             ]);
