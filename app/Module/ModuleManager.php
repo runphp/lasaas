@@ -280,10 +280,10 @@ class ModuleManager
         $this->loaded[] = $module->package_name;
 
         // 第一步：注册并 boot ServiceProvider
-        $provider = $this->registerProvider($module);
+        $providers = $this->registerProvider($module);
 
         // 第二步：加载模块资源（provider 不存在时由 ModuleManager 兜底加载）
-        if ($provider === null) {
+        if (empty($providers)) {
             $this->loadMigrations($module);
             $this->loadRoutes($module);
             $this->loadViews($module);
@@ -294,29 +294,39 @@ class ModuleManager
     /**
      * 注册模块的 ServiceProvider。
      *
-     * @return ServiceProvider|null 成功注册的 provider 实例
+     * @return ServiceProvider[] 成功注册的 provider 实例数组
      */
-    protected function registerProvider(Module $module): ?ServiceProvider
+    protected function registerProvider(Module $module): array
     {
-        $class = $module->provider_class;
+        $classes = $module->providers;
 
-        if (! class_exists($class)) {
-            return null;
+        if (empty($classes)) {
+            return [];
         }
 
-        if (! is_subclass_of($class, ServiceProvider::class)) {
-            return null;
+        $providers = [];
+
+        foreach ((array) $classes as $class) {
+            if (! class_exists($class)) {
+                continue;
+            }
+
+            if (! is_subclass_of($class, ServiceProvider::class)) {
+                continue;
+            }
+
+            /** @var ServiceProvider $provider */
+            $provider = $this->app->register($class);
+
+            // 如果 provider 已在之前的请求中被 boot，需要手动 boot
+            if (method_exists($provider, 'isBooted') && ! $provider->isBooted() && $this->app->isBooted()) {
+                $this->app->call([$provider, 'boot']);
+            }
+
+            $providers[] = $provider;
         }
 
-        /** @var ServiceProvider $provider */
-        $provider = $this->app->register($class);
-
-        // 如果 provider 已在之前的请求中被 boot，需要手动 boot
-        if (method_exists($provider, 'isBooted') && ! $provider->isBooted() && $this->app->isBooted()) {
-            $this->app->call([$provider, 'boot']);
-        }
-
-        return $provider;
+        return $providers;
     }
 
     /**
