@@ -35,6 +35,7 @@ class TenantAdminPanelProvider extends PanelProvider
         return $panel
             ->id('tenant-admin')
             ->path('admin')
+            ->viteTheme('resources/css/filament/tenant-admin/theme.css')
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -64,6 +65,7 @@ class TenantAdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                'localization.model',
                 // ========== Stancl租户中间件【必须放在此处】 ==========
                 PreventAccessFromCentralDomains::class,
                 InitializeTenancyByDomainOrSubdomain::class,

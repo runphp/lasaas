@@ -16,6 +16,7 @@
     "require": {
         "php": "^8.3",
         "ext-pdo": "*",
+        "bezhansalleh/filament-language-switch": "^5.0",
         "bezhansalleh/filament-shield": "^4.2",
         "composer/installers": "^2.0",
         "filament/filament": "^5.6",

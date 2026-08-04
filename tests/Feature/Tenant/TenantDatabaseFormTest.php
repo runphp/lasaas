@@ -155,6 +155,8 @@ test('team select only lists teams owned by the selected user', function () {
 });
 
 test('tenant form shows per-database-type examples that react to the connection', function () {
+    app()->setLocale('zh-CN');
+
     Event::fake([TenantCreated::class]);
 
     $admin = createTenantAdmin();

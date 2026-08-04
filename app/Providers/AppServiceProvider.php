@@ -5,14 +5,19 @@ namespace App\Providers;
 use App\Enums\TeamPermission;
 use App\Models\Team;
 use App\Models\User;
+use BezhanSalleh\LanguageSwitch\Events\LocaleChanged;
+use BezhanSalleh\LanguageSwitch\LanguageSwitch;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use LaravelLang\Locales\Facades\Locales;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
         $this->configureTeamPermissions();
         $this->configureGuestRedirect();
+        $this->configureFilamentLanguageSwitch();
     }
 
     /**
@@ -111,6 +117,20 @@ class AppServiceProvider extends ServiceProvider
             }
 
             return config('fortify.home', '/dashboard');
+        });
+    }
+
+    protected function configureFilamentLanguageSwitch(): void
+    {
+        LanguageSwitch::configureUsing(function (LanguageSwitch $switch): void {
+            $switch
+                ->locales(fn (): array => Locales::installed()->pluck('code')->all())
+                ->nativeLabel()
+                ->userPreferredLocale(fn (): ?string => Auth::user()?->locale);
+        });
+
+        Event::listen(function (LocaleChanged $event): void {
+            Auth::user()?->update(['locale' => $event->locale]);
         });
     }
 }

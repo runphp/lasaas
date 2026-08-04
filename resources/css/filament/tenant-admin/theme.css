@@ -1,0 +1,25 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/TenantAdmin/**/*';
+@source '../../../../resources/views/filament/tenant-admin/**/*';
+@source '../../../../vendor/bezhansalleh/filament-language-switch/**';
+
+@theme {
+    --radius-lg: 0.375rem;
+    --radius-xl: 0.5rem;
+    --radius-2xl: 0.75rem;
+}
+
+.fi-topbar {
+    @apply min-h-14 px-3;
+}
+
+.fi-main {
+    @apply px-3 md:px-4 lg:px-5;
+}
+
+.fi-sidebar-group-items,
+.fi-sidebar-item,
+.fi-sidebar-group-btn {
+    @apply rounded-md;
+}

@@ -12,6 +12,8 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/js/app.js',
                 'resources/js/passkeys.js',
+                'resources/css/filament/admin/theme.css',
+                'resources/css/filament/tenant-admin/theme.css',
             ],
             refresh: true,
             fonts: [
