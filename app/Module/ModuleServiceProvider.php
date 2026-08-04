@@ -8,7 +8,6 @@ use App\Models\Tenant;
 use App\Module\Settings\ModulePlatformSettings;
 use App\Module\Settings\ModuleTenantSettings;
 use Illuminate\Support\ServiceProvider;
-use ReflectionClass;
 
 /**
  * 模块 ServiceProvider 基类。
@@ -18,39 +17,41 @@ use ReflectionClass;
  * 生命周期：
  *   磁盘同步 → inactive → enable（首次：install） → active
  *                               → disable → inactive
- *                               → uninstall（回滚迁移 + 清理数据）→ 删除记录
+ *                               → uninstall（清理数据）→ 删除记录
  *
  * 租户侧生命周期（模块支持 tenant 区域后，由中央管理员按租户安装）：
  *   module:tenant-enable（首次：tenantInstall） → tenant_modules.enabled = true
  *                                                  → tenantOnEnable
  *                                     → 禁用 → tenantOnDisable
- *   module:tenant-uninstall（tenantUninstall：回滚租户库迁移）→ 删除记录
+ *   module:tenant-uninstall（tenantUninstall）→ 删除记录
  *
- * 迁移目录约定：
- *   database/migrations        —— 中央迁移（install/uninstall 默认运行/回滚）
- *   database/migrations/tenant —— 租户迁移（tenantInstall/tenantUninstall 默认运行/回滚）
+ * 迁移不再由本类处理：模块迁移统一由 ModuleMigrationService 执行，
+ * 记录到独立表 module_migrations（module_id + 模块内独立 batch），
+ * 与系统 migrations 表完全隔离。install/uninstall/tenantInstall/tenantUninstall
+ * 仅作为可覆盖的空钩子，供模块做数据播种、自定义清理等非迁移逻辑。
  */
 abstract class ModuleServiceProvider extends ServiceProvider
 {
     /**
      * 模块首次启用时执行（仅一次，中央上下文）。
      *
-     * 默认按约定运行包内 database/migrations 目录下的中央迁移；
-     * 有特殊需求的模块可覆盖此方法。
+     * 迁移已由 ModuleMigrationService 自动执行；本钩子仅供需要
+     * 自定义安装逻辑（如播种默认数据）的模块覆盖。
      */
     public function install(): void
     {
-        $this->runMigrations('database/migrations');
+        //
     }
 
     /**
      * 模块卸载时执行（中央上下文）。
      *
-     * 默认按约定回滚包内 database/migrations 目录下的中央迁移。
+     * 迁移已由 ModuleMigrationService 自动回滚；本钩子仅供需要
+     * 自定义清理逻辑的模块覆盖。
      */
     public function uninstall(): void
     {
-        $this->rollbackMigrations('database/migrations');
+        //
     }
 
     /**
@@ -72,12 +73,12 @@ abstract class ModuleServiceProvider extends ServiceProvider
     /**
      * 模块首次安装到指定租户时执行（租户上下文已初始化）。
      *
-     * 默认按约定运行包内 database/migrations/tenant 目录下的租户迁移；
-     * 有特殊需求的模块可覆盖此方法。
+     * 租户迁移已由 ModuleMigrationService 自动执行；本钩子仅供需要
+     * 自定义租户安装逻辑的模块覆盖。
      */
     public function tenantInstall(Tenant $tenant): void
     {
-        $this->runMigrations('database/migrations/tenant');
+        //
     }
 
     /**
@@ -99,62 +100,12 @@ abstract class ModuleServiceProvider extends ServiceProvider
     /**
      * 模块从指定租户卸载时执行（租户上下文已初始化）。
      *
-     * 默认按约定回滚包内 database/migrations/tenant 目录下的租户迁移。
+     * 租户迁移已由 ModuleMigrationService 自动回滚；本钩子仅供需要
+     * 自定义租户清理逻辑的模块覆盖。
      */
     public function tenantUninstall(Tenant $tenant): void
     {
-        $this->rollbackMigrations('database/migrations/tenant');
-    }
-
-    // ---------------------------------------------------------------
-    // 迁移约定
-    // ---------------------------------------------------------------
-
-    /**
-     * 运行包内指定目录的迁移。
-     *
-     * 目录不存在时静默跳过（模块可能只有中央或只有租户迁移）。
-     */
-    protected function runMigrations(string $relativePath): void
-    {
-        $path = $this->packagePath($relativePath);
-
-        if (is_dir($path)) {
-            $this->app['migrator']->run($path);
-        }
-    }
-
-    /**
-     * 回滚包内指定目录的迁移。
-     */
-    protected function rollbackMigrations(string $relativePath): void
-    {
-        $path = $this->packagePath($relativePath);
-
-        if (is_dir($path)) {
-            $this->app['migrator']->rollback($path);
-        }
-    }
-
-    /**
-     * 解析模块包根目录下相对路径的绝对路径。
-     *
-     * 从 Provider 文件所在目录向上查找 composer.json（lasaas-module 包根），
-     * 使迁移约定不依赖 Provider 在包内的具体位置。
-     */
-    protected function packagePath(string $path = ''): string
-    {
-        $dir = dirname((new ReflectionClass($this))->getFileName());
-
-        while ($dir !== '' && $dir !== DIRECTORY_SEPARATOR) {
-            if (file_exists($dir.'/composer.json')) {
-                return $path === '' ? $dir : rtrim($dir, '/').'/'.ltrim($path, '/');
-            }
-
-            $dir = dirname($dir);
-        }
-
-        return $path;
+        //
     }
 
     // ---------------------------------------------------------------

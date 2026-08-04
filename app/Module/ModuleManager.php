@@ -48,6 +48,7 @@ class ModuleManager
 
     public function __construct(
         protected Application $app,
+        protected ModuleMigrationService $migrations,
     ) {}
 
     // ---------------------------------------------------------------
@@ -284,7 +285,6 @@ class ModuleManager
 
         // 第二步：加载模块资源（provider 不存在时由 ModuleManager 兜底加载）
         if (empty($providers)) {
-            $this->loadMigrations($module);
             $this->loadRoutes($module);
             $this->loadViews($module);
             $this->loadConfig($module);
@@ -327,18 +327,6 @@ class ModuleManager
         }
 
         return $providers;
-    }
-
-    /**
-     * 加载模块的数据库迁移文件。
-     */
-    protected function loadMigrations(Module $module): void
-    {
-        $migrationPath = $module->path.'/database/migrations';
-
-        if (is_dir($migrationPath)) {
-            $this->app['migrator']->path($migrationPath);
-        }
     }
 
     /**
@@ -611,6 +599,9 @@ class ModuleManager
 
     /**
      * 启用模块并调用其生命周期钩子。
+     *
+     * 首次启用（install）与后续启用都会运行 pending 迁移（幂等），
+     * 因此模块升级新增的迁移文件无需额外操作即可补跑。
      */
     public function enable(Module $module): void
     {
@@ -622,6 +613,8 @@ class ModuleManager
         ]);
 
         $this->flushPanelPluginsCache();
+
+        $this->migrations->migrate($module);
 
         // 注册 Provider 以调用钩子
         $provider = $this->resolveModuleProvider($module);
@@ -649,7 +642,7 @@ class ModuleManager
     }
 
     /**
-     * 卸载模块：调用 uninstall() 钩子，然后删除数据库记录。
+     * 卸载模块：调用 uninstall() 钩子、回滚迁移，然后删除数据库记录。
      */
     public function uninstall(Module $module): void
     {
@@ -666,6 +659,10 @@ class ModuleManager
             $provider->uninstall();
         }
 
+        // 回滚该模块全部迁移（删除其表），并清空 module_migrations 残留记录
+        $this->migrations->rollback($module);
+        $this->migrations->purge($module);
+
         $this->deleteSettingsFor($module);
 
         $module->delete();
@@ -681,7 +678,7 @@ class ModuleManager
      * 为指定租户安装/启用模块。
      *
      * 首次安装：创建 tenant_modules 记录、在租户库运行模块迁移并调用 tenantInstall()；
-     * 重复启用：仅把 enabled 置为 true 并调用 tenantOnEnable()。
+     * 重复启用：仅把 enabled 置为 true 并调用 tenantOnEnable()（迁移幂等，新增文件自动补跑）。
      */
     public function enableForTenant(Module $module, Tenant $tenant): void
     {
@@ -692,6 +689,9 @@ class ModuleManager
         // 记录写入中央库，必须在初始化租户上下文之前完成
         $tenant->setModuleEnabled($module->id, true);
 
+        // 在租户库运行模块 pending 迁移（首次安装全部，升级补跑新增）
+        $this->migrations->migrateForTenant($module, $tenant);
+
         $provider = $this->resolveModuleProvider($module);
 
         if (! $provider instanceof ModuleServiceProvider) {
@@ -699,7 +699,7 @@ class ModuleManager
         }
 
         if ($isFirstInstall) {
-            $this->withTenancy($tenant, fn () => $provider->tenantInstall($tenant));
+            $provider->tenantInstall($tenant);
         }
 
         $provider->tenantOnEnable($tenant);
@@ -720,39 +720,23 @@ class ModuleManager
     }
 
     /**
-     * 从指定租户卸载模块：调用 tenantUninstall() 钩子（回滚租户库迁移等），然后删除记录。
+     * 从指定租户卸载模块：调用 tenantUninstall() 钩子、回滚租户库迁移，然后删除记录。
      */
     public function uninstallForTenant(Module $module, Tenant $tenant): void
     {
         $provider = $this->resolveModuleProvider($module);
 
         if ($provider instanceof ModuleServiceProvider) {
-            $this->withTenancy($tenant, fn () => $provider->tenantUninstall($tenant));
+            $provider->tenantUninstall($tenant);
         }
+
+        // 回滚该模块在该租户库的全部迁移，并清空 module_migrations 残留记录
+        $this->migrations->rollbackForTenant($module, $tenant);
+        $this->migrations->purgeForTenant($module, $tenant);
 
         $tenant->tenantModules()->where('module_id', $module->id)->delete();
 
         $this->deleteSettingsFor($module, $tenant);
-    }
-
-    /**
-     * 在租户上下文中执行回调，结束后恢复中央上下文。
-     */
-    protected function withTenancy(Tenant $tenant, Closure $callback): void
-    {
-        if (tenancy()->initialized) {
-            $callback();
-
-            return;
-        }
-
-        tenancy()->initialize($tenant);
-
-        try {
-            $callback();
-        } finally {
-            tenancy()->end();
-        }
     }
 
     /**

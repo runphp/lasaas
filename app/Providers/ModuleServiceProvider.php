@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Module\Http\Middleware\EnsureModuleEnabled;
 use App\Module\ModuleManager;
+use App\Module\ModuleMigrationService;
 use App\Module\Settings\ModuleSettingsScope;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
@@ -30,7 +31,10 @@ class ModuleServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(ModuleManager::class, fn ($app) => new ModuleManager($app));
+        $this->app->singleton(ModuleManager::class, fn ($app) => new ModuleManager(
+            $app,
+            $app->make(ModuleMigrationService::class),
+        ));
 
         // 租户设置作用域：scoped，每请求一个实例，供模块租户设置类解析 group
         $this->app->scoped(ModuleSettingsScope::class);
