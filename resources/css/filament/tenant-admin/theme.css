@@ -3,6 +3,7 @@
 @source '../../../../app/Filament/TenantAdmin/**/*';
 @source '../../../../resources/views/filament/tenant-admin/**/*';
 @source '../../../../vendor/bezhansalleh/filament-language-switch/**';
+@source '../../../../vendor/wezlo/filament-workspace-tabs/resources/views/**/*';
 
 @theme {
     --radius-lg: 0.375rem;

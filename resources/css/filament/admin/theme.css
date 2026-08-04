@@ -3,6 +3,7 @@
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
 @source '../../../../vendor/bezhansalleh/filament-language-switch/**';
+@source '../../../../vendor/wezlo/filament-workspace-tabs/resources/views/**/*';
 
 @theme {
     --radius-lg: 0.75rem;

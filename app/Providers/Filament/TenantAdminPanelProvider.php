@@ -27,6 +27,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomainOrSubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+use Wezlo\FilamentWorkspaceTabs\WorkspaceTabsPlugin;
 
 class TenantAdminPanelProvider extends PanelProvider
 {
@@ -75,6 +76,7 @@ class TenantAdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])->plugins([
                 FilamentShieldPlugin::make(),
+                WorkspaceTabsPlugin::make(),
                 ...static::getModulePlugins(),
             ]);
     }
