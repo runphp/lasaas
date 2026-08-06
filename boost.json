@@ -8,16 +8,19 @@
     "nightwatch": false,
     "packages": [
         "filament/filament",
-        "spatie/laravel-permission"
+        "spatie/laravel-permission",
+        "spatie/laravel-medialibrary"
     ],
     "sail": false,
     "skills": [
+        "infer-conventions",
         "fortify-development",
         "laravel-best-practices",
         "fluxui-development",
         "livewire-development",
         "pest-testing",
         "tailwindcss-development",
+        "medialibrary-development",
         "laravel-permission-development"
     ]
 }
