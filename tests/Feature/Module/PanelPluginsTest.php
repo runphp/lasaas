@@ -2,7 +2,7 @@
 
 use App\Enums\ModuleStatus;
 use App\Models\Module;
-use App\Module\ModuleManager;
+use App\Module\ModuleDiscoveryManager;
 use App\Providers\Filament\AdminPanelProvider;
 use App\Providers\Filament\TenantAdminPanelProvider;
 use Filament\Panel;
@@ -26,19 +26,19 @@ function createPanelExtensionModule(): Module
 beforeEach(function () {
     createPanelExtensionModule();
 
-    app(ModuleManager::class)->flushCache();
-    app(ModuleManager::class)->flushPanelPluginsCache();
+    app(ModuleDiscoveryManager::class)->flushCache();
+    app(ModuleDiscoveryManager::class)->flushPanelPluginsCache();
 });
 
 test('admin panel plugins are discovered by convention from central modules', function () {
-    $plugins = app(ModuleManager::class)->getAdminPanelPlugins();
+    $plugins = app(ModuleDiscoveryManager::class)->getAdminPanelPlugins();
 
     expect($plugins)->toContain(AdminBlogPlugin::class)
         ->and($plugins)->not->toContain(TenantBlogPlugin::class);
 });
 
 test('tenant admin panel plugins are discovered by convention from tenant modules', function () {
-    $plugins = app(ModuleManager::class)->getTenantAdminPanelPlugins();
+    $plugins = app(ModuleDiscoveryManager::class)->getTenantAdminPanelPlugins();
 
     expect($plugins)->toContain(TenantBlogPlugin::class)
         ->and($plugins)->not->toContain(AdminBlogPlugin::class);

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\Module;
-use App\Module\ModuleManager;
+use App\Module\ModuleDiscoveryManager;
 use Composer\InstalledVersions;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
@@ -108,7 +108,7 @@ class ModulesSync extends Command
         $this->generateAutoloadFile();
 
         // 清除面板插件发现缓存，下次请求自动重建
-        app(ModuleManager::class)->flushPanelPluginsCache();
+        app(ModuleDiscoveryManager::class)->flushPanelPluginsCache();
 
         return self::SUCCESS;
     }

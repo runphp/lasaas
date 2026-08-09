@@ -3,7 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Dashboard;
-use App\Module\ModuleManager;
+use App\Module\ModuleDiscoveryManager;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Contracts\Plugin;
 use Filament\Http\Middleware\Authenticate;
@@ -78,8 +78,8 @@ class AdminPanelProvider extends PanelProvider
      */
     protected static function getModulePlugins(): array
     {
-        /** @var ModuleManager $manager */
-        $manager = app(ModuleManager::class);
+        /** @var ModuleDiscoveryManager $manager */
+        $manager = app(ModuleDiscoveryManager::class);
 
         $plugins = [];
 

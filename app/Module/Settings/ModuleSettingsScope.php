@@ -8,8 +8,8 @@ namespace App\Module\Settings;
  * 当前租户模块设置作用域。
  *
  * 租户设置类解析 group 时需要知道当前作用于哪个租户：
- *  - 租户应用上下文：由 ModuleManager::loadTenantModules() 在 TenancyInitialized 时设置
- *  - 中央后台管理租户设置：由 ModuleManager::resolveTenantSettings() 显式设置
+ *  - 租户应用上下文：由 ModuleBootLoader::loadTenantModules() 在 TenancyInitialized 时设置
+ *  - 中央后台管理租户设置：由 ModuleSettingManager::resolveTenantSettings() 显式设置
  *
  * 注册为 scoped（每请求一个实例），避免在长驻进程/队列中串号。
  */

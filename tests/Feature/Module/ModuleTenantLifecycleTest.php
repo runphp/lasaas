@@ -5,7 +5,7 @@ use App\Models\Module;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Module\Http\Middleware\EnsureModuleEnabled;
-use App\Module\ModuleManager;
+use App\Module\ModuleBootLoader;
 use App\Module\ModuleServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
@@ -89,7 +89,7 @@ test('enableForTenant creates an enabled tenant_modules record and runs install 
 
     fakeTenancyAlreadyInitialized();
 
-    app(ModuleManager::class)->enableForTenant($module, $tenant);
+    app(ModuleBootLoader::class)->enableForTenant($module, $tenant);
 
     $tenantModule = $tenant->tenantModules()->where('module_id', $module->id)->first();
 
@@ -108,7 +108,7 @@ test('enableForTenant on an existing record only runs onEnable', function () {
 
     fakeTenancyAlreadyInitialized();
 
-    app(ModuleManager::class)->enableForTenant($module, $tenant);
+    app(ModuleBootLoader::class)->enableForTenant($module, $tenant);
 
     expect($tenant->tenantModules()->where('module_id', $module->id)->first()->enabled)->toBeTrue()
         ->and(TestTenantModuleProvider::$calls)->toBe(['tenantOnEnable']);
@@ -124,7 +124,7 @@ test('disableForTenant disables the module and runs the disable hook', function 
 
     fakeTenancyAlreadyInitialized();
 
-    app(ModuleManager::class)->disableForTenant($module, $tenant);
+    app(ModuleBootLoader::class)->disableForTenant($module, $tenant);
 
     expect($tenant->tenantModules()->where('module_id', $module->id)->first()->enabled)->toBeFalse()
         ->and(TestTenantModuleProvider::$calls)->toBe(['tenantOnDisable']);
@@ -140,7 +140,7 @@ test('uninstallForTenant runs the uninstall hook and deletes the record', functi
 
     fakeTenancyAlreadyInitialized();
 
-    app(ModuleManager::class)->uninstallForTenant($module, $tenant);
+    app(ModuleBootLoader::class)->uninstallForTenant($module, $tenant);
 
     expect($tenant->tenantModules()->where('module_id', $module->id)->exists())->toBeFalse()
         ->and(TestTenantModuleProvider::$calls)->toBe(['tenantUninstall']);

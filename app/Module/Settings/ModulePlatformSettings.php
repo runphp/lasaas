@@ -16,7 +16,7 @@ use Spatie\LaravelSettings\Settings;
  *    字段名与 public 属性一一对应（默认空，无后台表单时可不覆盖）
  *
  * 设置持久化到中央库 settings 表，group 固定为 "module:{groupKey}"，
- * 对所有租户统一生效。运行时通过 ModuleManager::resolvePlatformSettings()
+ * 对所有租户统一生效。运行时通过 ModuleSettingManager::resolvePlatformSettings()
  * 或直接实例化该类读取，不再合并进 config()。
  */
 abstract class ModulePlatformSettings extends Settings

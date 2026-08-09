@@ -7,7 +7,9 @@ namespace App\Livewire\Actions;
 use App\Models\Module;
 use App\Models\Tenant;
 use App\Models\TenantModule;
-use App\Module\ModuleManager;
+use App\Module\ModuleBootLoader;
+use App\Module\ModuleDiscoveryManager;
+use App\Module\ModuleSettingManager;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -48,10 +50,10 @@ class ManageTenantModules extends Component implements HasActions, HasSchemas, H
     public function table(Table $table): Table
     {
         $tenant = $this->getTenant();
-        $manager = app(ModuleManager::class);
+        $discovery = app(ModuleDiscoveryManager::class);
 
-        $tenantAreaModuleIds = $manager->discover()
-            ->filter(fn (Module $module) => $manager->supportsArea($module, 'tenant'))
+        $tenantAreaModuleIds = $discovery->discover()
+            ->filter(fn (Module $module) => $discovery->supportsArea($module, 'tenant'))
             ->pluck('id');
 
         return $table
@@ -88,10 +90,10 @@ class ManageTenantModules extends Component implements HasActions, HasSchemas, H
                     ->label(__('设置'))
                     ->icon(Heroicon::Cog6Tooth)
                     ->visible(fn (Module $record): bool => $this->tenantModuleFor($record) !== null)
-                    ->schema(fn (Module $record): array => $manager->tenantSettingsSchema($record))
-                    ->fillForm(fn (Module $record): array => $manager->resolveTenantSettings($record, $tenant)?->toArray() ?? [])
+                    ->schema(fn (Module $record): array => app(ModuleSettingManager::class)->tenantSettingsSchema($record))
+                    ->fillForm(fn (Module $record): array => app(ModuleSettingManager::class)->resolveTenantSettings($record, $tenant)?->toArray() ?? [])
                     ->action(function (Module $record, array $data): void {
-                        app(ModuleManager::class)->resolveTenantSettings($record, $this->getTenant())?->fill($data)?->save();
+                        app(ModuleSettingManager::class)->resolveTenantSettings($record, $this->getTenant())?->fill($data)?->save();
 
                         Notification::make()->success()->title(__('已保存'))->send();
                     }),
@@ -134,31 +136,31 @@ class ManageTenantModules extends Component implements HasActions, HasSchemas, H
 
     protected function installModule(Module $module): void
     {
-        app(ModuleManager::class)->enableForTenant($module, $this->getTenant());
+        app(ModuleBootLoader::class)->enableForTenant($module, $this->getTenant());
 
         Notification::make()->success()->title(__('模块已安装并启用'))->send();
     }
 
     protected function setModuleEnabled(Module $module, bool $enabled): void
     {
-        $manager = app(ModuleManager::class);
+        $bootLoader = app(ModuleBootLoader::class);
 
         if ($enabled) {
-            $manager->enableForTenant($module, $this->getTenant());
+            $bootLoader->enableForTenant($module, $this->getTenant());
 
             Notification::make()->success()->title(__('模块已启用'))->send();
 
             return;
         }
 
-        $manager->disableForTenant($module, $this->getTenant());
+        $bootLoader->disableForTenant($module, $this->getTenant());
 
         Notification::make()->success()->title(__('模块已禁用'))->send();
     }
 
     protected function uninstallModule(Module $module): void
     {
-        app(ModuleManager::class)->uninstallForTenant($module, $this->getTenant());
+        app(ModuleBootLoader::class)->uninstallForTenant($module, $this->getTenant());
 
         Notification::make()->success()->title(__('模块已卸载'))->send();
     }

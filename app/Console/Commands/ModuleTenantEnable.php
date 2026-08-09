@@ -7,7 +7,7 @@ namespace App\Console\Commands;
 use App\Enums\ModuleStatus;
 use App\Models\Module;
 use App\Models\Tenant;
-use App\Module\ModuleManager;
+use App\Module\ModuleBootLoader;
 use Illuminate\Console\Command;
 
 /**
@@ -22,7 +22,7 @@ class ModuleTenantEnable extends Command
 
     protected $description = '为指定租户安装并启用模块';
 
-    public function handle(ModuleManager $manager): int
+    public function handle(ModuleBootLoader $manager): int
     {
         $packageName = $this->argument('package');
         $tenantId = $this->argument('tenant');

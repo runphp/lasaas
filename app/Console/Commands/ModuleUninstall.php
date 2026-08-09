@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\Module;
-use App\Module\ModuleManager;
+use App\Module\ModuleBootLoader;
 use Illuminate\Console\Command;
 
 /**
@@ -21,7 +21,7 @@ class ModuleUninstall extends Command
 
     protected $description = '卸载模块并清理数据';
 
-    public function handle(ModuleManager $manager): int
+    public function handle(ModuleBootLoader $manager): int
     {
         $packageName = $this->argument('package');
 

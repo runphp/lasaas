@@ -4,7 +4,7 @@ use App\Enums\ModuleStatus;
 use App\Models\Module;
 use App\Models\Tenant;
 use App\Models\User;
-use App\Module\ModuleManager;
+use App\Module\ModuleBootLoader;
 use App\Module\ModuleMigrationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -251,13 +251,13 @@ test('enable runs central migrations and uninstall rolls them back and purges re
 
     $module = createMigrationModule($this->fixtureDir, 'test/migration-module');
 
-    app(ModuleManager::class)->enable($module);
+    app(ModuleBootLoader::class)->enable($module);
 
     expect(Schema::hasTable('mm_alpha'))->toBeTrue()
         ->and(DB::table('module_migrations')->where('module_id', $module->id)->exists())->toBeTrue()
         ->and($module->fresh()->status)->toBe(ModuleStatus::ACTIVE);
 
-    app(ModuleManager::class)->uninstall($module);
+    app(ModuleBootLoader::class)->uninstall($module);
 
     expect(Schema::hasTable('mm_alpha'))->toBeFalse()
         ->and(DB::table('module_migrations')->where('module_id', $module->id)->exists())->toBeFalse()
@@ -315,12 +315,12 @@ test('enableForTenant and uninstallForTenant run and roll back tenant migrations
 
     fakeMigrationTenancy();
 
-    app(ModuleManager::class)->enableForTenant($module, $tenant);
+    app(ModuleBootLoader::class)->enableForTenant($module, $tenant);
 
     expect(Schema::hasTable('mmt_alpha'))->toBeTrue()
         ->and($tenant->tenantModules()->where('module_id', $module->id)->first()->enabled)->toBeTrue();
 
-    app(ModuleManager::class)->uninstallForTenant($module, $tenant);
+    app(ModuleBootLoader::class)->uninstallForTenant($module, $tenant);
 
     expect(Schema::hasTable('mmt_alpha'))->toBeFalse()
         ->and(DB::table('module_migrations')->where('module_id', $module->id)->exists())->toBeFalse()

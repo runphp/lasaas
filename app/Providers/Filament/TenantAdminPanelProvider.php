@@ -7,7 +7,7 @@ use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Teams\TeamResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Filament\TenantAdmin\Pages\Dashboard;
-use App\Module\ModuleManager;
+use App\Module\ModuleDiscoveryManager;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Contracts\Plugin;
 use Filament\Http\Middleware\Authenticate;
@@ -91,8 +91,8 @@ class TenantAdminPanelProvider extends PanelProvider
      */
     protected static function getModulePlugins(): array
     {
-        /** @var ModuleManager $manager */
-        $manager = app(ModuleManager::class);
+        /** @var ModuleDiscoveryManager $manager */
+        $manager = app(ModuleDiscoveryManager::class);
 
         $plugins = [];
 

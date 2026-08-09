@@ -85,7 +85,7 @@ abstract class ModuleTenantSettings extends Settings
     }
 
     /**
-     * 更新某字段的回退值（模块设置值与租户字段同名时由 ModuleManager 调用）。
+     * 更新某字段的回退值（模块设置值与租户字段同名时由 ModuleSettingManager 调用）。
      */
     public function setFallbackValue(string $field, mixed $value): void
     {

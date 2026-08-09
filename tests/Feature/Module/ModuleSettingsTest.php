@@ -4,8 +4,8 @@ use App\Enums\ModuleStatus;
 use App\Models\Module;
 use App\Models\Tenant;
 use App\Models\User;
-use App\Module\ModuleManager;
 use App\Module\ModuleServiceProvider;
+use App\Module\ModuleSettingManager;
 use App\Module\Settings\ModulePlatformSettings;
 use App\Module\Settings\ModuleTenantSettings;
 use Filament\Forms\Components\TextInput;
@@ -118,7 +118,7 @@ function createSettingsTestTenant(): Tenant
 test('central settings resolve with the settings class defaults when nothing is stored', function () {
     $module = createSettingsModule(TestSettingsModuleProvider::class);
 
-    $settings = app(ModuleManager::class)->resolvePlatformSettings($module);
+    $settings = app(ModuleSettingManager::class)->resolvePlatformSettings($module);
 
     expect($settings)->toBeInstanceOf(TestPlatformSettings::class)
         ->and($settings->per_page)->toBe(10)
@@ -128,7 +128,7 @@ test('central settings resolve with the settings class defaults when nothing is 
 
 test('saving central settings persists to the central settings table and reloads', function () {
     $module = createSettingsModule(TestSettingsModuleProvider::class);
-    $manager = app(ModuleManager::class);
+    $manager = app(ModuleSettingManager::class);
 
     $manager->resolvePlatformSettings($module)?->fill([
         'per_page' => 3,
@@ -151,7 +151,7 @@ test('tenant settings are isolated per tenant', function () {
 
     $tenantA->setModuleEnabled($module->id, true);
 
-    $manager = app(ModuleManager::class);
+    $manager = app(ModuleSettingManager::class);
 
     $manager->resolveTenantSettings($module, $tenantA)?->fill([
         'per_page' => 2,
@@ -175,7 +175,7 @@ test('tenant settings do not overwrite the central settings group', function () 
     $module = createSettingsModule(TestSettingsModuleProvider::class);
     $tenant = createSettingsTestTenant();
 
-    $manager = app(ModuleManager::class);
+    $manager = app(ModuleSettingManager::class);
 
     $manager->resolvePlatformSettings($module)?->fill(['per_page' => 3])->save();
     $manager->resolveTenantSettings($module, $tenant)?->fill(['per_page' => 9])->save();
@@ -187,7 +187,7 @@ test('tenant settings do not overwrite the central settings group', function () 
 test('tenant settings fall back to module central values for same-name fields', function () {
     $module = createSettingsModule(TestSettingsModuleProvider::class);
     $tenant = createSettingsTestTenant();
-    $manager = app(ModuleManager::class);
+    $manager = app(ModuleSettingManager::class);
 
     $manager->resolvePlatformSettings($module)?->fill(['per_page' => 7])->save();
 
@@ -201,7 +201,7 @@ test('tenant settings fall back to module central values for same-name fields', 
 test('tenant override wins over the module central same-name value', function () {
     $module = createSettingsModule(TestSettingsModuleProvider::class);
     $tenant = createSettingsTestTenant();
-    $manager = app(ModuleManager::class);
+    $manager = app(ModuleSettingManager::class);
 
     $manager->resolvePlatformSettings($module)?->fill(['per_page' => 7])->save();
     $manager->resolveTenantSettings($module, $tenant)?->fill(['per_page' => 15])->save();
@@ -212,7 +212,7 @@ test('tenant override wins over the module central same-name value', function ()
 test('saving tenant settings does not persist fallback module central values', function () {
     $module = createSettingsModule(TestSettingsModuleProvider::class);
     $tenant = createSettingsTestTenant();
-    $manager = app(ModuleManager::class);
+    $manager = app(ModuleSettingManager::class);
 
     $manager->resolvePlatformSettings($module)?->fill(['per_page' => 7])->save();
 
@@ -239,7 +239,7 @@ test('saving tenant settings does not persist fallback module central values', f
 test('central and tenant settings classes and schemas are forwarded to the module provider', function () {
     $module = createSettingsModule(TestSettingsModuleProvider::class);
 
-    $manager = app(ModuleManager::class);
+    $manager = app(ModuleSettingManager::class);
 
     expect($manager->platformSettingsClass($module))->toBe(TestPlatformSettings::class)
         ->and($manager->tenantSettingsClass($module))->toBe(TestTenantSettings::class)
@@ -250,7 +250,7 @@ test('central and tenant settings classes and schemas are forwarded to the modul
 test('settings resolution returns null for providers that declare no settings class', function () {
     $module = createSettingsModule(TestNoSettingsModuleProvider::class);
 
-    $manager = app(ModuleManager::class);
+    $manager = app(ModuleSettingManager::class);
 
     expect($manager->platformSettingsClass($module))->toBeNull()
         ->and($manager->tenantSettingsClass($module))->toBeNull()
@@ -263,7 +263,7 @@ test('settings resolution returns null for providers that declare no settings cl
 test('uninstalling a module deletes its central and tenant settings', function () {
     $module = createSettingsModule(TestSettingsModuleProvider::class);
     $tenant = createSettingsTestTenant();
-    $manager = app(ModuleManager::class);
+    $manager = app(ModuleSettingManager::class);
 
     $manager->resolvePlatformSettings($module)?->fill(['per_page' => 3])->save();
     $manager->resolveTenantSettings($module, $tenant)?->fill(['per_page' => 9])->save();
@@ -278,7 +278,7 @@ test('uninstalling a module for one tenant deletes only that tenant settings', f
     $module = createSettingsModule(TestSettingsModuleProvider::class);
     $tenantA = createSettingsTestTenant();
     $tenantB = createSettingsTestTenant();
-    $manager = app(ModuleManager::class);
+    $manager = app(ModuleSettingManager::class);
 
     $manager->resolveTenantSettings($module, $tenantA)?->fill(['per_page' => 9])->save();
     $manager->resolveTenantSettings($module, $tenantB)?->fill(['per_page' => 8])->save();

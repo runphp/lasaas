@@ -5,7 +5,8 @@ namespace App\Filament\Resources\Modules\Tables;
 use App\Enums\ModuleStatus;
 use App\Models\Module;
 use App\Models\TenantModule;
-use App\Module\ModuleManager;
+use App\Module\ModuleBootLoader;
+use App\Module\ModuleSettingManager;
 use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
@@ -39,12 +40,12 @@ class ModulesTable
                     ->offIcon('heroicon-o-x-circle')
                     ->getStateUsing(fn ($record) => $record->status === ModuleStatus::ACTIVE)
                     ->updateStateUsing(function ($record, $state) {
-                        $manager = app(ModuleManager::class);
+                        $bootLoader = app(ModuleBootLoader::class);
 
                         if ($state) {
-                            $manager->enable($record);
+                            $bootLoader->enable($record);
                         } else {
-                            $manager->disable($record);
+                            $bootLoader->disable($record);
                         }
                     })
                     ->afterStateUpdated(function ($record, $state) {
@@ -86,11 +87,11 @@ class ModulesTable
                     ->authorize('settings')
                     ->label(__('filament-resources.module.settings.label'))
                     ->icon('heroicon-o-cog-6-tooth')
-                    ->visible(fn (Module $record): bool => ! empty(app(ModuleManager::class)->platformSettingsSchema($record)))
-                    ->schema(fn (Module $record): array => app(ModuleManager::class)->platformSettingsSchema($record))
-                    ->fillForm(fn (Module $record): array => app(ModuleManager::class)->resolvePlatformSettings($record)?->toArray() ?? [])
+                    ->visible(fn (Module $record): bool => ! empty(app(ModuleSettingManager::class)->platformSettingsSchema($record)))
+                    ->schema(fn (Module $record): array => app(ModuleSettingManager::class)->platformSettingsSchema($record))
+                    ->fillForm(fn (Module $record): array => app(ModuleSettingManager::class)->resolvePlatformSettings($record)?->toArray() ?? [])
                     ->action(function (Module $record, array $data): void {
-                        app(ModuleManager::class)->resolvePlatformSettings($record)?->fill($data)?->save();
+                        app(ModuleSettingManager::class)->resolvePlatformSettings($record)?->fill($data)?->save();
 
                         Notification::make()->success()->title(__('filament-resources.module.settings.saved'))->send();
                     }),
@@ -119,8 +120,8 @@ class ModulesTable
 
                             return;
                         }
-                        $manager = app(ModuleManager::class);
-                        $manager->uninstall($record);
+                        $bootLoader = app(ModuleBootLoader::class);
+                        $bootLoader->uninstall($record);
 
                         Notification::make()
                             ->title(__('filament-resources.module.uninstall.notify.success', [

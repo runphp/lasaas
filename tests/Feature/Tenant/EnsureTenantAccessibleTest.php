@@ -45,7 +45,7 @@ function runTenantAccessibilityMiddleware(?Tenant $tenant, bool $initialized = t
         config()->set('database.connections.tenant', $tenant->database()->connection());
     }
 
-    return (new EnsureTenantAccessible)->handle(Request::create('/'), fn (Request $request) => response('ok'));
+    return app(EnsureTenantAccessible::class)->handle(Request::create('/'), fn (Request $request) => response('ok'));
 }
 
 function expectTenantAccessibilityThrowsStatusCode(callable $callback, int $statusCode): void

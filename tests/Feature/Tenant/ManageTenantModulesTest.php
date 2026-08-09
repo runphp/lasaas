@@ -5,7 +5,7 @@ use App\Livewire\Actions\ManageTenantModules;
 use App\Models\Module;
 use App\Models\Tenant;
 use App\Models\User;
-use App\Module\ModuleManager;
+use App\Module\ModuleDiscoveryManager;
 use App\Module\ModuleServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
@@ -39,7 +39,7 @@ function createTenantAreaModuleForTable(string $packageName = 'test/table-tenant
         'installed_at' => now(),
     ]);
 
-    app(ModuleManager::class)->flushCache();
+    app(ModuleDiscoveryManager::class)->flushCache();
 
     return $module;
 }

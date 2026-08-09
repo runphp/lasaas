@@ -6,7 +6,7 @@ namespace App\Console\Commands;
 
 use App\Enums\ModuleStatus;
 use App\Models\Module;
-use App\Module\ModuleManager;
+use App\Module\ModuleBootLoader;
 use Illuminate\Console\Command;
 
 /**
@@ -20,7 +20,7 @@ class ModuleEnable extends Command
 
     protected $description = '启用模块';
 
-    public function handle(ModuleManager $manager): int
+    public function handle(ModuleBootLoader $manager): int
     {
         $packageName = $this->argument('package');
 

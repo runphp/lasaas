@@ -6,7 +6,7 @@ namespace App\Console\Commands;
 
 use App\Models\Module;
 use App\Models\Tenant;
-use App\Module\ModuleManager;
+use App\Module\ModuleBootLoader;
 use Illuminate\Console\Command;
 
 /**
@@ -20,7 +20,7 @@ class ModuleTenantUninstall extends Command
 
     protected $description = '从指定租户卸载模块';
 
-    public function handle(ModuleManager $manager): int
+    public function handle(ModuleBootLoader $manager): int
     {
         $packageName = $this->argument('package');
         $tenantId = $this->argument('tenant');
