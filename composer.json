@@ -25,13 +25,14 @@
         "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.7",
         "laravel/tinker": "^3.0",
-        "lasaas/example": "@dev",
+        "lasaas/address": "dev-main",
         "livewire/flux": "^2.13.1",
         "livewire/livewire": "^4.1",
         "mnsami/composer-custom-directory-installer": "^2.2",
         "spatie/laravel-medialibrary": "^11.23",
         "spatie/laravel-permission": "^7.4",
         "spatie/laravel-settings": "^3.9",
+        "spatie/menu": "^3.2",
         "stancl/tenancy": "^3.10",
         "wezlo/filament-workspace-tabs": "^1.0"
     },
@@ -54,6 +55,10 @@
             "options": {
                 "symlink": true
             }
+        },
+        {
+            "type": "vcs",
+            "url": "git@gitee.com:lasaas/lasaas-address.git"
         }
     ],
     "minimum-stability": "stable",
@@ -89,7 +94,7 @@
             "lasaas-module"
         ],
         "installer-paths": {
-            "packages/contrib/{$name}": [
+            "packages/contrib/{$vendor}/{$name}": [
                 "type:lasaas-module"
             ]
         },

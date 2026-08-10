@@ -80,7 +80,7 @@ new class extends Component {
     <div class="flex items-center gap-6 flex-wrap">
         {{-- flux头像组件：有图片展示图片，无图显示自定义首字母，color固定配色 --}}
         <flux:avatar
-            class="w-28 h-28 shrink-0 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600"
+            size="xl"
             :src="$this->previewUrl"
             :name="Auth::user()->name"
             :initials="Auth::user()->initials()"

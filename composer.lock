@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "da99b2c63d607d8367353cb7de658034",
+    "content-hash": "8d6d111b3367052a15c63bd1837fa2ac",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -950,6 +950,70 @@
             "time": "2024-03-02T12:51:17+00:00"
         },
         {
+            "name": "commerceguys/addressing",
+            "version": "v2.2.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/commerceguys/addressing.git",
+                "reference": "15b789e5e6ededaf803d23c56cdc300a94522a7c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/commerceguys/addressing/zipball/15b789e5e6ededaf803d23c56cdc300a94522a7c",
+                "reference": "15b789e5e6ededaf803d23c56cdc300a94522a7c",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/collections": "^1.6 || ^2.0",
+                "php": ">=8.0"
+            },
+            "require-dev": {
+                "ext-json": "*",
+                "mikey179/vfsstream": "^1.6.11",
+                "phpunit/phpunit": "^9.6",
+                "squizlabs/php_codesniffer": "^3.7",
+                "symfony/validator": "^5.4 || ^6.3 || ^7.0 || ^8.0"
+            },
+            "suggest": {
+                "symfony/validator": "to validate addresses"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "CommerceGuys\\Addressing\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bojan Zivanovic"
+                },
+                {
+                    "name": "Damien Tournoud"
+                }
+            ],
+            "description": "Addressing library powered by CLDR and Google's address data.",
+            "keywords": [
+                "address",
+                "internationalization",
+                "localization",
+                "postal"
+            ],
+            "support": {
+                "issues": "https://github.com/commerceguys/addressing/issues",
+                "source": "https://github.com/commerceguys/addressing/tree/v2.2.5"
+            },
+            "time": "2026-01-05T13:00:32+00:00"
+        },
+        {
             "name": "composer/class-map-generator",
             "version": "1.7.3",
             "source": {
@@ -1546,6 +1610,92 @@
                 "source": "https://github.com/dflydev/dflydev-dot-access-data/tree/v3.0.3"
             },
             "time": "2024-07-08T12:26:09+00:00"
+        },
+        {
+            "name": "doctrine/collections",
+            "version": "2.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/collections.git",
+                "reference": "7713da39d8e237f28411d6a616a3dce5e20d5de2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/collections/zipball/7713da39d8e237f28411d6a616a3dce5e20d5de2",
+                "reference": "7713da39d8e237f28411d6a616a3dce5e20d5de2",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/deprecations": "^1",
+                "php": "^8.1",
+                "symfony/polyfill-php84": "^1.30"
+            },
+            "require-dev": {
+                "doctrine/coding-standard": "^14",
+                "ext-json": "*",
+                "phpstan/phpstan": "^2.1.30",
+                "phpstan/phpstan-phpunit": "^2.0.7",
+                "phpunit/phpunit": "^10.5.58 || ^11.5.42 || ^12.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Doctrine\\Common\\Collections\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Guilherme Blanco",
+                    "email": "guilhermeblanco@gmail.com"
+                },
+                {
+                    "name": "Roman Borschel",
+                    "email": "roman@code-factory.org"
+                },
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de"
+                },
+                {
+                    "name": "Jonathan Wage",
+                    "email": "jonwage@gmail.com"
+                },
+                {
+                    "name": "Johannes Schmitt",
+                    "email": "schmittjoh@gmail.com"
+                }
+            ],
+            "description": "PHP Doctrine Collections library that adds additional functionality on top of PHP arrays.",
+            "homepage": "https://www.doctrine-project.org/projects/collections.html",
+            "keywords": [
+                "array",
+                "collections",
+                "iterators",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/doctrine/collections/issues",
+                "source": "https://github.com/doctrine/collections/tree/2.6.0"
+            },
+            "funding": [
+                {
+                    "url": "https://www.doctrine-project.org/sponsorship.html",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://www.patreon.com/phpdoctrine",
+                    "type": "patreon"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/doctrine%2Fcollections",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-01-15T10:01:58+00:00"
         },
         {
             "name": "doctrine/deprecations",
@@ -5236,17 +5386,22 @@
             "time": "2026-03-17T14:54:13+00:00"
         },
         {
-            "name": "lasaas/example",
+            "name": "lasaas/address",
             "version": "dev-main",
-            "dist": {
-                "type": "path",
-                "url": "packages/custom/lasaas/example",
-                "reference": "9292a387933288126744a8fae016810a0fede96a"
+            "source": {
+                "type": "git",
+                "url": "git@gitee.com:lasaas/lasaas-address.git",
+                "reference": "1f7c55ed789b9f7de0946a39ee605f80ba32b994"
             },
+            "require": {
+                "commerceguys/addressing": "^2.2",
+                "php": "^8.3"
+            },
+            "default-branch": true,
             "type": "lasaas-module",
             "extra": {
                 "lasaas-module": {
-                    "name": "示例模块",
+                    "name": "地址模块",
                     "areas": [
                         "central",
                         "tenant"
@@ -5254,23 +5409,20 @@
                     "weight": 0,
                     "after": [],
                     "providers": [
-                        "Lasaas\\Example\\ExampleServiceProvider"
+                        "Lasaas\\Address\\AddressServiceProvider"
                     ]
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "Lasaas\\Example\\": "src/"
+                    "Lasaas\\Address\\": "src/"
                 }
             },
             "license": [
                 "MIT"
             ],
-            "description": "示例模块，用于演示如何开发Lasaas模块",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
+            "description": "租户级地址模块，基于 commerceguys/addressing，支持中国省市区三级联动与国外地址格式。",
+            "time": "2026-08-10T02:27:39+00:00"
         },
         {
             "name": "league/commonmark",
@@ -8907,6 +9059,122 @@
             "time": "2026-05-26T13:18:06+00:00"
         },
         {
+            "name": "spatie/macroable",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/macroable.git",
+                "reference": "2967f69810ba4df158391665c0850010b9d1507c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/macroable/zipball/2967f69810ba4df158391665c0850010b9d1507c",
+                "reference": "2967f69810ba4df158391665c0850010b9d1507c",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "pestphp/pest": "^4",
+                "phpunit/phpunit": "^12"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\Macroable\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A trait to dynamically add methods to a class",
+            "homepage": "https://github.com/spatie/macroable",
+            "keywords": [
+                "macroable",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/macroable/issues",
+                "source": "https://github.com/spatie/macroable/tree/2.1.0"
+            },
+            "time": "2026-01-30T17:13:34+00:00"
+        },
+        {
+            "name": "spatie/menu",
+            "version": "3.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/menu.git",
+                "reference": "6b59c187e1800986bb354b849495e3cbbfff0f88"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/menu/zipball/6b59c187e1800986bb354b849495e3cbbfff0f88",
+                "reference": "6b59c187e1800986bb354b849495e3cbbfff0f88",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.0",
+                "spatie/url": "^2.0.0"
+            },
+            "require-dev": {
+                "larapack/dd": "^1.0",
+                "pestphp/pest": "^1.22",
+                "phpunit/phpunit": "^9.0",
+                "vimeo/psalm": "^4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\Menu\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian De Deyne",
+                    "email": "sebastian@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Html menu generator",
+            "homepage": "https://github.com/spatie/menu",
+            "keywords": [
+                "menu",
+                "navigation",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/menu/issues",
+                "source": "https://github.com/spatie/menu/tree/3.2.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sponsors/spatie",
+                    "type": "github"
+                },
+                {
+                    "url": "https://spatie.be/open-source/support-us",
+                    "type": "other"
+                }
+            ],
+            "time": "2025-06-13T07:09:57+00:00"
+        },
+        {
             "name": "spatie/shiki-php",
             "version": "2.4.0",
             "source": {
@@ -9031,6 +9299,68 @@
                 }
             ],
             "time": "2026-06-22T07:55:44+00:00"
+        },
+        {
+            "name": "spatie/url",
+            "version": "2.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/url.git",
+                "reference": "93a51db743cdec22b081c64593e193887c9cd395"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/url/zipball/93a51db743cdec22b081c64593e193887c9cd395",
+                "reference": "93a51db743cdec22b081c64593e193887c9cd395",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.0",
+                "psr/http-message": "^1.0 || ^2.0",
+                "spatie/macroable": "^1.0 || ^2.0"
+            },
+            "require-dev": {
+                "pestphp/pest": "^1.21"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\Url\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian De Deyne",
+                    "email": "sebastian@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Parse, build and manipulate URL's",
+            "homepage": "https://github.com/spatie/url",
+            "keywords": [
+                "spatie",
+                "url"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/url/issues",
+                "source": "https://github.com/spatie/url/tree/2.4.0"
+            },
+            "funding": [
+                {
+                    "url": "https://spatie.be/open-source/support-us",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2024-03-08T11:35:19+00:00"
         },
         {
             "name": "spomky-labs/cbor-php",
@@ -16401,7 +16731,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "lasaas/example": 20
+        "lasaas/address": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

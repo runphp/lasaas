@@ -10,5 +10,25 @@
                 "boost:mcp"
             ]
         }
+    },
+    "provider": {
+        "ollama-local": {
+            "npm": "@ai-sdk/openai-compatible",
+            "name": "本地 Ollama Qwen3.5",
+            "options": {
+                "baseURL": "http://localhost:11434/v1",
+                "apiKey": "ollama"
+            },
+            "models": {
+                "qwen3.5:9b-q4_K_M": {
+                    "name": "Qwen3.5 9B Q4_K_M 代码模型",
+                    "tool_call": true,
+                    "limit": {
+                        "context": 32768,
+                        "output": 2048
+                    }
+                }
+            }
+        }
     }
 }
