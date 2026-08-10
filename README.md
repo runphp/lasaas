@@ -333,8 +333,9 @@ lasaas/
 │   │   └── Widgets/       # 数据小组件
 │   ├── Http/              # HTTP 相关（Controllers、Middleware、Responses）
 │   ├── Livewire/          # Livewire 组件
+│   ├── Menu/              # 侧边栏菜单注册表（SidebarMenu、NavItem）
 │   ├── Models/            # Eloquent 数据模型（User、Team、Tenant、Membership等）
-│   ├── Modules/           # 模块管理器（ModuleManager、BaseModuleServiceProvider）
+│   ├── Module/            # 模块框架（ModuleServiceProvider、ModuleBootLoader、TenantRouteLoader等）
 │   ├── Notifications/     # 通知类
 │   ├── Policies/          # 授权策略类
 │   ├── Providers/         # 服务提供者
@@ -721,6 +722,39 @@ ddev composer dump-autoload
 ```
 
 4. 在 Filament 管理后台启用/禁用模块。
+
+#### 为模块添加前台侧边栏导航
+
+前台个人后台（中央 `{central_domain}/{team}/dashboard` 与租户 `{tenant_domain}/{team}/dashboard`）的侧边栏由框架统一渲染，模块在 `ModuleServiceProvider` 中覆写 `registerSidebarMenu()` 钩子注入入口即可（框架在加载模块时自动调用，无需在 `boot()` 手动注册）：
+
+```php
+use App\Enums\MenuPosition;
+use App\Menu\NavItem;
+use App\Menu\SidebarMenu;
+use Spatie\Menu\Menu;
+
+public function registerSidebarMenu(SidebarMenu $nav): void
+{
+    // 中央应用侧边栏
+    $nav->register(MenuPosition::DashboardNav, function (Menu $menu): void {
+        $menu->add(NavItem::to(route('blog.index'), __('博客'))
+            ->icon('document-text')
+            ->group('内容')
+            ->activeRoute('blog.*'));
+    });
+
+    // 租户应用侧边栏（仅在租户启用该模块后出现）
+    $nav->register(MenuPosition::TenantNav, function (Menu $menu): void {
+        $menu->add(NavItem::to(route('tenant.blog.index'), __('博客'))
+            ->icon('document-text')
+            ->group('内容')
+            ->activeRoute('tenant.blog.*'));
+    });
+}
+```
+
+- `NavItem::group()` 约定：`'Team'` 并入「团队」分组、`'Personal'` 并入「个人」分组、其他字符串为动态分组、省略则为无标题分组。
+- 租户上下文仅渲染当前租户已启用模块的入口（未启用的模块连其租户路由都未注册）。详见 `packages/README.md` 的「5.2 前台侧边栏导航菜单」。
 
 #### 命令参考
 

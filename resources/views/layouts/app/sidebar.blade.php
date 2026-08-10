@@ -12,42 +12,25 @@
 
             <livewire:team-switcher />
 
-            <flux:sidebar.nav>
-                <flux:sidebar.group :heading="__('Platform')" class="grid">
-                    <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
-                    </flux:sidebar.item>
-                </flux:sidebar.group>
-            </flux:sidebar.nav>
-
-            @php
-                $moduleNavItems = new \Illuminate\Support\Collection;
-                event(new \App\Events\FrontendNavigationCollecting($moduleNavItems, 'central'));
-            @endphp
-
-            @if ($moduleNavItems->isNotEmpty())
-                <flux:sidebar.nav>
-                    @foreach ($moduleNavItems->groupBy(fn (array $item): string => $item['group'] ?? '') as $group => $items)
-                        <flux:sidebar.group :heading="$group !== '' ? __($group) : null">
-                            @foreach ($items as $item)
-                                <flux:sidebar.item :icon="$item['icon'] ?? null" :href="$item['url']" wire:navigate>
-                                    {{ $item['label'] }}
-                                </flux:sidebar.item>
-                            @endforeach
-                        </flux:sidebar.group>
-                    @endforeach
-                </flux:sidebar.nav>
-            @endif
+            <livewire:nav.sidebar-nav position="dashboard_nav" />
 
             <flux:spacer />
 
             <flux:sidebar.nav>
-                {{--<flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    {{ __('Repository') }}
+                <flux:sidebar.item icon="folder-git-2" href="https://gitee.com/lasaas/lasaas" target="_blank">
+                    Gitee {{ __('Repository') }}
                 </flux:sidebar.item>
 
-                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                    {{ __('Documentation') }}
+                <flux:sidebar.item icon="folder-git-2" href="https://codeberg.org/lasaas/lasaas" target="_blank">
+                    Codeberg {{ __('Repository') }}
+                </flux:sidebar.item>
+
+                <flux:sidebar.item icon="folder-git-2" href="https://github.com/runphp/lasaas" target="_blank">
+                    Github {{ __('Repository') }}
+                </flux:sidebar.item>
+
+                {{--<flux:sidebar.item icon="book-open-text" href="https://github.com/runphp/lasaas" target="_blank">
+                     {{ __('Documentation') }}
                 </flux:sidebar.item>--}}
             </flux:sidebar.nav>
 

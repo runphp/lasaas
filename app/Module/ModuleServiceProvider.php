@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Module;
 
+use App\Menu\SidebarMenu;
 use App\Models\Tenant;
 use App\Module\Settings\ModulePlatformSettings;
 use App\Module\Settings\ModuleTenantSettings;
@@ -104,6 +105,33 @@ abstract class ModuleServiceProvider extends ServiceProvider
      * 自定义租户清理逻辑的模块覆盖。
      */
     public function tenantUninstall(Tenant $tenant): void
+    {
+        //
+    }
+
+    // ---------------------------------------------------------------
+    // 前台侧边栏菜单（Sidebar Menu）
+    // ---------------------------------------------------------------
+
+    /**
+     * 前台侧边栏菜单注入钩子。
+     *
+     * 模块覆盖此方法并通过 $nav 注册导航入口。$nav 即 SidebarMenu 实例。
+     * 闭包延迟到视图渲染时才执行，此时中央/租户路由已注册，route() 可用：
+     *
+     *     public function registerSidebarMenu(SidebarMenu $nav): void
+     *     {
+     *         $nav->register(MenuPosition::DashboardNav, function (Menu $menu): void {
+     *             $menu->add(NavItem::to(route('blog.index'), __('博客'))
+     *                 ->icon('document-text')
+     *                 ->group('内容')
+     *                 ->activeRoute('blog.*'));
+     *         });
+     *     }
+     *
+     * group 取值约定见 SidebarMenu。
+     */
+    public function registerSidebarMenu(SidebarMenu $nav): void
     {
         //
     }

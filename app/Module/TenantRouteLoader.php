@@ -78,6 +78,10 @@ class TenantRouteLoader
 
             $this->assertNoConflicts($router, $seenObjectIds, $signatures);
         }
+
+        // 路由文件内的 ->name() 在路由加入集合后才设置，不会自动更新命名查找表，
+        // 需手动刷新，否则 route('tenant.addresses.index') 这类命名路由无法解析。
+        $router->getRoutes()->refreshNameLookups();
     }
 
     /**

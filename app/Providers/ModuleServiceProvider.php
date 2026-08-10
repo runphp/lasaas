@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Menu\SidebarMenu;
 use App\Module\CentralRouteManager;
 use App\Module\CentralRouteQueue;
 use App\Module\Http\Middleware\EnsureModuleEnabled;
@@ -49,6 +50,9 @@ class ModuleServiceProvider extends ServiceProvider
             $app->make(ModuleDiscoveryManager::class),
             $app->make(CentralRouteQueue::class),
         ));
+
+        // 侧边栏菜单注册表：模块通过 register() 注入导航项
+        $this->app->singleton(SidebarMenu::class);
 
         // 租户设置作用域：scoped，每请求一个实例，供模块租户设置类解析 group
         $this->app->scoped(ModuleSettingsScope::class);

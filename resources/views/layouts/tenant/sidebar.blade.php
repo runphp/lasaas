@@ -12,32 +12,7 @@
 
             <livewire:team-switcher />
 
-            <flux:sidebar.nav>
-                <flux:sidebar.group :heading="__('Platform')" class="grid">
-                    <flux:sidebar.item icon="home" :href="route('tenant.dashboard')" :current="request()->routeIs('tenant.dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
-                    </flux:sidebar.item>
-                </flux:sidebar.group>
-            </flux:sidebar.nav>
-
-            @php
-                $moduleNavItems = new \Illuminate\Support\Collection;
-                event(new \App\Events\FrontendNavigationCollecting($moduleNavItems, 'tenant'));
-            @endphp
-
-            @if ($moduleNavItems->isNotEmpty())
-                <flux:sidebar.nav>
-                    @foreach ($moduleNavItems->groupBy(fn (array $item): string => $item['group'] ?? '') as $group => $items)
-                        <flux:sidebar.group :heading="$group !== '' ? __($group) : null">
-                            @foreach ($items as $item)
-                                <flux:sidebar.item :icon="$item['icon'] ?? null" :href="$item['url']" wire:navigate>
-                                    {{ $item['label'] }}
-                                </flux:sidebar.item>
-                            @endforeach
-                        </flux:sidebar.group>
-                    @endforeach
-                </flux:sidebar.nav>
-            @endif
+            <livewire:nav.sidebar-nav position="tenant_nav" />
 
             <flux:spacer />
 

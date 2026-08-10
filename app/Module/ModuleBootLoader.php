@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Module;
 
+use App\Menu\SidebarMenu;
 use App\Models\Module;
 use App\Models\Tenant;
 use App\Models\TenantModule;
@@ -103,6 +104,30 @@ class ModuleBootLoader
         if (empty($providers)) {
             $this->loadViews($module);
             $this->loadConfig($module);
+        } else {
+            $this->registerFrontendMenu($module, $providers);
+        }
+    }
+
+    /**
+     * 调用模块 provider 的前台侧边栏菜单注入钩子。
+     *
+     * 仅处理继承 ModuleServiceProvider 的 provider；将 SidebarMenu 实例
+     * 传入 registerSidebarMenu($nav)，由模块自行注册导航项。
+     * 注册前记录模块包名，供租户上下文按启用模块过滤导航项。
+     *
+     * @param  ServiceProvider[]  $providers
+     */
+    protected function registerFrontendMenu(Module $module, array $providers): void
+    {
+        foreach ($providers as $provider) {
+            if (! $provider instanceof ModuleServiceProvider) {
+                continue;
+            }
+
+            $nav = $this->app->make(SidebarMenu::class);
+
+            $nav->forModule($module->package_name, fn () => $provider->registerSidebarMenu($nav));
         }
     }
 

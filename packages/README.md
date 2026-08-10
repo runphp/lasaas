@@ -30,6 +30,24 @@ packages/custom/{vendor}/{name}/
 └── resources/views/               # 视图，命名空间为包名（/ 转 -）
 ```
 
+### 1.1 自研模块：独立 Git 仓库 + Composer 引入
+
+- **自研模块**（`packages/custom/{vendor}/{name}/`）各自维护**独立的 Git 仓库**（如 `git@gitee.com:lasaas/lasaas-address.git`），不随主项目提交——主项目 `.gitignore` 已忽略 `/packages/custom`。
+- **三方模块**（`packages/contrib/`）由 `composer require vendor/name` 安装到对应目录，同样不随主项目提交。
+
+无论来源，模块都必须**通过 Composer 引入主项目**后才会被 autoload 与 `module:sync` 识别：
+
+1. 根 `composer.json` 已配置 path 仓库（symlink）指向 `packages/custom/*/*`，自研模块无需改动该配置；
+2. 将包加入根 `composer.json` 的 `require`，或直接运行：
+
+   ```bash
+   composer require lasaas/address:@dev
+   ```
+
+3. 运行 `composer dump-autoload`，其 `post-autoload-dump` 钩子会自动执行 `module:sync`：把模块同步进 `modules` 表并生成 autoload 缓存。
+
+> 注意：修改模块 composer.json（新增类、改命名空间、改 provider）后，需重新执行 `composer dump-autoload` 生效。
+
 ## 2. composer.json
 
 ```json
@@ -223,29 +241,71 @@ class AdminBlogPlugin implements AdminPanelPlugin
 }
 ```
 
-### 5.2 前台个人后台（事件钩子）
+### 5.2 前台侧边栏导航菜单
 
-中央与租户前台共用两个事件，通过 `$area` 区分上下文：
+中央与租户前台个人后台侧边栏基于 spatie/menu + Livewire SFC 渲染，模块只需覆写一个钩子注入入口，无需关心分组与渲染细节。
 
-- `App\Events\FrontendNavigationCollecting`（侧边栏导航）
+**核心类：**
+
+- `App\Enums\MenuPosition`：菜单位置枚举（`DashboardNav = 'dashboard_nav'` | `TenantNav = 'tenant_nav'`）
+- `App\Menu\SidebarMenu`：单例注册表，`register(MenuPosition, callable)` 注入；框架在加载模块时通过 `forModule()` 自动记录入口的模块归属
+- `App\Menu\NavItem`：导航项，支持 `icon()` / `group()` / `activeRoute()`
+- `resources/views/livewire/nav/sidebar-nav.blade.php`：渲染组件（Livewire SFC），负责按分组输出 flux 侧边栏；中央/租户布局已分别挂载 `<livewire:nav.sidebar-nav position="dashboard_nav|tenant_nav">`，模块无需改动
+
+**注入入口：** 覆写 `ModuleServiceProvider::registerSidebarMenu(SidebarMenu $nav)`（框架在模块加载时自动调用，无需在 `boot()` 中手动注册）：
+
+```php
+use App\Enums\MenuPosition;
+use App\Menu\NavItem;
+use App\Menu\SidebarMenu;
+use Spatie\Menu\Menu;
+
+public function registerSidebarMenu(SidebarMenu $nav): void
+{
+    // 中央应用个人后台侧边栏
+    $nav->register(MenuPosition::DashboardNav, function (Menu $menu): void {
+        $menu->add(NavItem::to(route('blog.index'), __('博客'))
+            ->icon('document-text')
+            ->group('内容')
+            ->activeRoute('blog.*'));
+    });
+
+    // 租户应用侧边栏
+    $nav->register(MenuPosition::TenantNav, function (Menu $menu): void {
+        $menu->add(NavItem::to(route('tenant.blog.index'), __('博客'))
+            ->icon('document-text')
+            ->group('内容')
+            ->activeRoute('tenant.blog.*'));
+    });
+}
+```
+
+闭包延迟到视图渲染时才执行，此时中央/租户路由已注册，`route()` 可用。
+
+**分组约定（`NavItem::group()`）：**
+
+- `'Team'`：并入「团队」分组（如 Dashboard）
+- `'Personal'`：并入「个人」分组（如设置）
+- 其他字符串：动态分组
+- 省略 / null：无标题分组
+
+**租户隔离：** 框架按模块归属自动过滤——租户上下文构建菜单时仅包含当前租户已启用的模块入口；未启用的模块（其租户路由也未注册）不会渲染到租户侧边栏。
+
+首页模块入口卡片仍通过事件注入：
+
 - `App\Events\FrontendDashboardCardsCollecting`（首页模块入口卡片）
 
 在 ServiceProvider 的 `boot()` 中监听：
 
 ```php
-use App\Events\FrontendNavigationCollecting;
-use Illuminate\Support\Collection;
+use App\Events\FrontendDashboardCardsCollecting;
 
-Event::listen(function (FrontendNavigationCollecting $event) {
-    if ($event->area !== 'tenant') {
-        return; // 只注入租户个人后台
-    }
-
+Event::listen(function (FrontendDashboardCardsCollecting $event) {
     $event->items->push([
-        'label' => '博客',
+        'title' => __('博客'),
+        'description' => __('发布文章'),
         'url' => route('blog.index'),
         'icon' => 'document-text',
-        'group' => '内容',
     ]);
 });
 ```

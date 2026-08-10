@@ -120,6 +120,30 @@ it('dispatches enabled tenant module routes for the tenant domain', function () 
         ->assertSee('module-hello');
 });
 
+it('resolves named routes registered by tenant module route files', function () {
+    $dir = makeTestingModuleDir('dispatch-named');
+    writeModuleTenantRoutes($dir, <<<'PHP'
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+Route::get('/named', fn () => response('module-named'))->name('module.named.index');
+PHP);
+
+    $module = createDispatchModule($dir);
+    $tenant = createDispatchTenant('dispatch-named.test');
+    $tenant->setModuleEnabled($module->id, true);
+
+    app(ModuleDiscoveryManager::class)->flushCache();
+
+    $this->get('http://dispatch-named.test/named')
+        ->assertOk()
+        ->assertSee('module-named');
+
+    expect(app('router')->has('module.named.index'))->toBeTrue()
+        ->and(route('module.named.index'))->toBe('http://dispatch-named.test/named');
+});
+
 it('returns 404 for module routes not enabled for the tenant', function () {
     $dir = makeTestingModuleDir('dispatch-disabled');
     writeModuleTenantRoutes($dir, moduleHelloRoutes());
