@@ -5391,7 +5391,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitee.com:lasaas/lasaas-address.git",
-                "reference": "1f7c55ed789b9f7de0946a39ee605f80ba32b994"
+                "reference": "5e00833e7236822739d1a598d67f12dc2128a51e"
             },
             "require": {
                 "commerceguys/addressing": "^2.2",
@@ -5422,7 +5422,7 @@
                 "MIT"
             ],
             "description": "租户级地址模块，基于 commerceguys/addressing，支持中国省市区三级联动与国外地址格式。",
-            "time": "2026-08-10T02:27:39+00:00"
+            "time": "2026-08-10T13:11:24+00:00"
         },
         {
             "name": "league/commonmark",
