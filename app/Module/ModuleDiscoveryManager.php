@@ -272,19 +272,35 @@ class ModuleDiscoveryManager
      */
     protected function discoverPanelPlugins(string $interface, string $cacheKey, Closure $filter): array
     {
-        return Cache::rememberForever("lasaas.{$cacheKey}", function () use ($interface, $filter): array {
-            $plugins = [];
+        try {
+            return Cache::rememberForever(
+                "lasaas.{$cacheKey}",
+                fn (): array => $this->resolvePanelPlugins($interface, $filter),
+            );
+        } catch (\Throwable) {
+            // 缓存后端不可用（如 cache 表尚未迁移、数据库瞬断），降级为不缓存直接计算
+            return $this->resolvePanelPlugins($interface, $filter);
+        }
+    }
 
-            foreach ($this->discover()->filter($filter) as $module) {
-                foreach ($this->findPanelPluginClasses($module) as $pluginClass) {
-                    if (class_exists($pluginClass) && is_subclass_of($pluginClass, $interface)) {
-                        $plugins[] = $pluginClass;
-                    }
+    /**
+     * 计算实现指定接口的插件类列表（不做缓存）。
+     *
+     * @return array<class-string>
+     */
+    protected function resolvePanelPlugins(string $interface, Closure $filter): array
+    {
+        $plugins = [];
+
+        foreach ($this->discover()->filter($filter) as $module) {
+            foreach ($this->findPanelPluginClasses($module) as $pluginClass) {
+                if (class_exists($pluginClass) && is_subclass_of($pluginClass, $interface)) {
+                    $plugins[] = $pluginClass;
                 }
             }
+        }
 
-            return array_values(array_unique($plugins));
-        });
+        return array_values(array_unique($plugins));
     }
 
     /**

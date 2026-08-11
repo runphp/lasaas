@@ -6,6 +6,7 @@ use App\Module\ModuleDiscoveryManager;
 use App\Providers\Filament\AdminPanelProvider;
 use App\Providers\Filament\TenantAdminPanelProvider;
 use Filament\Panel;
+use Illuminate\Support\Facades\Cache;
 use Tests\Fixtures\Modules\PanelExt\Filament\Plugins\AdminBlogPlugin;
 use Tests\Fixtures\Modules\PanelExt\Filament\Plugins\TenantBlogPlugin;
 use Tests\Fixtures\Modules\PanelExt\PanelExtServiceProvider;
@@ -42,6 +43,17 @@ test('tenant admin panel plugins are discovered by convention from tenant module
 
     expect($plugins)->toContain(TenantBlogPlugin::class)
         ->and($plugins)->not->toContain(AdminBlogPlugin::class);
+});
+
+test('admin panel plugins resolve without cache when cache store is unavailable', function () {
+    Cache::shouldReceive('rememberForever')
+        ->once()
+        ->andThrow(new RuntimeException('cache table missing'));
+
+    $plugins = app(ModuleDiscoveryManager::class)->getAdminPanelPlugins();
+
+    expect($plugins)->toContain(AdminBlogPlugin::class)
+        ->and($plugins)->not->toContain(TenantBlogPlugin::class);
 });
 
 test('admin panel registers module admin panel plugins', function () {
