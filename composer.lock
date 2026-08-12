@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8d6d111b3367052a15c63bd1837fa2ac",
+    "content-hash": "eed3f78740f46fd216be31cc1204b8fc",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -1380,6 +1380,66 @@
                 }
             ],
             "time": "2025-08-20T19:15:30+00:00"
+        },
+        {
+            "name": "crumbls/layup",
+            "version": "v1.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Crumbls/layup.git",
+                "reference": "8d4c567db4adf1d35a24e51ccff49b9426db67fa"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Crumbls/layup/zipball/8d4c567db4adf1d35a24e51ccff49b9426db67fa",
+                "reference": "8d4c567db4adf1d35a24e51ccff49b9426db67fa",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "laravel/framework": "^12.0 || ^13.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.27",
+                "orchestra/testbench": "^10.0 || ^11.0",
+                "pestphp/pest": "^3.0",
+                "rector/rector": "^2.3"
+            },
+            "suggest": {
+                "livewire/livewire": "Required only when using BaseLivewireWidget to render widgets through Livewire components (^3.0)."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Crumbls\\Layup\\LayupServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Crumbls\\Layup\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A visual page builder plugin for Filament 5 — Divi-style grid layouts with extensible widgets.",
+            "homepage": "https://github.com/crumbls/layup",
+            "support": {
+                "docs": "https://crumbls.com/documentation/layup",
+                "issues": "https://github.com/crumbls/layup/issues",
+                "source": "https://github.com/crumbls/layup"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/Crumbls",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-08-08T20:48:44+00:00"
         },
         {
             "name": "danharrin/date-format-converter",

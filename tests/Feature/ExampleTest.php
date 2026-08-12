@@ -1,7 +1,15 @@
 <?php
 
-test('returns a successful response', function () {
-    $response = $this->get(route('home'));
+use Crumbls\Layup\Models\Page;
 
-    $response->assertOk();
+test('returns a successful response', function () {
+    Page::create([
+        'slug' => 'home',
+        'path' => 'home',
+        'title' => 'Home',
+        'status' => Page::STATUS_PUBLISHED,
+        'content' => ['rows' => []],
+    ]);
+
+    $this->get(route('home'))->assertOk();
 });

@@ -1,27 +1,32 @@
 <?php
 
 use App\Http\Middleware\EnsureTeamMembership;
+use Crumbls\Layup\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 use LaravelLang\Locales\Facades\Locales;
 
 $installedLocales = Locales::installed()->pluck('code')->all();
-Route::livewire('/{locale?}', 'pages::home')
+Route::get('/{locale?}', PageController::class)
     ->name('home')
+    ->defaults('slug', 'home')
     ->whereIn('locale', $installedLocales)
     ->middleware('localization.home');
 
-Route::livewire('/pricing/{locale?}', 'pages::pricing')
+Route::get('/pricing/{locale?}', PageController::class)
     ->name('pricing')
+    ->defaults('slug', 'pricing')
     ->whereIn('locale', $installedLocales)
     ->middleware('localization.home');
 
-Route::livewire('/features/{locale?}', 'pages::features')
+Route::get('/features/{locale?}', PageController::class)
     ->name('features')
+    ->defaults('slug', 'features')
     ->whereIn('locale', $installedLocales)
     ->middleware('localization.home');
 
-Route::livewire('/about/{locale?}', 'pages::about')
+Route::get('/about/{locale?}', PageController::class)
     ->name('about')
+    ->defaults('slug', 'about')
     ->whereIn('locale', $installedLocales)
     ->middleware('localization.home');
 

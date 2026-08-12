@@ -1,0 +1,1 @@
+- 本项目（lasaas）用 ddev 运行，artisan/测试应在 ddev 容器内执行；宿主机的 PHP（/opt/homebrew/bin/php）与容器共享 storage/，宿主机编译视图会把宿主机绝对路径写进 storage/framework/views，导致容器内渲染 filemtime() 500，需 ddev artisan view:clear 修复。

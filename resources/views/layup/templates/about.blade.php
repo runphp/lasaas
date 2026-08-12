@@ -1,28 +1,7 @@
-<?php
-
-use App\Models\Page;
-use Livewire\Attributes\Layout;
-use Livewire\Component;
-
-new #[Layout('layouts::landing')] class extends Component
-{
-    public string $locale;
-
-    public function mount(): void
-    {
-        $this->locale = app()->getLocale();
-        $page = Page::findBySlug('about');
-        view()->share('title', $page?->title ?? __('About'));
-    }
-
-    public function t(string $key): string
-    {
-        return $this->texts()[$key][$this->locale] ?? $key;
-    }
-
-    private function texts(): array
-    {
-        return [
+@php
+    $locale = app()->getLocale();
+    $title = $page->title ?? __('About');
+    $texts = [
             'hero_badge' => [
                 'zh-CN' => 'SOHO 全栈开发',
                 'en' => 'SOHO Full-Stack Development',
@@ -180,8 +159,11 @@ new #[Layout('layouts::landing')] class extends Component
                 'en' => 'Contact Me',
             ],
         ];
-    }
-}; ?>
+
+    $t = fn (string $key): string => $texts[$key][$locale] ?? $key;
+@endphp
+
+<x-layouts::landing.default :title="$page->title ?? null">
 
 <flux:main>
 
@@ -191,10 +173,10 @@ new #[Layout('layouts::landing')] class extends Component
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-gradient-to-b from-blue-100/60 via-indigo-50/30 to-transparent blur-3xl dark:from-blue-900/20 dark:via-indigo-900/10"></div>
         </div>
         <div class="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-            <flux:badge color="blue" class="!rounded-full !px-3 !py-1 !text-xs">{{ $this->t('hero_badge') }}</flux:badge>
-            <flux:heading size="xl" class="mt-6">{{ $this->t('hero_heading') }}</flux:heading>
+            <flux:badge color="blue" class="!rounded-full !px-3 !py-1 !text-xs">{{ $t('hero_badge') }}</flux:badge>
+            <flux:heading size="xl" class="mt-6">{{ $t('hero_heading') }}</flux:heading>
             <flux:text class="mx-auto mt-6 max-w-2xl !text-lg !leading-relaxed">
-                {{ $this->t('hero_desc') }}
+                {{ $t('hero_desc') }}
             </flux:text>
         </div>
     </section>
@@ -203,39 +185,39 @@ new #[Layout('layouts::landing')] class extends Component
     <section class="border-t border-zinc-100 bg-zinc-50/50 py-24 dark:border-zinc-800/50 dark:bg-zinc-900/50">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-3xl text-center">
-                <flux:badge color="green" class="!rounded-full !px-3 !py-1 !text-xs">{{ $this->t('services_badge') }}</flux:badge>
-                <flux:heading size="lg" class="mt-6">{{ $this->t('services_heading') }}</flux:heading>
+                <flux:badge color="green" class="!rounded-full !px-3 !py-1 !text-xs">{{ $t('services_badge') }}</flux:badge>
+                <flux:heading size="lg" class="mt-6">{{ $t('services_heading') }}</flux:heading>
             </div>
             <div class="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg dark:hover:border-blue-800">
                     <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/50 dark:to-blue-800/50 text-2xl">🆕</div>
-                    <flux:heading class="mt-5 !text-base">{{ $this->t('service_new_title') }}</flux:heading>
-                    <flux:text class="mt-2">{{ $this->t('service_new_desc') }}</flux:text>
+                    <flux:heading class="mt-5 !text-base">{{ $t('service_new_title') }}</flux:heading>
+                    <flux:text class="mt-2">{{ $t('service_new_desc') }}</flux:text>
                 </flux:card>
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-amber-200 hover:shadow-lg dark:hover:border-amber-800">
                     <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/50 dark:to-amber-800/50 text-2xl">🔧</div>
-                    <flux:heading class="mt-5 !text-base">{{ $this->t('service_maintenance_title') }}</flux:heading>
-                    <flux:text class="mt-2">{{ $this->t('service_maintenance_desc') }}</flux:text>
+                    <flux:heading class="mt-5 !text-base">{{ $t('service_maintenance_title') }}</flux:heading>
+                    <flux:text class="mt-2">{{ $t('service_maintenance_desc') }}</flux:text>
                 </flux:card>
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-purple-200 hover:shadow-lg dark:hover:border-purple-800">
                     <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/50 dark:to-purple-800/50 text-2xl">⬆️</div>
-                    <flux:heading class="mt-5 !text-base">{{ $this->t('service_upgrade_title') }}</flux:heading>
-                    <flux:text class="mt-2">{{ $this->t('service_upgrade_desc') }}</flux:text>
+                    <flux:heading class="mt-5 !text-base">{{ $t('service_upgrade_title') }}</flux:heading>
+                    <flux:text class="mt-2">{{ $t('service_upgrade_desc') }}</flux:text>
                 </flux:card>
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-green-200 hover:shadow-lg dark:hover:border-green-800">
                     <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/50 dark:to-green-800/50 text-2xl">⚡</div>
-                    <flux:heading class="mt-5 !text-base">{{ $this->t('service_performance_title') }}</flux:heading>
-                    <flux:text class="mt-2">{{ $this->t('service_performance_desc') }}</flux:text>
+                    <flux:heading class="mt-5 !text-base">{{ $t('service_performance_title') }}</flux:heading>
+                    <flux:text class="mt-2">{{ $t('service_performance_desc') }}</flux:text>
                 </flux:card>
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-rose-200 hover:shadow-lg dark:hover:border-rose-800">
                     <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-rose-100 to-rose-200 dark:from-rose-900/50 dark:to-rose-800/50 text-2xl">🔗</div>
-                    <flux:heading class="mt-5 !text-base">{{ $this->t('service_integration_title') }}</flux:heading>
-                    <flux:text class="mt-2">{{ $this->t('service_integration_desc') }}</flux:text>
+                    <flux:heading class="mt-5 !text-base">{{ $t('service_integration_title') }}</flux:heading>
+                    <flux:text class="mt-2">{{ $t('service_integration_desc') }}</flux:text>
                 </flux:card>
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-lg dark:hover:border-teal-800">
                     <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal-100 to-teal-200 dark:from-teal-900/50 dark:to-teal-800/50 text-2xl">🎯</div>
-                    <flux:heading class="mt-5 !text-base">{{ $this->t('service_consulting_title') }}</flux:heading>
-                    <flux:text class="mt-2">{{ $this->t('service_consulting_desc') }}</flux:text>
+                    <flux:heading class="mt-5 !text-base">{{ $t('service_consulting_title') }}</flux:heading>
+                    <flux:text class="mt-2">{{ $t('service_consulting_desc') }}</flux:text>
                 </flux:card>
             </div>
         </div>
@@ -245,13 +227,13 @@ new #[Layout('layouts::landing')] class extends Component
     <section class="py-24">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-3xl text-center">
-                <flux:badge color="purple" class="!rounded-full !px-3 !py-1 !text-xs">{{ $this->t('tech_badge') }}</flux:badge>
-                <flux:heading size="lg" class="mt-6">{{ $this->t('tech_heading') }}</flux:heading>
-                <flux:text class="mt-4">{{ $this->t('tech_desc') }}</flux:text>
+                <flux:badge color="purple" class="!rounded-full !px-3 !py-1 !text-xs">{{ $t('tech_badge') }}</flux:badge>
+                <flux:heading size="lg" class="mt-6">{{ $t('tech_heading') }}</flux:heading>
+                <flux:text class="mt-4">{{ $t('tech_desc') }}</flux:text>
             </div>
             <div class="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-red-200 hover:shadow-lg dark:hover:border-red-800">
-                    <flux:heading class="!text-base !font-semibold">{{ $this->t('tech_frameworks_label') }}</flux:heading>
+                    <flux:heading class="!text-base !font-semibold">{{ $t('tech_frameworks_label') }}</flux:heading>
                     <div class="mt-4 flex flex-wrap gap-2">
                         <flux:badge color="red" class="!rounded-lg">Laravel</flux:badge>
                         <flux:badge color="blue" class="!rounded-lg">ThinkPHP</flux:badge>
@@ -264,7 +246,7 @@ new #[Layout('layouts::landing')] class extends Component
                     </div>
                 </flux:card>
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-sky-200 hover:shadow-lg dark:hover:border-sky-800">
-                    <flux:heading class="!text-base !font-semibold">{{ $this->t('tech_lang_label') }}</flux:heading>
+                    <flux:heading class="!text-base !font-semibold">{{ $t('tech_lang_label') }}</flux:heading>
                     <div class="mt-4 flex flex-wrap gap-2">
                         <flux:badge color="sky" class="!rounded-lg">PHP 7.x</flux:badge>
                         <flux:badge color="sky" class="!rounded-lg">PHP 8.x</flux:badge>
@@ -276,7 +258,7 @@ new #[Layout('layouts::landing')] class extends Component
                     </div>
                 </flux:card>
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-lg dark:hover:border-indigo-800">
-                    <flux:heading class="!text-base !font-semibold">{{ $this->t('tech_direction_label') }}</flux:heading>
+                    <flux:heading class="!text-base !font-semibold">{{ $t('tech_direction_label') }}</flux:heading>
                     <div class="mt-4 flex flex-wrap gap-2">
                         <flux:badge color="indigo" class="!rounded-lg">纯后端</flux:badge>
                         <flux:badge color="purple" class="!rounded-lg">前后端分离</flux:badge>
@@ -285,7 +267,7 @@ new #[Layout('layouts::landing')] class extends Component
                     </div>
                 </flux:card>
                 <flux:card class="group transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-lg dark:hover:border-emerald-800">
-                    <flux:heading class="!text-base !font-semibold">{{ $this->t('tech_other_label') }}</flux:heading>
+                    <flux:heading class="!text-base !font-semibold">{{ $t('tech_other_label') }}</flux:heading>
                     <div class="mt-4 flex flex-wrap gap-2">
                         <flux:badge color="emerald" class="!rounded-lg">Docker</flux:badge>
                         <flux:badge color="teal" class="!rounded-lg">Git</flux:badge>
@@ -301,8 +283,8 @@ new #[Layout('layouts::landing')] class extends Component
     <section class="border-t border-zinc-100 bg-zinc-50/50 py-24 dark:border-zinc-800/50 dark:bg-zinc-900/50">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-3xl text-center">
-                <flux:badge color="amber" class="!rounded-full !px-3 !py-1 !text-xs">{{ $this->t('workflow_badge') }}</flux:badge>
-                <flux:heading size="lg" class="mt-6">{{ $this->t('workflow_heading') }}</flux:heading>
+                <flux:badge color="amber" class="!rounded-full !px-3 !py-1 !text-xs">{{ $t('workflow_badge') }}</flux:badge>
+                <flux:heading size="lg" class="mt-6">{{ $t('workflow_heading') }}</flux:heading>
             </div>
             <div class="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
                 @php
@@ -317,8 +299,8 @@ new #[Layout('layouts::landing')] class extends Component
                 @foreach ($steps as $step)
                     <flux:card class="group text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                         <div class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-zinc-100 to-zinc-200 text-2xl dark:from-zinc-800 dark:to-zinc-700">{{ $step['emoji'] }}</div>
-                        <flux:heading class="mt-4 !text-base">{{ $this->t($step['title_key']) }}</flux:heading>
-                        <flux:text class="mt-2 !text-sm">{{ $this->t($step['desc_key']) }}</flux:text>
+                        <flux:heading class="mt-4 !text-base">{{ $t($step['title_key']) }}</flux:heading>
+                        <flux:text class="mt-2 !text-sm">{{ $t($step['desc_key']) }}</flux:text>
                     </flux:card>
                 @endforeach
             </div>
@@ -329,12 +311,12 @@ new #[Layout('layouts::landing')] class extends Component
     <section class="relative overflow-hidden border-t border-zinc-100 dark:border-zinc-800/50">
         <div class="absolute inset-0 bg-gradient-to-b from-blue-50/30 to-indigo-50/30 dark:from-blue-950/10 dark:to-indigo-950/10"></div>
         <div class="relative mx-auto max-w-3xl px-4 py-24 text-center sm:px-6 lg:px-8">
-            <flux:heading size="lg">{{ $this->t('cta_heading') }}</flux:heading>
+            <flux:heading size="lg">{{ $t('cta_heading') }}</flux:heading>
             <flux:text class="mt-4 !text-lg">
-                {!! $this->t('cta_desc') !!}
+                {!! $t('cta_desc') !!}
             </flux:text>
             <div class="mt-10">
-                <flux:heading size="base" class="!font-semibold">{{ $this->t('contact_label') }}</flux:heading>
+                <flux:heading size="base" class="!font-semibold">{{ $t('contact_label') }}</flux:heading>
                 <div class="mt-4 inline-flex items-center gap-3 rounded-2xl border border-green-200 bg-green-50 px-8 py-4 text-lg font-semibold text-green-700 shadow-sm dark:border-green-800 dark:bg-green-950 dark:text-green-300">
                     <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 0 1 .598.082l1.584.926a.272.272 0 0 0 .14.047c.134 0 .24-.111.24-.247 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 0 1-.023-.156.49.49 0 0 1 .201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.952-7.062-6.122zm-2.18 2.769c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.97-.982z"/></svg>
                     <span class="whitespace-nowrap">微信：runphp</span>
@@ -344,3 +326,4 @@ new #[Layout('layouts::landing')] class extends Component
     </section>
 
 </flux:main>
+</x-layouts::landing.default>

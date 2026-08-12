@@ -30,12 +30,6 @@ return [
             'add_feature' => 'Add Feature',
         ],
     ],
-    'page' => [
-        'label' => 'Page Management',
-        'model' => [
-            'label' => 'Page',
-        ],
-    ],
     'tenant' => [
         'label' => 'Tenant Management',
         'model' => [

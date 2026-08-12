@@ -30,12 +30,6 @@ return [
             'add_feature' => '添加功能',
         ],
     ],
-    'page' => [
-        'label' => '页面管理',
-        'model' => [
-            'label' => '页面',
-        ],
-    ],
     'tenant' => [
         'label' => '租户管理',
         'model' => [

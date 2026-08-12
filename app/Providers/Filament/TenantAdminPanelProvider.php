@@ -2,13 +2,13 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Resources\Pages\PageResource;
 use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Teams\TeamResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Filament\TenantAdmin\Pages\Dashboard;
 use App\Module\ModuleDiscoveryManager;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Crumbls\Layup\LayupPlugin;
 use Filament\Contracts\Plugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -44,7 +44,6 @@ class TenantAdminPanelProvider extends PanelProvider
             ->resources([
                 UserResource::class,
                 RoleResource::class,
-                PageResource::class,
                 TeamResource::class,
             ])
             ->discoverPages(in: app_path('Filament/TenantAdmin/Pages'), for: 'App\Filament\TenantAdmin\Pages')
@@ -77,6 +76,7 @@ class TenantAdminPanelProvider extends PanelProvider
             ])->plugins([
                 FilamentShieldPlugin::make(),
                 WorkspaceTabsPlugin::make(),
+                LayupPlugin::make(),
                 ...static::getModulePlugins(),
             ]);
     }

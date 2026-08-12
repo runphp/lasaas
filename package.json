@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
+        "build": "php artisan layup:safelist && vite build",
         "dev": "vite"
     },
     "dependencies": {

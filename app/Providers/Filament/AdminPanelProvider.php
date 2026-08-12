@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Dashboard;
 use App\Module\ModuleDiscoveryManager;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Crumbls\Layup\LayupPlugin;
 use Filament\Contracts\Plugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -64,6 +65,7 @@ class AdminPanelProvider extends PanelProvider
             ])->plugins([
                 FilamentShieldPlugin::make(),
                 WorkspaceTabsPlugin::make(),
+                LayupPlugin::make(),
                 ...static::getModulePlugins(),
             ]);
     }

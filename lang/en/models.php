@@ -33,14 +33,6 @@ return [
             'tenant' => 'Tenant Application',
         ],
     ],
-    'page' => [
-        'slug' => 'Slug',
-        'title' => 'Title',
-        'layout' => 'Layout',
-        'meta' => 'Meta',
-        'content' => 'Content',
-        'is_published' => 'Is Published',
-    ],
     'tenant' => [
         'id' => 'ID',
         'name' => 'Name',

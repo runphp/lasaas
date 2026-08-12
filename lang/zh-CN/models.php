@@ -33,14 +33,6 @@ return [
             'tenant' => '租户应用',
         ],
     ],
-    'page' => [
-        'slug' => 'URL别名',
-        'title' => '标题',
-        'layout' => '布局',
-        'meta' => 'Meta',
-        'content' => '内容',
-        'is_published' => '是否发布',
-    ],
     'tenant' => [
         'id' => 'ID',
         'name' => '租户名称',
